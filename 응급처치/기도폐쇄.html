@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기도 폐쇄, 빠르게 대처해요! - 5학년 보건교실</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            title: ['Jua', 'sans-serif'],
+            sans: ['Noto Sans KR', 'sans-serif'],
+          },
+          colors: {
+            health: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            },
+            danger: {
+              500: '#ef4444',
+              600: '#dc2626',
+            },
+            point: {
+              amber: '#f59e0b',
+              sky: '#0ea5e9'
+            }
+          },
+          keyframes: {
+            chokeShake: {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '20%, 60%': { transform: 'translateX(-6px) rotate(-2deg)' },
+              '40%, 80%': { transform: 'translateX(6px) rotate(2deg)' },
+            },
+            popOut: {
+              '0%': { transform: 'scale(0.3) translateY(20px)', opacity: '0' },
+              '70%': { transform: 'scale(1.2) translateY(-40px)', opacity: '1' },
+              '100%': { transform: 'scale(1) translateY(-60px)', opacity: '0' }
+            },
+            pulseGlow: {
+              '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.6)' },
+              '50%': { transform: 'scale(1.08)', boxShadow: '0 0 0 15px rgba(239, 68, 68, 0)' }
+            }
+          },
+          animation: {
+            'choke-shake': 'chokeShake 0.6s infinite ease-in-out',
+            'pop-out': 'popOut 0.8s forwards ease-out',
+            'pulse-glow': 'pulseGlow 1.4s infinite'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-shadow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+    .touch-action-none {
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col selection:bg-emerald-200">
+
+  <!-- Navigation Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('intro')">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-200">
+          <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase bg-emerald-50 px-2 py-0.5 rounded-full">초등학교 5학년 보건</span>
+          <h1 class="font-title text-xl text-slate-800 tracking-tight">기도 폐쇄, 빠르게 대처해요!</h1>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl text-sm font-bold">
+        <button id="nav-btn-intro" onclick="showSection('intro')" class="nav-tab px-3 py-1.5 rounded-xl transition bg-white text-emerald-600 shadow-sm">
+          단원 열기
+        </button>
+        <button id="nav-btn-step1" onclick="showSection('step1')" class="nav-tab px-3 py-1.5 rounded-xl transition text-slate-600 hover:text-slate-900">
+          1. 증상 판별 퀴즈
+        </button>
+        <button id="nav-btn-step2" onclick="showSection('step2')" class="nav-tab px-3 py-1.5 rounded-xl transition text-slate-600 hover:text-slate-900">
+          2. 119 하임리히 실습
+        </button>
+        <button id="nav-btn-step3" onclick="showSection('step3')" class="nav-tab px-3 py-1.5 rounded-xl transition text-slate-600 hover:text-slate-900">
+          3. 혼자 대처 & 다지기
+        </button>
+      </nav>
+
+      <!-- Sound Toggle & Reset -->
+      <div class="flex items-center gap-2">
+        <button id="sound-btn" onclick="toggleSound()" title="소리 켜기/끄기" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600">
+          <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
+        </button>
+        <button onclick="resetAllActivities()" title="처음부터 다시하기" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600">
+          <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Sub Tabs -->
+    <div class="flex md:hidden overflow-x-auto border-t border-slate-100 px-3 py-2 gap-1 text-xs font-bold no-scrollbar">
+      <button id="m-nav-intro" onclick="showSection('intro')" class="px-3 py-1.5 rounded-lg whitespace-nowrap bg-emerald-500 text-white">단원열기</button>
+      <button id="m-nav-step1" onclick="showSection('step1')" class="px-3 py-1.5 rounded-lg whitespace-nowrap bg-slate-200 text-slate-700">1. 증상구분</button>
+      <button id="m-nav-step2" onclick="showSection('step2')" class="px-3 py-1.5 rounded-lg whitespace-nowrap bg-slate-200 text-slate-700">2. 응급처치 실습</button>
+      <button id="m-nav-step3" onclick="showSection('step3')" class="px-3 py-1.5 rounded-lg whitespace-nowrap bg-slate-200 text-slate-700">3. 혼자 대처 & 퀴즈</button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-start">
+
+    <!-- ===================== SECTION 0: INTRO / 생각 열기 ===================== -->
+    <section id="section-intro" class="space-y-6">
+      <!-- 교과서 124쪽 생각열기 배너 -->
+      <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-12 -bottom-12 opacity-15 pointer-events-none">
+          <i data-lucide="shield-alert" class="w-80 h-80"></i>
+        </div>
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-3">
+            <span>교과서 124~125쪽</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-300"></span>
+            <span>생각 열기: 배고팠던 누리의 이야기</span>
+          </div>
+          <h2 class="font-title text-2xl sm:text-4xl mb-3 leading-snug">
+            "켁! 켁! 켁! 갑자기 숨이 안 쉬어져요!"
+          </h2>
+          <p class="text-white/90 text-sm sm:text-base leading-relaxed mb-6 font-medium">
+            아침밥을 거르고 햄버거를 급하게 한 입 크게 베어 문 누리! 
+            음식물이 숨길(기도)을 막아 질식할 위험에 처했어요. 
+            뇌세포는 산소가 <strong>4~6분만 부족해도 치명적인 손상</strong>을 입습니다. 
+            여러분은 누리를 구할 수 있을까요?
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="showSection('step1'); playToneSound('start');" class="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-title text-base sm:text-lg px-6 py-3 rounded-2xl shadow-lg shadow-yellow-500/30 flex items-center gap-2 transition active:scale-95">
+              <span>수업 시작하기 (3단계 훈련)</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+            <button onclick="openModal('causeModal')" class="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-3 rounded-2xl backdrop-blur transition flex items-center gap-2 text-sm">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+              <span>기도 폐쇄의 4가지 원인 보기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3가지 핵심 활동 카드 안내 (교과서 핵심 연계) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <!-- 1번 카드 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 hover:shadow-md transition cursor-pointer group" onclick="showSection('step1')">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-title text-xl mb-4 group-hover:scale-110 transition">
+            1
+          </div>
+          <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">교과서 125쪽</span>
+          <h3 class="font-title text-lg text-slate-800 mt-1 mb-2">가벼운 폐쇄 vs 심각한 폐쇄</h3>
+          <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
+            '초킹 사인'을 알아채고 스스로 기침해야 할 때와 119 신고가 필요한 순간을 정확히 판단해요.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-emerald-600 gap-1">
+            <span>판별 퀴즈 시작</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </div>
+        </div>
+
+        <!-- 2번 카드 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 hover:shadow-md transition cursor-pointer group" onclick="showSection('step2')">
+          <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-title text-xl mb-4 group-hover:scale-110 transition">
+            2
+          </div>
+          <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md">교과서 126~127쪽</span>
+          <h3 class="font-title text-lg text-slate-800 mt-1 mb-2">119 복부 밀어내기 시뮬레이션</h3>
+          <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
+            등 두드리기 5회, 손 위치(명치와 배꼽 사이) 찾기, 위쪽으로 밀어올리기(하임리히법) 5단계를 실습해요.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-emerald-600 gap-1">
+            <span>응급처치 실습</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </div>
+        </div>
+
+        <!-- 3번 카드 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-emerald-400 hover:shadow-md transition cursor-pointer group" onclick="showSection('step3')">
+          <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-title text-xl mb-4 group-hover:scale-110 transition">
+            3
+          </div>
+          <span class="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md">교과서 128쪽</span>
+          <h3 class="font-title text-lg text-slate-800 mt-1 mb-2">혼자 있을 때 & 스스로 다지기</h3>
+          <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
+            주변에 아무도 없을 때 의자 등받이를 이용하는 방법과 교과서 빈칸 퀴즈를 풀고 수료증을 받아요.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-emerald-600 gap-1">
+            <span>자가 대처 & 골든벨</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 인체 구조 지식 팁 (교과서 용어 설명) -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 flex flex-col sm:flex-row items-center gap-5">
+        <div class="w-20 h-20 rounded-full bg-emerald-50 flex-shrink-0 flex items-center justify-center text-emerald-600">
+          <!-- 기도와 식도 모식 SVG -->
+          <svg viewBox="0 0 100 100" class="w-14 h-14" fill="none" stroke="currentColor" stroke-width="4">
+            <path d="M50 15 C45 25 35 30 35 50 L35 85" stroke="currentColor" stroke-linecap="round"/>
+            <path d="M50 15 C55 25 65 30 65 50 L65 85" stroke="#f59e0b" stroke-linecap="round"/>
+            <circle cx="50" cy="18" r="8" fill="#10b981"/>
+            <path d="M40 38 L60 38" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="flex-1 text-center sm:text-left">
+          <h4 class="font-title text-base text-slate-800 flex items-center justify-center sm:justify-start gap-2">
+            <span>[보건 쏙쏙 상식] 숨길(기도)과 음식길(식도)</span>
+            <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-sans font-semibold">교과서 125쪽</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+            평소에는 <strong>후두덮개</strong>라는 작은 뚜껑이 숨구멍(기도)을 덮어주어 음식이 식도로만 넘어가게 해줘요. 하지만 음식을 먹으면서 뛰거나 장난치면 후두덮개가 제때 닫히지 못해 음식이 기도로 쏙 들어가 목이 막히게 됩니다!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 1: 가벼운 vs 심각한 폐쇄 판별 ===================== -->
+    <section id="section-step1" class="hidden space-y-6">
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200">
+        <div>
+          <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">1단계 미션</span>
+          <h2 class="font-title text-2xl text-slate-800 mt-1">골든타임을 지켜라! 증상 판별 훈련</h2>
+          <p class="text-xs sm:text-sm text-slate-500">각 증상을 보고 <strong>"스스로 기침 유도"</strong>할지, 즉시 <strong>"119 신고 & 복부밀어내기"</strong>를 할지 선택하세요!</p>
+        </div>
+        <div class="flex items-center gap-3 self-end sm:self-center">
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block font-bold">진행 상황</span>
+            <span id="q-counter" class="font-title text-xl text-emerald-600">1 / 5</span>
+          </div>
+          <div class="w-12 h-12 rounded-full border-4 border-emerald-500 flex items-center justify-center font-title text-lg text-emerald-700 bg-emerald-50">
+            <span id="quiz-score">0</span>점
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Main Card -->
+      <div id="quiz-card-container" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden text-center">
+        <!-- Choking Sign Special Alert Badge -->
+        <div id="choking-sign-badge" class="hidden inline-flex items-center gap-1.5 bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-extrabold mb-3 animate-pulse">
+          <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          <span>초킹 사인(Choking Sign) 포착!</span>
+        </div>
+
+        <!-- Animated Scenario Character Graphic -->
+        <div class="w-40 h-40 mx-auto my-2 relative flex items-center justify-center">
+          <!-- Visual Circle Background -->
+          <div id="quiz-avatar-bg" class="w-36 h-36 rounded-full bg-slate-100 flex items-center justify-center transition-all duration-300">
+            <!-- Dynamic SVG Icon / Character -->
+            <div id="quiz-avatar-illustration">
+              <!-- Default Face SVG -->
+              <svg viewBox="0 0 120 120" class="w-28 h-28">
+                <circle cx="60" cy="60" r="45" fill="#fed7aa"/>
+                <!-- Eyes -->
+                <circle cx="45" cy="52" r="5" fill="#334155"/>
+                <circle cx="75" cy="52" r="5" fill="#334155"/>
+                <!-- Mouth -->
+                <ellipse id="quiz-mouth" cx="60" cy="78" rx="14" ry="10" fill="#dc2626"/>
+                <!-- Hands grasping neck (Choking Sign) -->
+                <g id="quiz-hands-neck" class="hidden">
+                  <path d="M35 85 C35 75 50 78 52 82" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M85 85 C85 75 70 78 68 82" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Symptom Description -->
+        <div class="max-w-xl mx-auto my-4">
+          <span id="quiz-patient-name" class="text-xs font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-600">환자 상황 1</span>
+          <h3 id="quiz-symptom-text" class="font-title text-xl sm:text-2xl text-slate-800 mt-2 mb-2 leading-snug">
+            "켁! 켁! 기침 소리를 내며 말을 할 수 있어요. 얼굴이 약간 붉어졌어요."
+          </h3>
+          <p id="quiz-subtext" class="text-xs sm:text-sm text-slate-500 font-medium">
+            숨을 어느 정도 쉴 수 있는 상태입니다. 어떤 처치를 해야 할까요?
+          </p>
+        </div>
+
+        <!-- Choice Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto mt-6">
+          <!-- Button A: Mild -->
+          <button onclick="handleAnswer('mild')" class="p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-900 font-title text-lg flex flex-col items-center gap-1 transition shadow-sm">
+            <span class="flex items-center gap-2">
+              <i data-lucide="smile" class="w-5 h-5 text-emerald-600"></i>
+              <span>스스로 기침 유도</span>
+            </span>
+            <span class="text-xs font-sans text-emerald-700">가벼운 기도 폐쇄 (스스로 뱉어내게 격려)</span>
+          </button>
+
+          <!-- Button B: Severe -->
+          <button onclick="handleAnswer('severe')" class="p-4 rounded-2xl border-2 border-red-300 bg-red-50 hover:bg-red-100 active:scale-95 text-red-900 font-title text-lg flex flex-col items-center gap-1 transition shadow-sm">
+            <span class="flex items-center gap-2">
+              <i data-lucide="siren" class="w-5 h-5 text-red-600"></i>
+              <span>119 신고 & 복부밀어내기</span>
+            </span>
+            <span class="text-xs font-sans text-red-700">심각한 기도 폐쇄 (즉각 응급처치 필요)</span>
+          </button>
+        </div>
+
+        <!-- Feedback Alert Toast (Hidden by default) -->
+        <div id="quiz-feedback" class="hidden mt-6 p-4 rounded-2xl max-w-lg mx-auto text-left flex items-start gap-3 transition-all animate-bounce-short">
+          <div id="feedback-icon" class="p-2 rounded-xl flex-shrink-0"></div>
+          <div>
+            <h4 id="feedback-title" class="font-title text-base"></h4>
+            <p id="feedback-desc" class="text-xs sm:text-sm mt-0.5 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- Next Quiz Button -->
+        <div class="mt-6">
+          <button id="next-q-btn" onclick="nextQuestion()" class="hidden bg-slate-800 hover:bg-slate-700 text-white font-title px-6 py-2.5 rounded-xl transition items-center gap-2 mx-auto">
+            <span>다음 상황 판별하기</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 교과서 125쪽 비교표 요약 카드 -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 overflow-x-auto">
+        <h4 class="font-title text-base text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-emerald-600"></i>
+          <span>교과서 125쪽 핵심 정리 표 다시 보기</span>
+        </h4>
+        <table class="w-full text-xs sm:text-sm text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-bold">
+              <th class="p-2.5 rounded-l-lg">구분</th>
+              <th class="p-2.5 text-emerald-700 bg-emerald-50">가벼운 기도 폐쇄</th>
+              <th class="p-2.5 rounded-r-lg text-red-700 bg-red-50">심각한 기도 폐쇄 (초킹 사인)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-600">
+            <tr>
+              <td class="p-2.5 font-bold bg-slate-50">숨 쉬기</td>
+              <td class="p-2.5">어느 정도 쉴 수 있음</td>
+              <td class="p-2.5 font-semibold text-red-600">거의 쉴 수 없거나 전혀 못 쉼</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-bold bg-slate-50">기침 & 소리</td>
+              <td class="p-2.5">스스로 기침 가능, 소리 냄</td>
+              <td class="p-2.5 font-semibold text-red-600">기침 불가, 말/소리 전혀 못 냄</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-bold bg-slate-50">얼굴 색깔</td>
+              <td class="p-2.5">약간 붉어짐</td>
+              <td class="p-2.5 font-semibold text-red-600">점점 파랗게 변함 (청색증)</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-bold bg-slate-50">응급처치</td>
+              <td class="p-2.5 font-bold text-emerald-700">스스로 기침하도록 계속 격려</td>
+              <td class="p-2.5 font-bold text-red-700">119 신고 후 즉시 복부 밀어내기!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 2: 119 대원 롤플레잉 & 복부 밀어내기 실습 ===================== -->
+    <section id="section-step2" class="hidden space-y-6">
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200">
+        <div>
+          <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">2단계 실전 미션</span>
+          <h2 class="font-title text-2xl text-slate-800 mt-1">119 지령 대원과 함께하는 '복부 밀어내기'</h2>
+          <p class="text-xs sm:text-sm text-slate-500">교과서 126~127쪽 순서대로 환자를 살리는 5단계를 하나씩 직접 수행하세요!</p>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600">
+          <i data-lucide="radio" class="w-4 h-4 text-red-500 animate-pulse"></i>
+          <span>119 영상통화 연결 중</span>
+        </div>
+      </div>
+
+      <!-- Step Indicator Bar -->
+      <div class="grid grid-cols-5 gap-1 sm:gap-2">
+        <button onclick="setSimStage(1)" id="sim-tab-1" class="sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-emerald-500 bg-emerald-50 text-emerald-700 transition">
+          1. 상태확인
+        </button>
+        <button onclick="setSimStage(2)" id="sim-tab-2" class="sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-slate-200 bg-white text-slate-400 transition">
+          2. 등두드리기
+        </button>
+        <button onclick="setSimStage(3)" id="sim-tab-3" class="sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-slate-200 bg-white text-slate-400 transition">
+          3. 손 위치찾기
+        </button>
+        <button onclick="setSimStage(4)" id="sim-tab-4" class="sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-slate-200 bg-white text-slate-400 transition">
+          4. 밀어올리기
+        </button>
+        <button onclick="setSimStage(5)" id="sim-tab-5" class="sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-slate-200 bg-white text-slate-400 transition">
+          5. 의식확인
+        </button>
+      </div>
+
+      <!-- Main Simulation Interactive Canvas Box -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative min-h-[420px] flex flex-col justify-between">
+        <!-- 119 Voice Prompt / Chat Bubble -->
+        <div class="flex items-start gap-3 bg-blue-50 border border-blue-200 p-4 rounded-2xl">
+          <div class="w-11 h-11 rounded-full bg-blue-600 text-white flex-shrink-0 flex items-center justify-center font-title text-sm shadow">
+            119
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-700">119 구급 상황요원</span>
+              <span id="sim-step-badge" class="text-[11px] bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full font-bold">1단계</span>
+            </div>
+            <p id="sim-voice-text" class="text-sm sm:text-base font-semibold text-slate-800 mt-1 leading-snug">
+              "119입니다! 환자에게 '목에 뭐가 걸렸나요?' 물어보고 주변 사람을 지정해 119 신고를 요청하세요!"
+            </p>
+          </div>
+        </div>
+
+        <!-- Central Stage Area (Interactive Body / Action Area) -->
+        <div id="sim-interactive-area" class="my-6 relative flex flex-col items-center justify-center min-h-[200px]">
+
+          <!-- STAGE 1: 상태 확인 및 119 요청 -->
+          <div id="stage1-view" class="w-full flex flex-col items-center text-center space-y-4">
+            <div class="w-32 h-32 rounded-full bg-amber-100 flex items-center justify-center animate-choke-shake relative">
+              <i data-lucide="user-x" class="w-16 h-16 text-red-500"></i>
+              <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-title px-2 py-1 rounded-full shadow">켁! 켁!</span>
+            </div>
+            <p class="text-sm text-slate-600 font-medium max-w-sm">
+              환자가 고개를 끄덕이며 말을 못 하고 목을 쥐고 있습니다. 먼저 주변에 큰 소리로 도움을 청하세요!
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+              <button onclick="simCompleteStage1()" class="bg-red-600 hover:bg-red-500 text-white font-title text-base px-6 py-3 rounded-2xl shadow-lg shadow-red-200 flex items-center gap-2 active:scale-95 transition">
+                <i data-lucide="phone-call" class="w-5 h-5"></i>
+                <span>"빨간 옷 입은 분, 119에 신고해주세요!"</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STAGE 2: 등 두드리기 5회 실습 -->
+          <div id="stage2-view" class="hidden w-full flex flex-col items-center text-center space-y-3">
+            <div class="relative w-64 h-56 flex items-center justify-center">
+              <!-- Back SVG Illustration -->
+              <svg viewBox="0 0 200 180" class="w-56 h-48 drop-shadow">
+                <!-- Torso bent forward -->
+                <path d="M70 40 Q100 20 130 40 Q150 90 140 160 L60 160 Q50 90 70 40" fill="#cbd5e1"/>
+                <circle cx="100" cy="25" r="18" fill="#fed7aa"/>
+                <!-- Shoulder blades area (Target Zone) -->
+                <rect x="75" y="65" width="50" height="40" rx="8" fill="#fecdd3" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4"/>
+                <text x="100" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="#e11d48">어깨뼈 사이</text>
+              </svg>
+              <!-- Tap Hit Button positioned over shoulder blades -->
+              <button onclick="tapBack()" id="back-tap-target" class="absolute top-[38%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-24 h-16 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border-2 border-red-500 flex flex-col items-center justify-center cursor-pointer transition active:scale-90 animate-pulse">
+                <span class="text-xs font-bold text-red-700">여기를 탭!</span>
+                <i data-lucide="hand" class="w-5 h-5 text-red-600"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-slate-600">등 두드리기 횟수:</span>
+              <div id="back-hits-dots" class="flex gap-2">
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+              </div>
+              <span id="back-hits-count" class="font-title text-lg text-red-600 ml-1">0 / 5</span>
+            </div>
+            <p class="text-xs text-slate-500">환자 허리를 앞으로 숙이게 한 뒤, 손바닥 밑부분으로 위쪽으로 강하게 5번 칩니다.</p>
+          </div>
+
+          <!-- STAGE 3: 손 위치 찾기 (명치와 배꼽 사이) -->
+          <div id="stage3-view" class="hidden w-full flex flex-col items-center text-center space-y-3">
+            <p class="text-xs sm:text-sm text-slate-600 font-bold mb-1">
+              환자의 배에서 <span class="text-red-600 bg-red-50 px-2 py-0.5 rounded">명치와 배꼽 사이</span>를 정확히 찾아 클릭하세요!
+            </p>
+            <div class="relative w-64 h-64 bg-amber-50 rounded-3xl border-2 border-amber-200 p-2 flex flex-col items-center justify-between">
+              <!-- Rib cage top (Wrong point) -->
+              <button onclick="wrongPosition('명치를 누르면 뼈와 내부 장기가 손상될 위험이 있어요! 좀 더 아래를 찾아보세요.')" class="w-44 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+                명치 및 갈비뼈 (X)
+              </button>
+
+              <!-- Correct target: Between Sternum & Navel -->
+              <button onclick="correctPosition()" class="w-48 py-3 bg-red-100 hover:bg-red-200 border-2 border-dashed border-red-500 rounded-2xl flex flex-col items-center justify-center animate-pulseGlow transition group">
+                <span class="text-xs font-extrabold text-red-700">★ 배꼽과 명치 사이 ★</span>
+                <span class="text-[11px] text-red-600">주먹 쥔 엄지손가락 쪽을 대는 곳!</span>
+              </button>
+
+              <!-- Navel bottom (Wrong point) -->
+              <button onclick="wrongPosition('배꼽 아래쪽은 너무 낮아서 폐 압력을 높이기 어려워요! 조금 더 위를 찾아보세요.')" class="w-44 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+                배꼽 및 아랫배 (X)
+              </button>
+            </div>
+            <p id="pos-feedback" class="text-xs text-slate-500 font-medium h-5"></p>
+          </div>
+
+          <!-- STAGE 4: 복부 밀어내기 5회 (위쪽으로 밀어올리기) -->
+          <div id="stage4-view" class="hidden w-full flex flex-col items-center text-center space-y-4">
+            <div class="relative w-64 h-48 bg-emerald-50 rounded-3xl border border-emerald-200 flex items-center justify-center overflow-hidden">
+              <!-- Trapped Object (e.g. Candy/Jelly) -->
+              <div id="choking-object" class="w-8 h-8 rounded-full bg-red-500 text-white font-title text-xs flex items-center justify-center shadow-md absolute z-10 transition-all">
+                젤리
+              </div>
+              <div class="text-center z-0 opacity-40">
+                <i data-lucide="shield" class="w-24 h-24 text-emerald-400 mx-auto"></i>
+                <span class="text-xs font-bold">환자의 기도 공간</span>
+              </div>
+            </div>
+
+            <!-- Thrust Action Button -->
+            <button onclick="thrustAbdomen()" id="thrust-btn" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-title text-lg px-8 py-3.5 rounded-2xl shadow-lg shadow-red-300 flex items-center gap-2 active:scale-90 transition">
+              <i data-lucide="arrow-up" class="w-6 h-6 animate-bounce"></i>
+              <span>안쪽 위로 훅! 밀어올리기 (J자)</span>
+            </button>
+
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-slate-600">밀어내기 횟수:</span>
+              <div id="thrust-dots" class="flex gap-2">
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+                <span class="w-4 h-4 rounded-full bg-slate-200"></span>
+              </div>
+              <span id="thrust-count" class="font-title text-lg text-rose-600 ml-1">0 / 5</span>
+            </div>
+            <p class="text-xs text-slate-500">다른 손으로 주먹을 감싸 쥐고, 빠르고 강하게 안쪽 위를 향해 당겨 올립니다.</p>
+          </div>
+
+          <!-- STAGE 5: 이물질 배출 성공 및 의식 소실 시 대처 -->
+          <div id="stage5-view" class="hidden w-full flex flex-col items-center text-center space-y-4">
+            <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-title text-3xl shadow-sm">
+              <i data-lucide="sparkles" class="w-10 h-10"></i>
+            </div>
+            <h3 class="font-title text-2xl text-slate-800">
+              "뿅! 목에 걸린 이물질이 밖으로 튀어나왔어요!"
+            </h3>
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 max-w-lg text-left text-xs sm:text-sm text-slate-700 space-y-2">
+              <div class="font-bold text-amber-800 flex items-center gap-1.5 text-sm">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                <span>교과서 126쪽 꼭 알아두기!</span>
+              </div>
+              <p>• <strong>이물질이 나왔어도:</strong> 복부에 강한 힘을 주었기 때문에 내부 장기가 다쳤을 수 있어요. 반드시 119 구급대나 의사의 진료를 받아야 합니다.</p>
+              <p>• <strong>만약 환자가 의식을 잃고 쓰러지면?</strong> 즉시 바닥에 눕히고 <strong>심폐소생술(CPR)</strong>을 바로 시작해야 합니다!</p>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="setSimStage(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-title px-5 py-2.5 rounded-xl transition text-sm">
+                처음부터 다시 연습
+              </button>
+              <button onclick="showSection('step3'); playToneSound('cheer');" class="bg-emerald-600 hover:bg-emerald-500 text-white font-title px-6 py-2.5 rounded-xl transition text-sm flex items-center gap-1.5 shadow">
+                <span>3단계 혼자 대처 & 퀴즈로 가기</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Simulation Instruction Bottom Bar -->
+        <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-xs text-slate-500">
+          <span class="flex items-center gap-1">
+            <i data-lucide="info" class="w-4 h-4 text-slate-400"></i>
+            <span>임산부나 고도 비만 환자는 가슴 밀어내기를 실시해요 (교과서 126쪽)</span>
+          </span>
+          <span id="sim-overall-status" class="font-bold text-emerald-600">진행 중</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 3: 혼자 있을 때 대처 & 스스로 다지기 ===================== -->
+    <section id="section-step3" class="hidden space-y-6">
+      <!-- Section Header -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200">
+        <span class="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">3단계 완성 미션</span>
+        <h2 class="font-title text-2xl text-slate-800 mt-1">혼자 목이 막혔을 때 & 스스로 다지기 골든벨</h2>
+        <p class="text-xs sm:text-sm text-slate-500">교과서 128쪽 내용을 확인하고 최종 퀴즈를 맞혀 "보건 안전 영웅 수료증"을 획득하세요!</p>
+      </div>
+
+      <!-- 혼자 있을 때 3대 행동 요령 (인터랙티브 탭) -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center font-title text-sm">
+            TIP
+          </div>
+          <h3 class="font-title text-lg text-slate-800">혼자 있을 때 이물질이 목에 걸렸다면?</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 방법 1 -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between">
+            <div>
+              <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-title text-xs flex items-center justify-center mb-2">1</span>
+              <h4 class="font-title text-base text-slate-800 mb-1">스스로 기침하기</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                가장 먼저 상체를 숙이고 가슴과 복부의 힘을 주어 힘껏 기침을 켁켁 하며 이물질을 뱉어내려고 노력합니다.
+              </p>
+            </div>
+            <div class="mt-3 text-right">
+              <span class="text-[11px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-bold">1차 시도</span>
+            </div>
+          </div>
+
+          <!-- 방법 2 -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between">
+            <div>
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-title text-xs flex items-center justify-center mb-2">2</span>
+              <h4 class="font-title text-base text-slate-800 mb-1">내 주먹으로 복부 밀기</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                기침으로 안 나오면 한 손으로 주먹을 쥐고 다른 손으로 감싸 자신의 명치와 배꼽 사이를 위쪽으로 강하게 압박합니다.
+              </p>
+            </div>
+            <div class="mt-3 text-right">
+              <span class="text-[11px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md font-bold">2차 시도</span>
+            </div>
+          </div>
+
+          <!-- 방법 3: 의자 등받이 활용 -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between border-sky-300 ring-2 ring-sky-100">
+            <div>
+              <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-title text-xs flex items-center justify-center mb-2">3</span>
+              <h4 class="font-title text-base text-slate-800 mb-1">물체(의자 등받이) 이용</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                단단한 의자 등받이나 테이블 모서리에 배꼽과 명치 사이를 대고 상체를 숙이며 몸무게를 실어 강하게 압박합니다!
+              </p>
+            </div>
+            <div class="mt-3 text-right">
+              <span class="text-[11px] text-red-600 bg-red-100 px-2 py-0.5 rounded-md font-bold">주의: 뾰족한 곳 X</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 교과서 128쪽 [스스로 다지기] 빈칸 완성 골든벨 -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+          <div>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">교과서 128쪽 문제</span>
+            <h3 class="font-title text-xl text-slate-800 mt-1">스스로 다지기: 빈칸을 채워보세요!</h3>
+          </div>
+          <button onclick="fillHints()" class="text-xs text-slate-500 hover:text-slate-800 underline">초성 힌트 보기</button>
+        </div>
+
+        <form id="quiz-form" onsubmit="event.preventDefault(); checkFinalQuiz();" class="space-y-6">
+          <!-- 문제 1 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <label class="block text-sm sm:text-base font-semibold text-slate-800 leading-relaxed mb-3">
+              1. <span class="font-title text-emerald-600">(　　　)</span>은(는) 음식물이나 물건 같은 이물질이 기도를 막아 숨 쉬는 것을 어렵게 만드는 상태입니다.
+            </label>
+            <div class="flex items-center gap-2 max-w-sm">
+              <input type="text" id="blank-1" placeholder="정답 4글자 (힌트: ㄱㄷㅍㅅ)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold">
+              <span id="mark-1" class="w-6 h-6 flex items-center justify-center font-bold"></span>
+            </div>
+          </div>
+
+          <!-- 문제 2 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <label class="block text-sm sm:text-base font-semibold text-slate-800 leading-relaxed mb-3">
+              2. <span class="font-title text-emerald-600">(　　)</span>를 강하게 압박하여 위쪽으로 밀어 올려 기도의 이물질을 빼내는 응급처치를 
+              <span class="font-title text-rose-600">(　　　　　)</span>(하임리히법)이라고 합니다.
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
+              <div>
+                <span class="text-xs text-slate-500 font-bold mb-1 block">첫 번째 빈칸 (2글자, ㅂㅂ):</span>
+                <input type="text" id="blank-2-1" placeholder="어디를 압박할까요?" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold">
+              </div>
+              <div>
+                <span class="text-xs text-slate-500 font-bold mb-1 block">두 번째 빈칸 (5글자, ㅂㅂㅁㅇㄴㄱ):</span>
+                <input type="text" id="blank-2-2" placeholder="응급처치 이름" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold">
+              </div>
+            </div>
+            <span id="mark-2" class="text-xs font-bold mt-2 block"></span>
+          </div>
+
+          <!-- 문제 3 (추가 핵심 문제) -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <label class="block text-sm sm:text-base font-semibold text-slate-800 leading-relaxed mb-3">
+              3. 기도가 완전히 막혀 목을 양손으로 움켜쥐는 전형적인 행동을 무엇이라고 부를까요?
+            </label>
+            <div class="flex items-center gap-2 max-w-sm">
+              <input type="text" id="blank-3" placeholder="두 글자 또는 네 글자 (ㅊㅋㅅㅇ)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold">
+              <span id="mark-3" class="w-6 h-6 flex items-center justify-center font-bold"></span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-title text-lg py-3.5 rounded-2xl shadow-lg shadow-emerald-200 transition active:scale-98 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span>정답 채점하고 수료증 확인하기</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Completion Certificate Card (Revealed upon 100%) -->
+      <div id="cert-box" class="hidden bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-300 rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden shadow-xl">
+        <div class="w-16 h-16 rounded-full bg-amber-400 text-white flex items-center justify-center mx-auto mb-3 shadow-md">
+          <i data-lucide="award" class="w-10 h-10"></i>
+        </div>
+        <span class="text-xs font-bold text-amber-700 uppercase tracking-widest bg-amber-200/60 px-3 py-1 rounded-full">
+          보건교육 수료증
+        </span>
+        <h3 class="font-title text-2xl sm:text-3xl text-slate-800 mt-2 mb-1">
+          어린이 생명 지킴이 위촉장
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed my-3 font-medium">
+          위 학생은 5학년 보건 <strong class="text-slate-800">[기도 폐쇄, 빠르게 대처해요!]</strong> 교육 과정을 성실히 이수하여 위급한 상황에서 신속하고 정확하게 생명을 구할 수 있는 능력을 갖추었음을 인정합니다.
+        </p>
+
+        <!-- Dynamic Student Name -->
+        <div class="my-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-amber-200">
+          <label for="student-name-input" class="text-xs font-bold text-slate-500">학생 이름:</label>
+          <input type="text" id="student-name-input" value="5학년 보건 꿈나무" class="font-title text-base text-emerald-700 border-b border-dashed border-emerald-400 focus:outline-none text-center bg-transparent w-36">
+        </div>
+
+        <div class="flex justify-center gap-3 mt-4">
+          <button onclick="shareOrPrint()" class="bg-amber-500 hover:bg-amber-400 text-white font-title text-sm px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>수료증 복사하기</span>
+          </button>
+          <button onclick="showSection('intro')" class="bg-white hover:bg-slate-50 text-slate-700 font-title text-sm px-5 py-2.5 rounded-xl border border-slate-300 transition">
+            첫 화면으로 이동
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: 기도 폐쇄의 4가지 원인 (교과서 125쪽 삽화 반영) -->
+  <div id="causeModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold">!</div>
+          <h3 class="font-title text-lg text-slate-800">기도 폐쇄를 일으키는 4가지 위험 행동</h3>
+        </div>
+        <button onclick="closeModal('causeModal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 my-4">
+        <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200 text-center">
+          <div class="w-10 h-10 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center mx-auto mb-2 font-bold">
+            1
+          </div>
+          <h4 class="font-title text-sm text-slate-800">음식을 급하게 먹는 경우</h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">꼭꼭 씹지 않고 삼키면 목에 걸려요.</p>
+        </div>
+
+        <div class="bg-sky-50 rounded-2xl p-3 border border-sky-200 text-center">
+          <div class="w-10 h-10 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center mx-auto mb-2 font-bold">
+            2
+          </div>
+          <h4 class="font-title text-sm text-slate-800">누워서 먹는 경우</h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">후두덮개가 기도를 제대로 덮지 못해요.</p>
+        </div>
+
+        <div class="bg-rose-50 rounded-2xl p-3 border border-rose-200 text-center">
+          <div class="w-10 h-10 rounded-full bg-rose-200 text-rose-800 flex items-center justify-center mx-auto mb-2 font-bold">
+            3
+          </div>
+          <h4 class="font-title text-sm text-slate-800">먹으면서 뛰는 경우</h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">숨을 가쁘게 쉬며 음식이 숨길로 쏙 들어가요.</p>
+        </div>
+
+        <div class="bg-purple-50 rounded-2xl p-3 border border-purple-200 text-center">
+          <div class="w-10 h-10 rounded-full bg-purple-200 text-purple-800 flex items-center justify-center mx-auto mb-2 font-bold">
+            4
+          </div>
+          <h4 class="font-title text-sm text-slate-800">먹을 때 놀라게 하는 경우</h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">갑자기 숨을 들이켜 사레가 들리고 기도가 막혀요.</p>
+        </div>
+      </div>
+
+      <button onclick="closeModal('causeModal')" class="w-full bg-slate-800 text-white font-title py-2.5 rounded-xl hover:bg-slate-700 transition text-sm">
+        이해했습니다, 안전하게 먹을게요!
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-xl z-50 pointer-events-none transition-all opacity-0 translate-y-4">
+  </div>
+
+  <script>
+    /* =========================================================================
+     * 1. Sound Synthesis using Web Audio API (100% Self-contained, No externals)
+     * ========================================================================= */
+    let audioCtx = null;
+    let isSoundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      const icon = document.getElementById('sound-icon');
+      if (isSoundEnabled) {
+        icon.setAttribute('data-lucide', 'volume-2');
+        showToast("소리가 켜졌습니다.");
+      } else {
+        icon.setAttribute('data-lucide', 'volume-x');
+        showToast("소리가 꺼졌습니다.");
+      }
+      lucide.createIcons();
+    }
+
+    function playToneSound(type) {
+      if (!isSoundEnabled) return;
+      initAudio();
+      const now = audioCtx.currentTime;
+
+      if (type === 'correct') {
+        // High cheery ding-dong (E5 -> G#5)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, now);
+        osc.frequency.setValueAtTime(830.61, now + 0.12);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'wrong') {
+        // Low buzzer tone
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(196, now);
+        osc.frequency.setValueAtTime(146.83, now + 0.15);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'hit') {
+        // Percussion thump for back tap & abdominal thrust
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'pop') {
+        // Pop out whoosh
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'cheer') {
+        // Fanfare chord
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.15, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+          osc.start(now + i * 0.08);
+          osc.stop(now + 0.75);
+        });
+      }
+    }
+
+    /* =========================================================================
+     * 2. Navigation & Modal Management
+     * ========================================================================= */
+    const sections = ['intro', 'step1', 'step2', 'step3'];
+
+    function showSection(targetSection) {
+      initAudio();
+      sections.forEach(sec => {
+        const secEl = document.getElementById(`section-${sec}`);
+        if (secEl) {
+          if (sec === targetSection) {
+            secEl.classList.remove('hidden');
+          } else {
+            secEl.classList.add('hidden');
+          }
+        }
+
+        // Desktop nav sync
+        const navBtn = document.getElementById(`nav-btn-${sec}`);
+        if (navBtn) {
+          if (sec === targetSection) {
+            navBtn.className = 'nav-tab px-3 py-1.5 rounded-xl transition bg-white text-emerald-600 shadow-sm';
+          } else {
+            navBtn.className = 'nav-tab px-3 py-1.5 rounded-xl transition text-slate-600 hover:text-slate-900';
+          }
+        }
+
+        // Mobile nav sync
+        const mNavBtn = document.getElementById(`m-nav-${sec}`);
+        if (mNavBtn) {
+          if (sec === targetSection) {
+            mNavBtn.className = 'px-3 py-1.5 rounded-lg whitespace-nowrap bg-emerald-500 text-white';
+          } else {
+            mNavBtn.className = 'px-3 py-1.5 rounded-lg whitespace-nowrap bg-slate-200 text-slate-700';
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    /* =========================================================================
+     * 3. SECTION 1: Symptom Classification Quiz Logic
+     * ========================================================================= */
+    const quizQuestions = [
+      {
+        patient: "1번 학생 (급식실에서)",
+        symptom: "사탕을 먹다가 켁켁거리며 기침을 스스로 하고 있어요. 얼굴이 약간 붉어졌지만 목소리는 나옵니다.",
+        subtext: "공기가 아직 어느 정도 드나드는 상태입니다.",
+        type: "mild",
+        explanation: "스스로 기침을 할 수 있고 소리를 낼 수 있는 '가벼운 기도 폐쇄'입니다. 이때는 등을 치거나 무리하게 복부를 압박하지 말고 계속 강하게 기침하도록 격려해야 합니다."
+      },
+      {
+        patient: "2번 환자 (운동장에서)",
+        symptom: "젤리를 먹고 뛰다가 갑자기 양손으로 목을 감싸 쥐며 말을 전혀 못 하고 헐떡입니다. 얼굴이 파래집니다.",
+        subtext: "전형적인 '초킹 사인(Choking Sign)'이 나타났습니다!",
+        type: "severe",
+        explanation: "양손으로 목을 쥐는 '초킹 사인'은 기도가 완전히 막혔다는 긴급 신호입니다! 지체 없이 119에 신고하고 복부 밀어내기 응급처치를 시작해야 합니다."
+      },
+      {
+        patient: "3번 동생 (거실에서)",
+        symptom: "과자를 먹다가 사레가 들려 기침을 세게 하며 '엄마 물 줘'라고 또박또박 말하고 있습니다.",
+        subtext: "말을 할 수 있다는 것은 성대로 공기가 통하고 있다는 뜻입니다.",
+        type: "mild",
+        explanation: "말을 하거나 소리를 낼 수 있다면 기도가 완전히 막힌 것이 아닙니다. 스스로 기침하여 이물질을 뱉을 수 있도록 안심시켜 줍니다."
+      },
+      {
+        patient: "4번 친구 (식당에서)",
+        symptom: "고기를 삼킨 뒤 숨을 전혀 쉬지 못하고 눈이 커진 채 가슴을 쥐어뜯고 있습니다. 소리를 내지 못합니다.",
+        subtext: "산소 공급이 멈춰 4~6분 내에 뇌 손상이 올 수 있습니다.",
+        type: "severe",
+        explanation: "소리를 전혀 낼 수 없고 숨을 쉬지 못하는 '심각한 기도 폐쇄'입니다. 즉시 119 구급대를 부르고 등 두드리기와 복부 밀어내기를 해야 합니다!"
+      },
+      {
+        patient: "5번 어린이 (놀이터에서)",
+        symptom: "동전 모양 초콜릿을 삼키려다 목을 감싸 쥐고 주저앉았으며 입술과 얼굴색이 점차 파랗게 변해갑니다.",
+        subtext: "산소 부족으로 인한 청색증이 나타나고 있습니다.",
+        type: "severe",
+        explanation: "얼굴이 파랗게 변하는 것은 체내 산소가 바닥나고 있다는 뜻입니다. 1초가 급한 심각한 기도 폐쇄 상황입니다."
+      }
+    ];
+
+    let currentQIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    function renderQuestion() {
+      quizAnswered = false;
+      const q = quizQuestions[currentQIndex];
+      document.getElementById('q-counter').innerText = `${currentQIndex + 1} / ${quizQuestions.length}`;
+      document.getElementById('quiz-patient-name').innerText = q.patient;
+      document.getElementById('quiz-symptom-text').innerText = `"${q.symptom}"`;
+      document.getElementById('quiz-subtext').innerText = q.subtext;
+
+      // Hide feedback & next button
+      document.getElementById('quiz-feedback').classList.add('hidden');
+      document.getElementById('next-q-btn').classList.add('hidden');
+
+      // Choking badge & graphic update
+      const chokingBadge = document.getElementById('choking-sign-badge');
+      const handsNeck = document.getElementById('quiz-hands-neck');
+      const mouth = document.getElementById('quiz-mouth');
+      const avatarBg = document.getElementById('quiz-avatar-bg');
+
+      if (q.type === 'severe') {
+        chokingBadge.classList.remove('hidden');
+        handsNeck.classList.remove('hidden');
+        avatarBg.className = 'w-36 h-36 rounded-full bg-red-100 flex items-center justify-center transition-all duration-300 animate-choke-shake';
+        mouth.setAttribute('fill', '#991b1b');
+      } else {
+        chokingBadge.classList.add('hidden');
+        handsNeck.classList.add('hidden');
+        avatarBg.className = 'w-36 h-36 rounded-full bg-emerald-50 flex items-center justify-center transition-all duration-300';
+        mouth.setAttribute('fill', '#dc2626');
+      }
+      lucide.createIcons();
+    }
+
+    function handleAnswer(selectedType) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const q = quizQuestions[currentQIndex];
+      const feedback = document.getElementById('quiz-feedback');
+      const fbIcon = document.getElementById('feedback-icon');
+      const fbTitle = document.getElementById('feedback-title');
+      const fbDesc = document.getElementById('feedback-desc');
+      const nextBtn = document.getElementById('next-q-btn');
+
+      if (selectedType === q.type) {
+        // Correct
+        playToneSound('correct');
+        quizScore += 20;
+        document.getElementById('quiz-score').innerText = quizScore;
+        feedback.className = 'mt-6 p-4 rounded-2xl max-w-lg mx-auto text-left flex items-start gap-3 bg-emerald-50 border border-emerald-200 text-emerald-900';
+        fbIcon.className = 'p-2 rounded-xl bg-emerald-200 text-emerald-800 flex-shrink-0';
+        fbIcon.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>';
+        fbTitle.innerText = "정확한 판단입니다! (정답)";
+        fbDesc.innerText = q.explanation;
+      } else {
+        // Wrong
+        playToneSound('wrong');
+        feedback.className = 'mt-6 p-4 rounded-2xl max-w-lg mx-auto text-left flex items-start gap-3 bg-red-50 border border-red-200 text-red-900';
+        fbIcon.className = 'p-2 rounded-xl bg-red-200 text-red-800 flex-shrink-0';
+        fbIcon.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
+        fbTitle.innerText = "다시 확인해 보세요! (오답)";
+        fbDesc.innerText = q.explanation;
+      }
+
+      feedback.classList.remove('hidden');
+      nextBtn.classList.remove('hidden');
+      nextBtn.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function nextQuestion() {
+      currentQIndex++;
+      if (currentQIndex < quizQuestions.length) {
+        renderQuestion();
+      } else {
+        // Completed Section 1
+        playToneSound('cheer');
+        if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60 });
+        showToast("1단계 증상 판별 미션 완료! 2단계 실습으로 이동합니다.");
+        setTimeout(() => {
+          showSection('step2');
+        }, 1200);
+      }
+    }
+
+    /* =========================================================================
+     * 4. SECTION 2: Heimlich Simulation Logic (5 Steps)
+     * ========================================================================= */
+    let currentSimStage = 1;
+    let backHitCount = 0;
+    let thrustCount = 0;
+
+    function setSimStage(stageNum) {
+      currentSimStage = stageNum;
+      initAudio();
+
+      // Update tabs styling
+      for (let i = 1; i <= 5; i++) {
+        const tab = document.getElementById(`sim-tab-${i}`);
+        const view = document.getElementById(`stage${i}-view`);
+        if (i === stageNum) {
+          tab.className = 'sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-emerald-500 bg-emerald-50 text-emerald-700 transition';
+          view.classList.remove('hidden');
+        } else if (i < stageNum) {
+          tab.className = 'sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-emerald-300 bg-emerald-50/50 text-emerald-600 transition';
+          view.classList.add('hidden');
+        } else {
+          tab.className = 'sim-step-tab py-2 px-1 rounded-xl text-xs font-bold text-center border-2 border-slate-200 bg-white text-slate-400 transition';
+          view.classList.add('hidden');
+        }
+      }
+
+      // Update 119 Voice prompts based on textbook
+      const voiceText = document.getElementById('sim-voice-text');
+      const badge = document.getElementById('sim-step-badge');
+      badge.innerText = `${stageNum}단계`;
+
+      if (stageNum === 1) {
+        voiceText.innerText = '"환자에게 말을 걸어 상태를 확인하고, 특정 사람을 똑 짚어서 119 신고를 요청하세요!"';
+      } else if (stageNum === 2) {
+        voiceText.innerText = '"환자의 상체를 앞으로 숙이게 한 후, 양 어깨뼈(견갑골) 사이를 손바닥 밑으로 5회 세게 치세요!"';
+        backHitCount = 0;
+        updateBackHitDots();
+      } else if (stageNum === 3) {
+        voiceText.innerText = '"뒤에 서서 한쪽 발을 다리 사이에 넣고, 주먹을 쥔 엄지 부분을 배꼽과 명치 사이에 대세요!"';
+        document.getElementById('pos-feedback').innerText = "";
+      } else if (stageNum === 4) {
+        voiceText.innerText = '"다른 손으로 주먹을 감싸 쥐고, 안쪽 위를 향해 J자를 그리듯 빠르게 5번 밀어 올리세요!"';
+        thrustCount = 0;
+        updateThrustDots();
+        resetTrappedObject();
+      } else if (stageNum === 5) {
+        voiceText.innerText = '"훌륭합니다! 이물질이 제거되었습니다. 하지만 장기 손상 확인을 위해 반드시 진료를 받아야 합니다."';
+      }
+      lucide.createIcons();
+    }
+
+    // Step 1: Emergency Call
+    function simCompleteStage1() {
+      playToneSound('correct');
+      showToast("119에 정확히 신고되었습니다! 다음 등 두드리기로 넘어갑니다.");
+      setSimStage(2);
+    }
+
+    // Step 2: Back Blows
+    function tapBack() {
+      if (backHitCount >= 5) return;
+      backHitCount++;
+      playToneSound('hit');
+      updateBackHitDots();
+
+      if (backHitCount === 5) {
+        showToast("등 두드리기 5회 완료! 다음 복부 손 위치를 찾으세요.");
+        setTimeout(() => {
+          setSimStage(3);
+        }, 800);
+      }
+    }
+
+    function updateBackHitDots() {
+      const dots = document.getElementById('back-hits-dots').children;
+      for (let i = 0; i < 5; i++) {
+        if (i < backHitCount) {
+          dots[i].className = 'w-4 h-4 rounded-full bg-red-500 scale-110 transition';
+        } else {
+          dots[i].className = 'w-4 h-4 rounded-full bg-slate-200 transition';
+        }
+      }
+      document.getElementById('back-hits-count').innerText = `${backHitCount} / 5`;
+    }
+
+    // Step 3: Finding Hand Position
+    function correctPosition() {
+      playToneSound('correct');
+      document.getElementById('pos-feedback').innerText = "정확합니다! 배꼽과 명치 사이를 주먹으로 지지합니다.";
+      document.getElementById('pos-feedback').className = "text-xs font-bold text-emerald-600 h-5";
+      showToast("손 위치 포착 성공! 이제 복부 밀어내기를 실시합니다.");
+      setTimeout(() => {
+        setSimStage(4);
+      }, 900);
+    }
+
+    function wrongPosition(msg) {
+      playToneSound('wrong');
+      const fb = document.getElementById('pos-feedback');
+      fb.innerText = msg;
+      fb.className = "text-xs font-bold text-red-600 h-5";
+    }
+
+    // Step 4: Abdominal Thrusts
+    function thrustAbdomen() {
+      if (thrustCount >= 5) return;
+      thrustCount++;
+      playToneSound('hit');
+      updateThrustDots();
+
+      // Animate object moving up
+      const obj = document.getElementById('choking-object');
+      const shiftY = thrustCount * -18;
+      obj.style.transform = `translateY(${shiftY}px) scale(${1 + thrustCount * 0.1})`;
+
+      if (thrustCount === 5) {
+        playToneSound('pop');
+        obj.classList.add('animate-pop-out');
+        showToast("이물질(젤리)이 기도를 빠져나왔습니다!");
+        if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 80 });
+        setTimeout(() => {
+          setSimStage(5);
+        }, 1100);
+      }
+    }
+
+    function updateThrustDots() {
+      const dots = document.getElementById('thrust-dots').children;
+      for (let i = 0; i < 5; i++) {
+        if (i < thrustCount) {
+          dots[i].className = 'w-4 h-4 rounded-full bg-rose-600 scale-110 transition';
+        } else {
+          dots[i].className = 'w-4 h-4 rounded-full bg-slate-200 transition';
+        }
+      }
+      document.getElementById('thrust-count').innerText = `${thrustCount} / 5`;
+    }
+
+    function resetTrappedObject() {
+      const obj = document.getElementById('choking-object');
+      obj.style.transform = "translateY(0) scale(1)";
+      obj.classList.remove('animate-pop-out');
+    }
+
+    /* =========================================================================
+     * 5. SECTION 3: Textbook Review Quiz (교과서 128쪽)
+     * ========================================================================= */
+    function fillHints() {
+      document.getElementById('blank-1').placeholder = "힌트: 기 도 폐 쇄";
+      document.getElementById('blank-2-1').placeholder = "힌트: 복 부";
+      document.getElementById('blank-2-2').placeholder = "힌트: 복 부 밀 어 내 기";
+      document.getElementById('blank-3').placeholder = "힌트: 초 킹 사 인";
+      showToast("초성 힌트가 표시되었습니다.");
+    }
+
+    function checkFinalQuiz() {
+      const b1 = document.getElementById('blank-1').value.trim().replace(/\s+/g, '');
+      const b2_1 = document.getElementById('blank-2-1').value.trim().replace(/\s+/g, '');
+      const b2_2 = document.getElementById('blank-2-2').value.trim().replace(/\s+/g, '');
+      const b3 = document.getElementById('blank-3').value.trim().replace(/\s+/g, '');
+
+      let allCorrect = true;
+
+      // Q1: 기도폐쇄
+      const mark1 = document.getElementById('mark-1');
+      if (b1 === '기도폐쇄' || b1 === '기도폐쇄증') {
+        mark1.innerHTML = '<span class="text-emerald-600">O</span>';
+      } else {
+        mark1.innerHTML = '<span class="text-red-500">X</span>';
+        allCorrect = false;
+      }
+
+      // Q2: 복부, 복부밀어내기
+      const mark2 = document.getElementById('mark-2');
+      const isB2_1 = (b2_1 === '복부' || b2_1 === '배');
+      const isB2_2 = (b2_2 === '복부밀어내기' || b2_2 === '복부밀어내기법' || b2_2 === '하임리히' || b2_2 === '하임리히법');
+      if (isB2_1 && isB2_2) {
+        mark2.innerHTML = '<span class="text-emerald-600">2번 모두 정답! O</span>';
+      } else {
+        mark2.innerHTML = '<span class="text-red-500">2번 오답 확인 필요 (정답: 복부, 복부 밀어내기)</span>';
+        allCorrect = false;
+      }
+
+      // Q3: 초킹사인 (또는 질식사인)
+      const mark3 = document.getElementById('mark-3');
+      if (b3 === '초킹사인' || b3 === '초킹' || b3 === '질식신호' || b3 === '초킹시그널') {
+        mark3.innerHTML = '<span class="text-emerald-600">O</span>';
+      } else {
+        mark3.innerHTML = '<span class="text-red-500">X</span>';
+        allCorrect = false;
+      }
+
+      if (allCorrect) {
+        playToneSound('cheer');
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+          });
+        }
+        document.getElementById('cert-box').classList.remove('hidden');
+        showToast("축하합니다! 전 문항을 완벽히 맞히셨습니다!");
+        document.getElementById('cert-box').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        playToneSound('wrong');
+        showToast("틀린 문제가 있습니다. 다시 한번 확인해 보세요!");
+      }
+      lucide.createIcons();
+    }
+
+    function shareOrPrint() {
+      const studentName = document.getElementById('student-name-input').value || '5학년 학생';
+      const textToCopy = `[초등 5학년 보건 수료증]\n성명: ${studentName}\n주제: 기도 폐쇄, 빠르게 대처해요!\n위 학생은 기도폐쇄 응급처치(하임리히법) 훈련을 우수한 성적으로 이수하였습니다.`;
+      
+      const tempArea = document.createElement("textarea");
+      tempArea.value = textToCopy;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempArea);
+
+      showToast("수료증 텍스트가 클립보드에 복사되었습니다!");
+    }
+
+    function resetAllActivities() {
+      currentQIndex = 0;
+      quizScore = 0;
+      document.getElementById('quiz-score').innerText = "0";
+      renderQuestion();
+
+      setSimStage(1);
+
+      document.getElementById('blank-1').value = "";
+      document.getElementById('blank-2-1').value = "";
+      document.getElementById('blank-2-2').value = "";
+      document.getElementById('blank-3').value = "";
+      document.getElementById('mark-1').innerHTML = "";
+      document.getElementById('mark-2').innerHTML = "";
+      document.getElementById('mark-3').innerHTML = "";
+      document.getElementById('cert-box').classList.add('hidden');
+
+      showSection('intro');
+      showToast("학습 활동이 초기화되었습니다.");
+    }
+
+    // Window load initializations
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderQuestion();
+      setSimStage(1);
+    });
+  </script>
+</body>
+</html>
