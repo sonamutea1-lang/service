@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노담(No담배) 키즈 꿈마켓 - 초등 흡연예방 체험관</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- React 18 & ReactDOM UMD -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel Standalone (브라우저 내 JSX 실시간 트랜스파일링) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Pretendard / Noto Sans KR 폰트 스타일링 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <style>
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-glow {
+      animation: pulse-ring 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-100 via-amber-50 to-emerald-50 text-slate-800 antialiased selection:bg-yellow-200">
+  <!-- React 렌더링 컨테이너 루트 -->
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // 초등학생 눈높이에 맞춘 버킷리스트 쇼핑 아이템 리스트
+    const BUCKET_ITEMS = [
+      {
+        id: 'tteokbokki',
+        name: '치즈 떡볶이 & 바삭 튀김 세트',
+        category: '맛있는 간식',
+        price: 15000,
+        emoji: '🍢',
+        desc: '친구 3명과 배터지게 즐기는 신나는 분식 파티!'
+      },
+      {
+        id: 'chicken',
+        name: '황금 올리브 치킨 & 콜라 세트',
+        category: '맛있는 간식',
+        price: 25000,
+        emoji: '🍗',
+        desc: '주말 저녁 온 가족이 다 함께 먹는 바삭바삭 치킨'
+      },
+      {
+        id: 'game_title',
+        name: '인기 모험 콘솔 게임 타이틀',
+        category: '취미 & 장난감',
+        price: 70000,
+        emoji: '🎮',
+        desc: '친구들과 협동하며 퀘스트를 깨는 최고의 게임 팩'
+      },
+      {
+        id: 'lego',
+        name: '초대형 슈퍼카 레고 테크닉 세트',
+        category: '취미 & 장난감',
+        price: 180000,
+        emoji: '🧱',
+        desc: '내 손으로 정교한 부품을 하나하나 조립하는 멋진 자동차'
+      },
+      {
+        id: 'switch',
+        name: '닌텐도 스위치 본체 풀패키지',
+        category: '취미 & 장난감',
+        price: 450000,
+        emoji: '🕹️',
+        desc: '가족과 거실 TV에서 다 함께 웃고 뛰는 휴대용 게임기'
+      },
+      {
+        id: 'theme_park',
+        name: '가족 에버랜드 자유이용권 + 리조트 숙박',
+        category: '가족 추억',
+        price: 800000,
+        emoji: '🎡',
+        desc: '놀이기구 타고 사파리 구경하는 온 가족 1박 2일 힐링 여행'
+      },
+      {
+        id: 'ipad',
+        name: '최신 아이패드 & 스마트 펜슬',
+        category: '디지털 기기',
+        price: 1200000,
+        emoji: '📱',
+        desc: '그림도 그리고 인강도 보고 코딩도 배우는 똑똑한 태블릿'
+      },
+      {
+        id: 'travel',
+        name: '온 가족 에메랄드빛 해외여행',
+        category: '가족 추억',
+        price: 4000000,
+        emoji: '✈️',
+        desc: '비행기 타고 푸른 바다와 야자수가 있는 휴양지로 슝!'
+      },
+      {
+        id: 'college',
+        name: '꿈을 이루는 대학교 1년 전액 장학금',
+        category: '빛나는 미래',
+        price: 8000000,
+        emoji: '🎓',
+        desc: '원하는 꿈을 위해 마음껏 배우고 연구할 수 있는 든든한 학비'
+      },
+      {
+        id: 'car',
+        name: '우리 가족 안전하고 멋진 새 자동차',
+        category: '빛나는 미래',
+        price: 35000000,
+        emoji: '🚗',
+        desc: '언제든 신나게 드라이브를 떠날 수 있는 패밀리 SUV'
+      },
+      {
+        id: 'house_fund',
+        name: '행복한 우리 가족 내 집 마련 종잣돈',
+        category: '빛나는 미래',
+        price: 80000000,
+        emoji: '🏡',
+        desc: '창문으로 햇살이 쏟아지는 아늑하고 넓은 우리 집'
+      }
+    ];
+
+    const PERIOD_OPTIONS = [
+      { label: '1년', years: 1 },
+      { label: '5년', years: 5 },
+      { label: '10년', years: 10 },
+      { label: '20년', years: 20 },
+      { label: '30년', years: 30 },
+      { label: '40년', years: 40 }
+    ];
+
+    const PACKS_OPTIONS = [
+      { label: '0.5갑 (반 갑)', value: 0.5 },
+      { label: '1갑 (보통)', value: 1.0 },
+      { label: '2갑 (골초)', value: 2.0 }
+    ];
+
+    // 숫자가 역동적으로 부드럽게 올라가는 카운트업 커스텀 훅
+    function useCountUp(targetValue, duration = 800) {
+      const [count, setCount] = useState(0);
+      const prevValueRef = useRef(0);
+
+      useEffect(() => {
+        let startTimestamp = null;
+        const startVal = prevValueRef.current;
+        const endVal = targetValue;
+        const diff = endVal - startVal;
+
+        if (diff === 0) return;
+
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          // Ease-out expo 가속도 수식
+          const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+          const currentVal = Math.floor(startVal + diff * easeProgress);
+          setCount(currentVal);
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            prevValueRef.current = endVal;
+            setCount(endVal);
+          }
+        };
+
+        window.requestAnimationFrame(step);
+      }, [targetValue, duration]);
+
+      return count;
+    }
+
+    function App() {
+      // 1. 기본 설정 상태
+      const [packPrice, setPackPrice] = useState(4500);
+      const [years, setYears] = useState(1);
+      const [packsPerDay, setPacksPerDay] = useState(1);
+
+      // 2. 장바구니 상태 { [itemId]: 수량 }
+      const [cart, setCart] = useState({});
+      const [shakeWarning, setShakeWarning] = useState(false);
+
+      // 3. 모달 및 서약 상태
+      const [showCertificate, setShowCertificate] = useState(false);
+      const [studentName, setStudentName] = useState('');
+      const [hasPledged, setHasPledged] = useState(false);
+
+      // 폭죽 효과 트리거
+      const triggerConfetti = (isSuper = false) => {
+        if (typeof window.confetti === 'function') {
+          if (isSuper) {
+            window.confetti({
+              particleCount: 140,
+              spread: 90,
+              origin: { y: 0.6 }
+            });
+          } else {
+            window.confetti({
+              particleCount: 45,
+              spread: 60,
+              origin: { y: 0.7 }
+            });
+          }
+        }
+      };
+
+      // 총 일수, 총 개비 수, 누적 절약 금액 계산
+      const totalDays = years * 365;
+      const totalCigarettes = Math.round(totalDays * packsPerDay * 20);
+      const totalSavedMoney = Math.round(totalDays * packsPerDay * (Number(packPrice) || 0));
+
+      const animatedMoney = useCountUp(totalSavedMoney, 850);
+      const animatedCigarettes = useCountUp(totalCigarettes, 750);
+
+      // 장바구니 지출 계산
+      const totalSpent = Object.entries(cart).reduce((sum, [id, qty]) => {
+        const item = BUCKET_ITEMS.find(i => i.id === id);
+        return sum + (item ? item.price * qty : 0);
+      }, 0);
+
+      const remainingMoney = totalSavedMoney - totalSpent;
+      const budgetUsagePercent = totalSavedMoney > 0 
+        ? Math.min(100, Math.round((totalSpent / totalSavedMoney) * 100)) 
+        : 0;
+
+      // 장바구니 담기 핸들러
+      const handleAddItem = (item) => {
+        if (remainingMoney < item.price) {
+          setShakeWarning(true);
+          setTimeout(() => setShakeWarning(false), 900);
+          return;
+        }
+
+        setCart(prev => ({
+          ...prev,
+          [item.id]: (prev[item.id] || 0) + 1
+        }));
+        triggerConfetti(false);
+      };
+
+      // 수량 1개 빼기
+      const handleRemoveOne = (itemId) => {
+        setCart(prev => {
+          const current = prev[itemId] || 0;
+          if (current <= 1) {
+            const next = { ...prev };
+            delete next[itemId];
+            return next;
+          }
+          return { ...prev, [itemId]: current - 1 };
+        });
+      };
+
+      const handleClearCart = () => {
+        setCart({});
+      };
+
+      const formatKRW = (num) => {
+        return Number(num).toLocaleString('ko-KR') + '원';
+      };
+
+      return (
+        <div className="min-h-screen pb-20">
+          {/* 상단 네비게이션 헤더 */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b-4 border-yellow-300">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-11 h-11 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-md text-2xl transform hover:rotate-6 transition-transform select-none">
+                  🚭
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-rose-500 text-white text-[11px] font-black px-2 py-0.5 rounded-full animate-pulse">
+                      초등 흡연예방 교실
+                    </span>
+                    <span className="text-xs text-sky-700 font-bold hidden sm:inline">건강 & 꿈 지킴이</span>
+                  </div>
+                  <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+                    노담(No담배) 키즈 <span className="text-sky-600">꿈마켓</span> 🛒✨
+                  </h1>
+                </div>
+              </div>
+
+              {/* 담배 1갑 가격 설정 인풋 */}
+              <div className="flex items-center bg-amber-50 border-2 border-amber-300 rounded-2xl px-3 py-1.5 shadow-sm">
+                <span className="text-xs md:text-sm font-black text-amber-900 mr-2 flex items-center gap-1">
+                  🚬 1갑 가격:
+                </span>
+                <input
+                  type="number"
+                  min="500"
+                  step="500"
+                  max="50000"
+                  value={packPrice}
+                  onChange={(e) => setPackPrice(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-20 md:w-24 text-right font-black text-slate-900 bg-white border border-amber-300 rounded-xl px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner"
+                />
+                <span className="text-xs md:text-sm font-bold text-amber-900 ml-1">원</span>
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-6xl mx-auto px-4 mt-6 space-y-7">
+            
+            {}
+            {/* 설정 카드: 절약 기간 & 하루 흡연량 선택 */}
+            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-xl border-4 border-sky-200">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">✨</span>
+                <h2 className="text-lg md:text-xl font-black text-slate-800">
+                  만약 담배를 피우지 않는다면? 조건을 골라보세요!
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* 1. 기간 선택 */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-black text-slate-700">⏳ 절약할 기간 선택</span>
+                    <span className="text-xs bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full font-bold">
+                      {years}년 동안
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                    {PERIOD_OPTIONS.map((item) => (
+                      <button
+                        key={item.years}
+                        onClick={() => {
+                          setYears(item.years);
+                          triggerConfetti(false);
+                        }}
+                        className={`py-3 px-1 rounded-2xl font-black text-sm md:text-base transition-all transform active:scale-95 shadow-sm border-2 ${
+                          years === item.years
+                            ? 'bg-sky-500 text-white border-sky-600 shadow-md scale-105 ring-4 ring-sky-200'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. 하루 흡연량 선택 */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-black text-slate-700">💨 하루 흡연량 가정</span>
+                    <span className="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-bold">
+                      하루 {packsPerDay}갑 ({packsPerDay * 20}개비)
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {PACKS_OPTIONS.map((item) => (
+                      <button
+                        key={item.value}
+                        onClick={() => {
+                          setPacksPerDay(item.value);
+                          triggerConfetti(false);
+                        }}
+                        className={`py-3 px-2 rounded-2xl font-black text-sm md:text-base transition-all transform active:scale-95 shadow-sm border-2 ${
+                          packsPerDay === item.value
+                            ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-105 ring-4 ring-amber-200'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-amber-50 hover:border-amber-300'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {}
+            {/* ① 누적 낭비 금액 디스플레이 대형 카드 */}
+            <section className="bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 rounded-3xl p-6 md:p-8 text-slate-900 shadow-2xl border-4 border-yellow-200 relative overflow-hidden">
+              <span className="absolute -right-6 -bottom-6 text-9xl opacity-20 pointer-events-none select-none">
+                💰
+              </span>
+              <span className="absolute -left-6 -top-6 text-8xl opacity-15 pointer-events-none select-none">
+                🐷
+              </span>
+
+              <div className="relative z-10 text-center max-w-3xl mx-auto space-y-4">
+                <div className="inline-flex items-center gap-1.5 bg-white/95 text-amber-950 px-4 py-1.5 rounded-full font-black text-xs md:text-sm shadow-sm">
+                  <span>🏆 {years}년 동안 담배를 전혀 피우지 않고 저금했다면?</span>
+                </div>
+
+                {/* 역동적 카운트업 숫자 표기 */}
+                <div>
+                  <p className="text-sm md:text-base font-bold text-amber-950/90">
+                    우리가 지켜낸 눈부신 꿈의 보물 상자
+                  </p>
+                  <div className="text-4xl sm:text-6xl md:text-7xl font-black text-slate-900 tracking-tight my-2 drop-shadow-sm flex items-center justify-center gap-1 flex-wrap">
+                    <span>{animatedMoney.toLocaleString('ko-KR')}</span>
+                    <span className="text-2xl sm:text-4xl text-amber-950 font-extrabold">원!</span>
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold text-amber-950/80">
+                    (담배를 피웠다면 허공 속 매캐한 연기와 재로 사라졌을 엄청난 돈이에요!)
+                  </p>
+                </div>
+
+                {/* 개비 수 및 건강 인포그래픽 카드 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <div className="bg-white/95 rounded-2xl p-4 shadow-md flex items-center gap-3 text-left border-2 border-amber-200">
+                    <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center text-2xl shrink-0">
+                      🚫
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-bold">피우지 않은 담배 총 개수</p>
+                      <p className="text-xl md:text-2xl font-black text-rose-600">
+                        {animatedCigarettes.toLocaleString('ko-KR')}
+                        <span className="text-sm text-slate-700 font-bold ml-1">개비</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400">몸속에 나쁜 독성 연기를 넣지 않았어요!</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 rounded-2xl p-4 shadow-md flex items-center gap-3 text-left border-2 border-emerald-200">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl shrink-0">
+                      🫁
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-bold">선물받은 나의 건강</p>
+                      <p className="text-xl md:text-2xl font-black text-emerald-600">
+                        100% 깨끗한 핑크빛 폐
+                      </p>
+                      <p className="text-[11px] text-slate-400">숨차지 않고 친구들과 마음껏 달릴 수 있어요!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {}
+            {/* ② 버킷리스트 쇼핑 마켓: 실시간 예산 현황바 */}
+            <section className={`bg-white rounded-3xl p-5 md:p-6 shadow-xl border-4 transition-all duration-300 ${
+              shakeWarning ? 'border-rose-500 ring-8 ring-rose-200 animate-bounce' : 'border-emerald-300'
+            }`}>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full inline-flex items-center gap-1">
+                    🛒 실시간 꿈 쇼핑 계산기
+                  </span>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-800 mt-1">
+                    담배 안 피우고 모은 돈으로 버킷리스트 쇼핑하기 🛍️
+                  </h3>
+                </div>
+
+                {Object.keys(cart).length > 0 && (
+                  <button
+                    onClick={handleClearCart}
+                    className="flex items-center gap-1 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl border border-rose-200 transition-colors"
+                  >
+                    <span>🔄</span> 장바구니 비우기
+                  </button>
+                )}
+              </div>
+
+              {/* 예산 프로그레스 게이지 */}
+              <div className="bg-slate-100 rounded-2xl p-4 border border-slate-200">
+                <div className="flex justify-between items-end mb-2 text-sm md:text-base font-black">
+                  <span className="text-slate-600">
+                    사용한 꿈 예산: <span className="text-sky-600 font-extrabold">{formatKRW(totalSpent)}</span>
+                  </span>
+                  <span className={`text-base md:text-lg ${remainingMoney < 0 ? 'text-rose-500 font-extrabold' : 'text-emerald-600 font-extrabold'}`}>
+                    남은 돈: {formatKRW(remainingMoney)}
+                  </span>
+                </div>
+
+                <div className="w-full h-5 bg-slate-200 rounded-full overflow-hidden p-0.5 shadow-inner">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      budgetUsagePercent > 90 
+                        ? 'bg-gradient-to-r from-amber-400 to-rose-500' 
+                        : 'bg-gradient-to-r from-teal-400 to-emerald-500'
+                    }`}
+                    style={{ width: `${budgetUsagePercent}%` }}
+                  />
+                </div>
+
+                <div className="flex justify-between items-center text-xs text-slate-500 mt-2 font-bold">
+                  <span>0% 시작</span>
+                  <span>절약 머니의 {budgetUsagePercent}% 달성!</span>
+                  <span>100% 한도</span>
+                </div>
+              </div>
+
+              {/* 예산 초과 경고 메시지 배너 */}
+              {shakeWarning && (
+                <div className="mt-4 bg-rose-100 border-2 border-rose-400 text-rose-800 px-4 py-3 rounded-2xl flex items-center gap-2 animate-pulse">
+                  <span className="text-2xl">⚠️</span>
+                  <div className="text-sm font-black">
+                    앗! 남은 돈이 부족해요! 😭 기간을 더 길게 늘리거나 다른 신나는 아이템을 담아보세요!
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {}
+            {/* 상품 리스트 & 우측 장바구니 결제창 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              {/* 왼쪽: 상품 목록 (2열 너비) */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <h4 className="text-base md:text-lg font-black text-slate-700 flex items-center gap-1.5">
+                    <span>🎁 사고 싶은 선물을 콕콕 눌러 담아보세요!</span>
+                  </h4>
+                  <span className="text-xs text-slate-500 font-bold">총 {BUCKET_ITEMS.length}개 꿈 아이템</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {BUCKET_ITEMS.map((item) => {
+                    const inCartQty = cart[item.id] || 0;
+                    const canAfford = remainingMoney >= item.price;
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={`bg-white rounded-3xl p-4 border-2 transition-all duration-200 relative flex flex-col justify-between shadow-sm hover:shadow-lg ${
+                          inCartQty > 0 
+                            ? 'border-sky-400 ring-2 ring-sky-200 bg-sky-50/40' 
+                            : 'border-slate-200 hover:border-amber-300'
+                        } ${!canAfford && inCartQty === 0 ? 'opacity-60 bg-slate-50' : ''}`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-extrabold bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full">
+                            {item.category}
+                          </span>
+                          {inCartQty > 0 && (
+                            <span className="bg-sky-500 text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm animate-pulse">
+                              담김: {inCartQty}개
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-start gap-3 my-1">
+                          <span className="text-4xl p-2.5 bg-amber-50 rounded-2xl border border-amber-100 shrink-0 select-none">
+                            {item.emoji}
+                          </span>
+                          <div className="flex-1">
+                            <h5 className="font-black text-slate-800 text-base leading-tight">
+                              {item.name}
+                            </h5>
+                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                          <div>
+                            <span className="text-[11px] text-slate-400 block font-bold">가격</span>
+                            <span className="font-black text-slate-900 text-base">
+                              {formatKRW(item.price)}
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => handleAddItem(item)}
+                            className={`px-4 py-2 rounded-2xl font-black text-sm flex items-center gap-1 shadow-md transition-all active:scale-95 ${
+                              canAfford
+                                ? 'bg-amber-400 hover:bg-amber-500 text-amber-950 shadow-amber-200 cursor-pointer'
+                                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            }`}
+                          >
+                            <span>+</span> 담기
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {}
+              {/* 오른쪽: 장바구니 내역 & 완료 버튼 */}
+              <div className="bg-white rounded-3xl p-5 md:p-6 shadow-xl border-4 border-indigo-200 sticky top-20">
+                <div className="flex items-center justify-between pb-3 border-b-2 border-slate-100">
+                  <h4 className="text-lg font-black text-slate-800 flex items-center gap-1.5">
+                    <span>🛒</span> 나의 장바구니
+                  </h4>
+                  <span className="text-xs bg-indigo-100 text-indigo-800 font-extrabold px-2.5 py-1 rounded-full">
+                    {Object.values(cart).reduce((a, b) => a + b, 0)}개 선택
+                  </span>
+                </div>
+
+                {/* 담긴 물품 목록 */}
+                <div className="my-4 max-h-72 overflow-y-auto pr-1 space-y-3 divide-y divide-slate-100">
+                  {Object.keys(cart).length === 0 ? (
+                    <div className="text-center py-10">
+                      <span className="text-4xl block mb-2 select-none">🛍️</span>
+                      <p className="text-slate-500 font-bold text-sm">
+                        아직 담긴 꿈 아이템이 없어요!
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        왼쪽에서 마음에 드는 선물을 골라 [담기]를 눌러보세요.
+                      </p>
+                    </div>
+                  ) : (
+                    Object.entries(cart).map(([id, qty]) => {
+                      const item = BUCKET_ITEMS.find(i => i.id === id);
+                      if (!item) return null;
+                      return (
+                        <div key={id} className="pt-3 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <span className="text-xl shrink-0">{item.emoji}</span>
+                            <div className="truncate">
+                              <p className="text-xs font-black text-slate-800 truncate">
+                                {item.name}
+                              </p>
+                              <p className="text-[11px] text-slate-500 font-semibold">
+                                {formatKRW(item.price * qty)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 shrink-0">
+                            <button
+                              onClick={() => handleRemoveOne(id)}
+                              className="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-slate-700 hover:bg-slate-200 shadow-xs font-bold text-xs"
+                            >
+                              -
+                            </button>
+                            <span className="w-5 text-center text-xs font-black text-slate-800">
+                              {qty}
+                            </span>
+                            <button
+                              onClick={() => handleAddItem(item)}
+                              className="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-slate-700 hover:bg-slate-200 shadow-xs font-bold text-xs"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* 금액 영수증 */}
+                <div className="bg-indigo-50/80 rounded-2xl p-4 space-y-2 border border-indigo-100">
+                  <div className="flex justify-between text-xs font-bold text-slate-600">
+                    <span>총 절약한 돈</span>
+                    <span>{formatKRW(totalSavedMoney)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs font-bold text-indigo-700">
+                    <span>장바구니 담은 금액</span>
+                    <span>- {formatKRW(totalSpent)}</span>
+                  </div>
+                  <div className="border-t border-indigo-200 pt-2 flex justify-between text-sm font-black text-slate-800">
+                    <span>남아있는 잔액</span>
+                    <span className={remainingMoney < 0 ? 'text-rose-500' : 'text-emerald-600'}>
+                      {formatKRW(remainingMoney)}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  disabled={Object.keys(cart).length === 0}
+                  onClick={() => {
+                    triggerConfetti(true);
+                    setShowCertificate(true);
+                  }}
+                  className={`w-full mt-4 py-3.5 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-lg transition-all transform active:scale-95 ${
+                    Object.keys(cart).length > 0
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-emerald-200 cursor-pointer animate-pulse'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
+                >
+                  <span>🎉</span>
+                  <span>내 꿈 쇼핑 완료 & 축하받기!</span>
+                </button>
+              </div>
+            </div>
+
+            {}
+            {/* ③ 교육적 마무리 슬로건 카드 & 건강 비교 배지 */}
+            <section className="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 rounded-3xl p-6 md:p-8 text-white shadow-2xl space-y-6">
+              <div className="text-center max-w-2xl mx-auto space-y-3">
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs md:text-sm font-bold">
+                  <span>🛡️ 선생님이 들려주는 노담 이야기</span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug">
+                  "담배를 피우지 않는 것만으로도 건강뿐만 아니라 꿈을 이룰 수 있는 큰 돈을 모을 수 있어요!"
+                </h3>
+
+                <p className="text-sm md:text-base text-sky-100 font-medium leading-relaxed">
+                  담배 연기 속에는 니코틴, 타르, 일산화탄소 등 4,000가지가 넘는 유해 물질이 들어있어요.
+                  담배 대신 건강한 꿈과 행복을 저금통에 가득 채우는 멋진 어린이가 되어볼까요?
+                </p>
+              </div>
+
+              {/* 3가지 비교 카드 */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-2">
+                    🏃‍♂️
+                  </div>
+                  <h5 className="font-black text-base text-yellow-300">튼튼한 심장과 폐</h5>
+                  <p className="text-xs text-slate-100 mt-1">
+                    담배를 피우지 않으면 운동장을 마음껏 뛰어도 숨이 덜 차고 언제나 활기차요!
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-2">
+                    💎
+                  </div>
+                  <h5 className="font-black text-base text-yellow-300">꿈을 이루는 종잣돈</h5>
+                  <p className="text-xs text-slate-100 mt-1">
+                    버려지는 담뱃돈 대신 멋진 게임기, 해외여행, 나만의 자동차와 집을 살 수 있어요.
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-2">
+                    🌿
+                  </div>
+                  <h5 className="font-black text-base text-yellow-300">상쾌한 숨과 가족 사랑</h5>
+                  <p className="text-xs text-slate-100 mt-1">
+                    옷과 입에서 불쾌한 냄새가 나지 않아 사랑하는 가족과 친구들이 아주 좋아해요!
+                  </p>
+                </div>
+              </div>
+            </section>
+
+          </main>
+
+          {}
+          {/* 쇼핑 완료 축하 & 노담 다짐 서약서 팝업 모달 */}
+          {showCertificate && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border-4 border-yellow-300 relative text-center">
+                <button
+                  onClick={() => setShowCertificate(false)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold"
+                >
+                  ✕
+                </button>
+
+                <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-inner mb-3">
+                  🏆
+                </div>
+
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full">
+                  꿈 쇼핑 달성 인증서
+                </span>
+
+                <h3 className="text-2xl font-black text-slate-800 mt-2">
+                  축하합니다! 멋진 꿈을 담았어요!
+                </h3>
+
+                <p className="text-sm text-slate-600 mt-1">
+                  담배를 멀리한 덕분에 무려 <b className="text-sky-600 font-black">{formatKRW(totalSpent)}</b> 어치의
+                  소중한 선물과 미래를 내 것으로 만들 수 있었습니다!
+                </p>
+
+                {/* 담은 물품 목록 */}
+                <div className="bg-amber-50 rounded-2xl p-4 my-4 border border-amber-200 text-left max-h-40 overflow-y-auto">
+                  <p className="text-xs font-bold text-amber-900 mb-2">내가 지켜낸 소중한 선물 목록:</p>
+                  <div className="space-y-1">
+                    {Object.entries(cart).map(([id, qty]) => {
+                      const item = BUCKET_ITEMS.find(i => i.id === id);
+                      if (!item) return null;
+                      return (
+                        <div key={id} className="text-xs font-black text-slate-700 flex justify-between">
+                          <span>{item.emoji} {item.name}</span>
+                          <span className="text-amber-800 font-extrabold">{qty}개</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 서약 섹션 */}
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2">
+                  <label className="block text-xs font-bold text-slate-600">
+                    내 이름으로 평생 노담(금연) 약속하기 ✍️
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="이름을 입력하세요 (예: 김건강)"
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+                    <button
+                      onClick={() => {
+                        if (studentName.trim()) {
+                          setHasPledged(true);
+                          triggerConfetti(true);
+                        }
+                      }}
+                      className="bg-sky-500 hover:bg-sky-600 text-white text-xs font-black px-4 py-2 rounded-xl shrink-0 transition-colors"
+                    >
+                      도장 쾅!
+                    </button>
+                  </div>
+
+                  {hasPledged && (
+                    <div className="mt-2 bg-emerald-100 text-emerald-800 text-xs font-black p-2.5 rounded-xl text-center flex items-center justify-center gap-1.5 animate-pulse">
+                      <span>✨ {studentName} 어린이는 평생 건강과 꿈을 지키기로 굳게 약속했어요! 🌟</span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setShowCertificate(false)}
+                  className="mt-5 w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-black py-3 rounded-2xl text-sm transition-colors shadow-md"
+                >
+                  마켓으로 돌아가기
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 하단 푸터 */}
+          <footer className="mt-12 text-center text-xs text-slate-400 font-medium">
+            <p>🏫 초등학교 흡연예방 보건교육 인터랙티브 체험관</p>
+            <p className="mt-0.5">건강한 숨, 빛나는 미래! 우리 모두 노담(No담배)을 실천해요 🌱</p>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

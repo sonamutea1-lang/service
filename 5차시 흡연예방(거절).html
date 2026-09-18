@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>당당하게 거절해요! - 나를 지키는 단호박 거절의 기술</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Tone.js for Sound Effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            },
+            hero: {
+              yellow: '#fef08a',
+              orange: '#f97316',
+              purple: '#8b5cf6',
+              blue: '#0284c7'
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'bounce-slow': 'bounce 2.5s infinite',
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: Pretendard, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .chat-bubble-peer::after {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 18px;
+      border-width: 8px 12px 8px 0;
+      border-style: solid;
+      border-color: transparent #e2e8f0 transparent transparent;
+    }
+    .chat-bubble-me::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 18px;
+      border-width: 8px 0 8px 12px;
+      border-style: solid;
+      border-color: transparent transparent transparent #22c55e;
+    }
+    .stamp-badge {
+      transform: rotate(-12deg);
+      box-shadow: 0 0 0 4px #dc2626;
+    }
+    /* Hide scrollbar for tabs */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-green-200">
+
+  <!-- Sticky Top Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTab('home')">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-green-600 to-emerald-400 flex items-center justify-center text-white text-xl shadow-md shadow-green-200">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">초등 5학년 보건/창체</span>
+          <h1 class="text-lg font-black tracking-tight text-slate-900 leading-tight">단호박 거절의 기술!</h1>
+        </div>
+      </div>
+
+      <!-- Audio Mute/Unmute & User Badge -->
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition text-sm flex items-center gap-1.5 font-medium shadow-sm">
+          <i id="sound-icon" class="fa-solid fa-volume-high text-green-600"></i>
+          <span id="sound-text" class="hidden sm:inline">효과음 ON</span>
+        </button>
+        <div id="user-display-badge" class="hidden items-center gap-1.5 bg-green-50 text-green-800 border border-green-200 px-3 py-1.5 rounded-xl text-sm font-semibold">
+          <i class="fa-solid fa-user-graduate text-green-600"></i>
+          <span id="user-display-name">5학년 학생</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tab Bar -->
+    <div class="max-w-4xl mx-auto px-4 flex gap-2 overflow-x-auto no-scrollbar border-t border-slate-100 pt-2 pb-1">
+      <button onclick="navigateTab('home')" class="nav-tab active-tab flex-1 min-w-[75px] py-2 px-3 text-center rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-green-600 text-white shadow-sm" data-tab="home">
+        <i class="fa-solid fa-house"></i> <span>홈</span>
+      </button>
+      <button onclick="navigateTab('learn')" class="nav-tab flex-1 min-w-[75px] py-2 px-3 text-center rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100" data-tab="learn">
+        <i class="fa-solid fa-book-open"></i> <span>STOP 거절법</span>
+      </button>
+      <button onclick="navigateTab('roleplay')" class="nav-tab flex-1 min-w-[75px] py-2 px-3 text-center rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100" data-tab="roleplay">
+        <i class="fa-solid fa-comments"></i> <span>실전 시뮬레이션</span>
+      </button>
+      <button onclick="navigateTab('quiz')" class="nav-tab flex-1 min-w-[75px] py-2 px-3 text-center rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100" data-tab="quiz">
+        <i class="fa-solid fa-bolt"></i> <span>단호박 퀴즈</span>
+      </button>
+      <button onclick="navigateTab('cert')" class="nav-tab flex-1 min-w-[75px] py-2 px-3 text-center rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100" data-tab="cert">
+        <i class="fa-solid fa-award"></i> <span>선언서 발급</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- VIEW 1: HOME & WELCOME -->
+    <section id="view-home" class="space-y-6">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white p-6 sm:p-8 shadow-xl">
+        <div class="absolute -right-6 -bottom-8 opacity-15 text-9xl">
+          <i class="fa-solid fa-ban-smoking"></i>
+        </div>
+        <div class="relative z-10 max-w-xl">
+          <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border border-white/30">
+            <i class="fa-solid fa-sparkles text-yellow-300"></i> 스스로를 지키는 슈퍼 히어로 파워
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold leading-snug mb-3">
+            "진짜 친구는 내 건강을 해치는 위험을 강요하지 않아요!"
+          </h2>
+          <p class="text-green-100 text-sm sm:text-base leading-relaxed mb-6 font-medium">
+            담배를 권하는 친구나 선배를 만났을 때, 우정을 깨뜨리지 않으면서도 당당하게 나의 건강을 지키는 <strong>S.T.O.P 거절 4단계</strong>를 함께 배워보아요!
+          </p>
+
+          <!-- Student Name Input / Quick Start Card -->
+          <div class="bg-white/95 text-slate-800 p-4 rounded-2xl shadow-lg border border-white/50 backdrop-blur-sm">
+            <p class="text-xs font-bold text-slate-500 mb-2">🎓 나의 학습 정보 입력하기</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <div class="flex gap-2 flex-1">
+                <input type="text" id="input-grade" value="5" class="w-16 px-3 py-2 text-center text-sm border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-green-500 outline-none" placeholder="학년" readonly>
+                <input type="text" id="input-class" class="w-20 px-3 py-2 text-center text-sm border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-green-500 outline-none" placeholder="반 (예: 2)" value="1">
+              </div>
+              <input type="text" id="input-name" class="flex-1 px-4 py-2 text-sm border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-green-500 outline-none" placeholder="이름을 입력하세요 (예: 김단호)">
+              <button onclick="startJourney()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl text-sm font-extrabold transition flex items-center justify-center gap-2 shadow-md shadow-green-700/30">
+                <span>학습 시작!</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learning Steps Card Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1 -->
+        <div onclick="navigateTab('learn')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-green-400 transition cursor-pointer group">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+            <i class="fa-solid fa-hand"></i>
+          </div>
+          <span class="text-xs font-bold text-amber-600">STEP 1</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">S.T.O.P 거절법</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">단호하게 거절하고 내 뜻을 당당히 밝히는 4단계 공식 배우기</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div onclick="navigateTab('roleplay')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer group">
+          <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span class="text-xs font-bold text-blue-600">STEP 2</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">실전 시뮬레이션</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">단짝 친구, 놀리는 친구, 무서운 선배의 권유에 직접 대답하기</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div onclick="navigateTab('quiz')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-400 transition cursor-pointer group">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="text-xs font-bold text-purple-600">STEP 3</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">단호박 퀴즈 배틀</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">5문제 풀고 100점 마스터에 도전하는 지식 챌린지</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div onclick="navigateTab('cert')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-400 transition cursor-pointer group">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+            <i class="fa-solid fa-stamp"></i>
+          </div>
+          <span class="text-xs font-bold text-emerald-600">STEP 4</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1">금연 라이선스 발급</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">나만의 멋진 거절 한마디 적고 평생 금연 선언서 받기</p>
+        </div>
+      </div>
+
+      <!-- Empathy & Insight Box -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 mb-3">
+          <i class="fa-solid fa-lightbulb text-amber-500"></i>
+          <span>잠깐! 친구들은 왜 담배를 권할까요?</span>
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-red-600 flex items-center gap-2 mb-1">
+              <i class="fa-solid fa-triangle-exclamation"></i> 권유하는 사람의 진짜 심리
+            </div>
+            <p class="text-slate-600 text-xs sm:text-sm">
+              "혼자 하기 불안하고 무서워서 공범(?)을 만들고 싶어해요. 혹은 어른 흉내를 내며 멋져 보이고 싶을 뿐이에요."
+            </p>
+          </div>
+          <div class="p-4 rounded-2xl bg-green-50 border border-green-200">
+            <div class="font-bold text-green-700 flex items-center gap-2 mb-1">
+              <i class="fa-solid fa-heart-circle-check"></i> 우리의 지혜로운 생각
+            </div>
+            <p class="text-slate-700 text-xs sm:text-sm">
+              "거절한다고 해서 진짜 친구가 끊어지지 않아요. 거절할 줄 아는 사람이 오히려 더 신뢰받고 멋진 친구입니다!"
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: STOP REFUSAL METHOD (LEARN) -->
+    <section id="view-learn" class="hidden space-y-6">
+      <div class="text-center max-w-2xl mx-auto mb-6">
+        <span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+          단호박 거절의 4원칙
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          마법의 4단계, <span class="text-green-600">S.T.O.P 기술</span>을 기억해요!
+        </h2>
+        <p class="text-slate-600 text-sm mt-2">
+          각 단계를 클릭하여 자세한 요령과 음성 예시를 들어보세요.
+        </p>
+      </div>
+
+      <!-- 4-Stage Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- S Card -->
+        <div class="stop-step-card bg-white p-6 rounded-3xl border-2 border-red-200 hover:border-red-400 transition shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden" onclick="playSpeechText('Say No. 단호하게 거절하기! 눈을 똑바로 보고 싫어, 안 해라고 분명히 말해요.')">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center font-black text-2xl shadow-sm">
+              S
+            </div>
+            <span class="text-xs bg-red-50 text-red-700 font-bold px-3 py-1 rounded-full border border-red-200">
+              1단계 : 단호하게 NO
+            </span>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 mt-4">Say No! (단호하게 거절하기)</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed font-medium">
+            우물쭈물하거나 웃지 말고, 상대방의 <strong>눈을 똑바로 바라보며</strong> 확실한 목소리로 거절해요.
+          </p>
+          <div class="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 text-red-900 text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-red-500"></i>
+            <span>"싫어, 난 안 할래." / "난 담배 안 피워."</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">💡 시선 피하지 않기, 허리 펴고 당당한 자세!</div>
+        </div>
+
+        <!-- T Card -->
+        <div class="stop-step-card bg-white p-6 rounded-3xl border-2 border-amber-200 hover:border-amber-400 transition shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden" onclick="playSpeechText('Tell Reason. 이유 말하기! 나는 담배 냄새가 싫고 내 폐 건강을 지키고 싶어라고 나 전달법으로 말해요.')">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-black text-2xl shadow-sm">
+              T
+            </div>
+            <span class="text-xs bg-amber-50 text-amber-700 font-bold px-3 py-1 rounded-full border border-amber-200">
+              2단계 : 이유 말하기
+            </span>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 mt-4">Tell Reason (이유 분명히 밝히기)</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed font-medium">
+            상대방을 비난하지 않고 <strong>'나(I)'를 주어로</strong> 건강과 원칙에 대한 이유를 말해요.
+          </p>
+          <div class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-100 text-amber-900 text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-amber-500"></i>
+            <span>"담배 피우면 폐 건강 상하고 냄새나서 싫어."</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">💡 "너 나빠"가 아닌 "나는 건강을 지키고 싶어"로 표현하기!</div>
+        </div>
+
+        <!-- O Card -->
+        <div class="stop-step-card bg-white p-6 rounded-3xl border-2 border-blue-200 hover:border-blue-400 transition shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden" onclick="playSpeechText('Offer Alternative. 대안 제안하기! 담배 대신 축구하러 가자거나 매점 가자고 다른 재미있는 활동을 제안해요.')">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-2xl shadow-sm">
+              O
+            </div>
+            <span class="text-xs bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full border border-blue-200">
+              3단계 : 대안 제안하기
+            </span>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 mt-4">Offer Alternative (더 좋은 활동 제안)</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed font-medium">
+            어색해진 분위기를 전환하며 친구 관계를 지키기 위해 <strong>신나고 유익한 다른 활동</strong>을 제시해요.
+          </p>
+          <div class="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100 text-blue-900 text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-blue-500"></i>
+            <span>"그거 말고 우리 떡볶이 먹으러 가자!" / "운동장 가서 축구하자!"</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">💡 유혹의 순간에서 화제를 돌리는 가장 똑똑한 방법!</div>
+        </div>
+
+        <!-- P Card -->
+        <div class="stop-step-card bg-white p-6 rounded-3xl border-2 border-purple-200 hover:border-purple-400 transition shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden" onclick="playSpeechText('Pass and Report. 피하고 도움 요청하기! 계속 강요하면 난 먼저 갈게 하고 즉시 자리를 피하고 믿을 수 있는 어른께 알려요.')">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center font-black text-2xl shadow-sm">
+              P
+            </div>
+            <span class="text-xs bg-purple-50 text-purple-700 font-bold px-3 py-1 rounded-full border border-purple-200">
+              4단계 : 피하고 알리기
+            </span>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 mt-4">Pass & Report (자리 피하고 도움 요청)</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed font-medium">
+            거절해도 계속 강요하거나 위협한다면 <strong>즉시 자리를 벗어나</strong> 선생님이나 부모님께 알립니다.
+          </p>
+          <div class="mt-4 p-3 bg-purple-50 rounded-xl border border-purple-100 text-purple-900 text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-purple-500"></i>
+            <span>"난 학원 가야 해서 먼저 갈게." (신속히 밝은 큰길로 이동)</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">💡 선배나 무리의 위협이 있을 땐 즉각적인 안전 확보가 최우선!</div>
+        </div>
+      </div>
+
+      <!-- Golden Rule Banner -->
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-6 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl shrink-0">
+            🎯
+          </div>
+          <div>
+            <h4 class="font-bold text-lg">기억해요! 당당한 거절의 태도</h4>
+            <p class="text-amber-100 text-xs sm:text-sm">목소리는 또박또박! 어깨는 펴고! 시선은 상대방의 미간을 바라보며 당당하게!</p>
+          </div>
+        </div>
+        <button onclick="navigateTab('roleplay')" class="w-full sm:w-auto px-5 py-2.5 bg-white text-orange-600 hover:bg-orange-50 rounded-2xl font-black text-sm transition shrink-0 shadow">
+          실전 시뮬레이션 도전! →
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: INTERACTIVE ROLEPLAYING SIMULATOR -->
+    <section id="view-roleplay" class="hidden space-y-6">
+      <!-- Scenario Selector Tabs -->
+      <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div>
+          <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">실전 롤플레잉</span>
+          <h2 class="text-lg font-black text-slate-900 mt-1">상황을 고르고 거절의 기술을 직접 시험해보세요!</h2>
+        </div>
+        <div class="flex gap-1.5 w-full sm:w-auto">
+          <button onclick="loadScenario(0)" id="scen-btn-0" class="flex-1 sm:flex-none px-3 py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-600 text-white transition">상황 1: 단짝친구</button>
+          <button onclick="loadScenario(1)" id="scen-btn-1" class="flex-1 sm:flex-none px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition">상황 2: 쫄보 도발</button>
+          <button onclick="loadScenario(2)" id="scen-btn-2" class="flex-1 sm:flex-none px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition">상황 3: 동네 선배</button>
+        </div>
+      </div>
+
+      <!-- Simulation Sandbox Card -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden flex flex-col">
+        <!-- Scenario Header Banner -->
+        <div id="sim-header" class="bg-slate-800 text-white p-5 border-b border-slate-700 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span id="sim-icon" class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-xl">🤫</span>
+            <div>
+              <span id="sim-tag" class="text-[11px] font-bold text-yellow-400">비밀 유지형 유혹</span>
+              <h3 id="sim-title" class="text-base sm:text-lg font-black leading-tight">상황 1. 단짝 친구의 비밀 제안</h3>
+            </div>
+          </div>
+          <!-- Shield Meter -->
+          <div class="text-right">
+            <span class="text-[10px] text-slate-300 block font-semibold">단호박 방어 실드</span>
+            <div class="w-24 sm:w-32 bg-slate-700 h-3 rounded-full overflow-hidden p-0.5 mt-1 border border-slate-600">
+              <div id="sim-shield-bar" class="bg-gradient-to-r from-yellow-400 to-green-500 h-full rounded-full transition-all duration-500" style="width: 25%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dialogue Arena -->
+        <div class="p-6 bg-slate-50 flex-1 space-y-4 min-h-[260px] flex flex-col justify-center">
+          <!-- Opponent Balloon -->
+          <div class="flex items-start gap-3 max-w-xl">
+            <div id="peer-avatar" class="w-12 h-12 rounded-2xl bg-amber-200 text-amber-800 flex items-center justify-center text-2xl font-black shrink-0 shadow-sm">
+              👦
+            </div>
+            <div class="relative bg-white border border-slate-200 p-4 rounded-2xl shadow-sm text-slate-800 chat-bubble-peer">
+              <div id="peer-name" class="text-xs font-bold text-slate-400 mb-1">단짝 친구 민수</div>
+              <p id="peer-dialogue" class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">
+                "야, 이거 우리 형 가방에서 몰래 가져온 건데 딱 한 모금만 해보자. 아무한테도 안 들키면 돼. 우리 절친이잖아!"
+              </p>
+              <button onclick="speakPeerDialogue()" class="mt-2 text-xs text-blue-600 font-bold flex items-center gap-1 hover:underline">
+                <i class="fa-solid fa-volume-high"></i> 친구 목소리 듣기
+              </button>
+            </div>
+          </div>
+
+          <!-- Player Response Area (Dynamic) -->
+          <div id="player-balloon" class="hidden self-end flex items-start gap-3 max-w-xl flex-row-reverse">
+            <div class="w-12 h-12 rounded-2xl bg-green-500 text-white flex items-center justify-center text-2xl font-black shrink-0 shadow-sm">
+              🦸
+            </div>
+            <div class="relative bg-green-600 p-4 rounded-2xl shadow-md text-white chat-bubble-me">
+              <div class="text-xs font-bold text-green-200 mb-1 text-right">나의 당당한 거절</div>
+              <p id="player-dialogue" class="text-sm sm:text-base font-bold leading-relaxed"></p>
+            </div>
+          </div>
+
+          <!-- Coach Feedback Box (Hidden initially) -->
+          <div id="coach-feedback" class="hidden p-4 rounded-2xl border transition-all text-xs sm:text-sm"></div>
+        </div>
+
+        <!-- Choices Options Area -->
+        <div id="choices-container" class="p-5 bg-white border-t border-slate-200 space-y-2.5">
+          <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-hand-pointer text-green-600"></i> 다음 중 가장 바람직한 거절 대답을 선택하세요:
+          </p>
+          <!-- Dynamic Choice Buttons rendered via JS -->
+          <div id="choice-buttons-list" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Next Scenario Controller -->
+        <div id="sim-control-footer" class="hidden p-4 bg-slate-100 border-t border-slate-200 flex justify-between items-center">
+          <span id="sim-result-status" class="text-xs font-bold text-green-700"></span>
+          <button onclick="resetCurrentScenario()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+            다시 시도하기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: QUIZ BATTLE -->
+    <section id="view-quiz" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-purple-600">거절 마스터 시험</span>
+              <h2 class="text-lg font-black text-slate-900">단호박 흡연예방 퀴즈 배틀</h2>
+            </div>
+          </div>
+          <!-- Progress indicator -->
+          <div class="text-right">
+            <span id="quiz-progress-text" class="text-xs font-extrabold text-purple-600">문제 1 / 5</span>
+            <div class="w-24 bg-slate-100 h-2 rounded-full overflow-hidden mt-1">
+              <div id="quiz-progress-bar" class="bg-purple-600 h-full rounded-full transition-all" style="width: 20%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Body -->
+        <div id="quiz-question-box" class="space-y-4">
+          <div class="flex items-start gap-3">
+            <span id="quiz-q-num" class="w-8 h-8 rounded-xl bg-purple-600 text-white font-black flex items-center justify-center shrink-0 text-sm">
+              Q1
+            </span>
+            <p id="quiz-question-title" class="text-base sm:text-lg font-black text-slate-900 leading-snug pt-0.5">
+              친구가 "딱 한 번은 몸에 아무 해가 없어!"라고 말하며 담배를 권했습니다. 올바른 사실은 무엇일까요?
+            </p>
+          </div>
+
+          <!-- Multiple choices container -->
+          <div id="quiz-options-list" class="space-y-2.5 pt-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Quiz Feedback & Explanation -->
+        <div id="quiz-explanation-box" class="hidden mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div id="quiz-result-title" class="font-extrabold text-sm mb-1 flex items-center gap-2"></div>
+          <p id="quiz-result-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed"></p>
+          <div class="mt-3 flex justify-end">
+            <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow transition flex items-center gap-2">
+              <span>다음 문제</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quiz Complete Summary (Hidden) -->
+        <div id="quiz-summary-box" class="hidden text-center py-8 space-y-4">
+          <div class="w-20 h-20 mx-auto rounded-3xl bg-green-100 text-green-600 flex items-center justify-center text-4xl shadow-md">
+            🏆
+          </div>
+          <h3 class="text-2xl font-black text-slate-900">퀴즈 챌린지 완료!</h3>
+          <p id="quiz-final-score" class="text-base font-bold text-slate-700">총 5문제 중 5문제를 맞혔습니다!</p>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto">
+            당신은 유혹 앞에서도 끄떡없는 단호박 거절의 달인입니다! 이제 평생 금연 선언서를 발급받아보세요.
+          </p>
+          <div class="pt-3 flex justify-center gap-3">
+            <button onclick="restartQuiz()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-xl font-bold text-xs hover:bg-slate-50">
+              다시 풀기
+            </button>
+            <button onclick="navigateTab('cert')" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-black text-xs shadow-md shadow-green-600/30">
+              선언서 발급받기 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: PLEDGE & LICENSE CERTIFICATE -->
+    <section id="view-cert" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="text-center max-w-lg mx-auto mb-6">
+          <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+            평생 금연 & 거절 약속
+          </span>
+          <h2 class="text-2xl font-black text-slate-900">단호박 거절 선언서 및 라이선스</h2>
+          <p class="text-slate-500 text-xs sm:text-sm mt-1">
+            나만의 멋진 거절 한마디를 입력하고 도장을 쾅 찍어 인증서를 완성하세요!
+          </p>
+        </div>
+
+        <!-- Certificate Design Frame (Printable/Saveable) -->
+        <div id="certificate-card" class="relative max-w-xl mx-auto bg-gradient-to-b from-amber-50/70 via-white to-green-50/60 p-6 sm:p-8 rounded-3xl border-4 border-emerald-600 shadow-xl overflow-hidden">
+          <!-- Background Watermark -->
+          <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none">
+            <i class="fa-solid fa-award text-[260px] text-green-900"></i>
+          </div>
+
+          <!-- Header -->
+          <div class="text-center border-b-2 border-emerald-600/30 pb-4 mb-5">
+            <span class="text-xs font-black tracking-widest text-emerald-800 uppercase">NO SMOKING & REFUSAL LICENSE</span>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">나를 지키는 단호박 거절 선언서</h3>
+            <p class="text-xs text-slate-500 font-semibold mt-0.5">초등학교 5학년 건강 지킴이 라이선스</p>
+          </div>
+
+          <!-- Student Info Row (Directly Editable by Students) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm bg-white/90 p-3.5 rounded-2xl border border-emerald-200 mb-4 shadow-sm">
+            <div>
+              <label for="cert-input-school" class="text-emerald-800 font-bold block text-[11px] mb-1 flex items-center gap-1">
+                <i class="fa-solid fa-school text-emerald-600"></i> 소속 및 학년:
+              </label>
+              <input type="text" id="cert-input-school" value="5학년 1반" class="w-full bg-emerald-50/50 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs sm:text-sm font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition" placeholder="예: 5학년 2반">
+            </div>
+            <div>
+              <label for="cert-input-name" class="text-emerald-800 font-bold block text-[11px] mb-1 flex items-center gap-1">
+                <i class="fa-solid fa-user-pen text-emerald-600"></i> 선언자 성명:
+              </label>
+              <input type="text" id="cert-input-name" value="김단호" class="w-full bg-emerald-50/50 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs sm:text-sm font-extrabold text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition" placeholder="이름을 입력하세요">
+            </div>
+          </div>
+
+          <!-- Pledge Points -->
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+            <div class="flex items-start gap-2 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
+              <span class="font-black text-emerald-700 shrink-0">1.</span>
+              <span><strong>단호한 거절(STOP):</strong> 담배를 권유받았을 때 상대방의 눈을 똑바로 보고 분명하게 <strong>"싫어, 안 해!"</strong>라고 말한다.</span>
+            </div>
+            <div class="flex items-start gap-2 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
+              <span class="font-black text-emerald-700 shrink-0">2.</span>
+              <span><strong>진짜 용기:</strong> "겁쟁이냐?"라고 도발해도 흔들리지 않고 건강을 지키는 것이 진정한 용기임을 기억한다.</span>
+            </div>
+            <div class="flex items-start gap-2 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
+              <span class="font-black text-emerald-700 shrink-0">3.</span>
+              <span><strong>평생 금연:</strong> 호기심이나 또래 압력에 굴복하지 않고 내 소중한 몸과 꿈을 위해 평생 담배를 피우지 않는다.</span>
+            </div>
+          </div>
+
+          <!-- Custom Slogan Input / Display -->
+          <div class="mt-4 p-3 bg-yellow-50 rounded-2xl border border-yellow-200">
+            <label class="block text-[11px] font-bold text-amber-800 mb-1">
+              💬 유혹을 물리칠 나만의 거절 한마디:
+            </label>
+            <input type="text" id="cert-custom-quote" value="내 폐는 소중해! 그런 걸로 용기 시험하지 마!" class="w-full bg-white px-3 py-1.5 rounded-xl border border-amber-300 text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="나만의 멋진 한마디를 적어보세요!">
+          </div>
+
+          <!-- Date and Official Stamp Area -->
+          <div class="mt-6 pt-4 border-t border-dashed border-slate-300 flex items-center justify-between">
+            <div class="text-left">
+              <span class="text-[11px] text-slate-400 font-bold block">선언 일자</span>
+              <span id="cert-today-date" class="text-xs sm:text-sm font-black text-slate-700">2026년 9월 13일</span>
+            </div>
+
+            <!-- Interactive Stamp -->
+            <div class="relative cursor-pointer" onclick="triggerStampEffect()">
+              <div id="cert-stamp-badge" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-red-600 text-red-600 flex flex-col items-center justify-center font-black stamp-badge bg-red-50/80 transition-transform active:scale-95 select-none">
+                <span class="text-[9px] font-black uppercase tracking-tighter">금연약속</span>
+                <span class="text-xs sm:text-sm font-black">단호박</span>
+                <span class="text-[8px] font-bold">인증완료</span>
+              </div>
+              <div id="stamp-click-hint" class="text-[9px] text-red-500 font-bold text-center mt-1">도장 쾅!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="max-w-xl mx-auto mt-6 flex flex-wrap gap-2.5 justify-center">
+          <button onclick="window.print()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl font-extrabold text-xs sm:text-sm shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> <span>선언서 인쇄하기</span>
+          </button>
+          <button onclick="copyPledgeText()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/30 transition flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> <span>다짐 복사하기</span>
+          </button>
+          <button onclick="triggerConfettiCelebration()" class="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-amber-950 rounded-2xl font-black text-xs sm:text-sm shadow transition flex items-center gap-1.5">
+            🎉 축하 축포 터뜨리기
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+    <div class="max-w-4xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
+      <p class="font-bold text-slate-700">초등학교 5학년 흡연예방 및 STOP 거절법 인터랙티브 교육 프로그램</p>
+      <p>유혹에는 당당하게! 거절은 단호하게! 우리 모두의 건강한 성장을 응원합니다.</p>
+    </div>
+  </footer>
+
+  <!-- Custom Alert/Toast Container -->
+  <div id="toast-modal" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toast-inner" class="bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold border border-slate-700">
+      <i id="toast-icon" class="fa-solid fa-circle-check text-green-400 text-base"></i>
+      <span id="toast-message">알림 내용이 들어갑니다.</span>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. STATE & SOUND SYNTHESIS
+    // -------------------------------------------------------------
+    const AppState = {
+      soundEnabled: true,
+      currentTab: 'home',
+      student: {
+        grade: '5',
+        classNum: '1',
+        name: '단호박'
+      },
+      currentScenarioIdx: 0,
+      quizCurrentIdx: 0,
+      quizScore: 0,
+      quizAnswered: false,
+      stamped: true
+    };
+
+    // Tone.js Sound Synthesizer
+    let synth = null;
+    function initSound() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -8;
+      }
+    }
+
+    function playTone(type) {
+      if (!AppState.soundEnabled) return;
+      try {
+        if (Tone.context.state !== 'running') {
+          Tone.start();
+        }
+        initSound();
+
+        if (type === 'click') {
+          synth.triggerAttackRelease("C5", "32n");
+        } else if (type === 'correct') {
+          synth.triggerAttackRelease(["C5", "E5", "G5"], "16n");
+        } else if (type === 'wrong') {
+          synth.triggerAttackRelease(["F4", "C4"], "8n");
+        } else if (type === 'fanfare') {
+          const now = Tone.now();
+          synth.triggerAttackRelease("C5", "8n", now);
+          synth.triggerAttackRelease("E5", "8n", now + 0.1);
+          synth.triggerAttackRelease("G5", "8n", now + 0.2);
+          synth.triggerAttackRelease("C6", "4n", now + 0.35);
+        } else if (type === 'stamp') {
+          synth.triggerAttackRelease(["A4", "E4"], "16n");
+        }
+      } catch (e) {
+        console.warn("Sound error:", e);
+      }
+    }
+
+    function toggleSound() {
+      AppState.soundEnabled = !AppState.soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      const text = document.getElementById('sound-text');
+      if (AppState.soundEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-green-600';
+        text.innerText = '효과음 ON';
+        showToast('효과음이 켜졌습니다.', 'info');
+        playTone('click');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = '효과음 OFF';
+        showToast('효과음이 꺼졌습니다.', 'info');
+      }
+    }
+
+    // Speech Synthesis for Dialogue and Cards
+    function playSpeechText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // -------------------------------------------------------------
+    // 2. NAVIGATION & TABS
+    // -------------------------------------------------------------
+    function navigateTab(tabKey) {
+      playTone('click');
+      AppState.currentTab = tabKey;
+
+      // Update Navigation Buttons
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabKey) {
+          btn.classList.add('bg-green-600', 'text-white', 'shadow-sm');
+          btn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        } else {
+          btn.classList.remove('bg-green-600', 'text-white', 'shadow-sm');
+          btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+        }
+      });
+
+      // View visibility toggling
+      const views = ['home', 'learn', 'roleplay', 'quiz', 'cert'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (v === tabKey) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startJourney() {
+      const name = document.getElementById('input-name').value.trim() || '김단호';
+      const classNum = document.getElementById('input-class').value.trim() || '1';
+      AppState.student.name = name;
+      AppState.student.classNum = classNum;
+
+      // Update user badges
+      document.getElementById('user-display-badge').classList.remove('hidden');
+      document.getElementById('user-display-badge').classList.add('flex');
+      document.getElementById('user-display-name').innerText = `5학년 ${classNum}반 ${name}`;
+
+      // Synchronize initial values to certificate input fields
+      const certSchool = document.getElementById('cert-input-school');
+      if (certSchool) certSchool.value = `5학년 ${classNum}반`;
+      const certName = document.getElementById('cert-input-name');
+      if (certName) certName.value = name;
+
+      showToast(`${name} 학생, 환영합니다! STOP 거절법을 배워봐요!`, 'success');
+      playTone('correct');
+      navigateTab('learn');
+    }
+
+    // -------------------------------------------------------------
+    // 3. ROLEPLAYING SCENARIO DATA & LOGIC
+    // -------------------------------------------------------------
+    const scenarios = [
+      {
+        id: 0,
+        tag: "상황 1: 비밀 유지형 (단짝 친구)",
+        title: "놀이터 뒤편, 제일 친한 친구의 권유",
+        icon: "🤫",
+        avatar: "👦",
+        peerName: "단짝 친구 민수",
+        dialogue: "야, 이거 우리 형 가방에서 몰래 가져온 건데 딱 한 모금만 해보자. 아무한테도 안 들키면 돼. 우리 절친이잖아!",
+        choices: [
+          {
+            text: "그래, 우리 절친이니까 아무한테도 말 안 하면 괜찮겠지?",
+            correct: false,
+            playerSpeech: "어... 그래... 딱 한 번만 해보자.",
+            feedback: "🚨 위험해요! 한 번의 호기심이 평생 흡연과 중독으로 이어질 수 있습니다. 진짜 절친이라면 해로운 행동은 단호하게 말려야 해요!",
+            shield: 15
+          },
+          {
+            text: "(STOP 4단계 적용) '싫어, 난 안 해! 담배 피우면 폐 상하고 냄새나. 차라리 떡볶이 먹으러 가자!'",
+            correct: true,
+            playerSpeech: "싫어, 난 안 할래! 담배는 한 번만 해도 중독되고 몸에 진짜 해로워. 그거 버리고 우리 떡볶이나 먹으러 가자!",
+            feedback: "🎉 완벽한 거절! [Say No] 단호하게 거절하고, [Tell Reason] 건강 이유를 밝히며, [Offer Alternative] 떡볶이라는 즐거운 대안을 제시했어요!",
+            shield: 100
+          },
+          {
+            text: "야, 너 미쳤어? 선생님한테 다 일러바칠 거야! 너랑 이제 절교야!",
+            correct: false,
+            playerSpeech: "너 진짜 나쁘다! 당장 선생님한테 말할 거야!",
+            feedback: "⚠️ 감정적인 비난은 친구와 싸움을 유발해요. '너'를 비난하기보다 '나'의 건강 원칙을 분명히 말하는 나-전달법이 훨씬 멋집니다.",
+            shield: 40
+          }
+        ]
+      },
+      {
+        id: 1,
+        tag: "상황 2: 자존심 자극형 (도발)",
+        title: "학원 앞, '너 쫄았냐?' 자존심 도발",
+        icon: "😤",
+        avatar: "😼",
+        peerName: "도발하는 친구 준호",
+        dialogue: "너 설마 무서워서 못 피우냐? 완전 쫄보네! 담배 하나 가지고 덜덜 떠는 겁쟁이 맞지?",
+        choices: [
+          {
+            text: "내가 왜 쫄보야? 나 겁쟁이 아니거든? 줘봐, 피워볼 테니까!",
+            correct: false,
+            playerSpeech: "나 쫄보 아니거든? 줘봐, 내가 못 피울 줄 알아?",
+            feedback: "🚨 유혹에 넘어갔어요! 상대방의 도발에 오기로 담배를 피우는 것은 용기가 아니라 자신의 건강을 버리는 행동입니다.",
+            shield: 10
+          },
+          {
+            text: "(STOP 4단계 적용) '겁쟁이 아니야. 내 몸에 나쁜 걸 거절하는 게 진짜 용기야. 피구나 한판 하자!'",
+            correct: true,
+            playerSpeech: "겁쟁이 아니야, 안 피우는 거야! 내 몸에 해로운 걸 안 하는 게 진짜 용기 있는 행동이야. 그런 걸로 시험하지 말고 피구나 하자!",
+            feedback: "🎉 최고예요! 도발에 휘말리지 않고 '거절하는 것이 진짜 용기'임을 당당하게 선언하고 다른 게임을 제안했어요!",
+            shield: 100
+          },
+          {
+            text: "그냥 아무 말도 못 하고 얼굴만 빨개진 채 고개를 숙인다.",
+            correct: false,
+            playerSpeech: "...(아무 말 못 하고 바닥만 쳐다봄)...",
+            feedback: "⚠️ 우물쭈물 시선을 피하면 상대방이 계속해서 더 심하게 놀리거나 강요할 수 있어요. 눈을 똑바로 보고 당당히 말해야 합니다.",
+            shield: 30
+          }
+        ]
+      },
+      {
+        id: 2,
+        tag: "상황 3: 선배/형·누나의 강압형",
+        title: "골목길, 평소 알던 동네 선배의 강요",
+        icon: "😨",
+        avatar: "🧑‍🦱",
+        peerName: "동네 중학생 선배",
+        dialogue: "야, 너 이리 와봐. 형이 주는 건데 그냥 한번 펴봐. 거절하면 선배 무시하는 거 알지?",
+        choices: [
+          {
+            text: "(STOP 4단계 적용) '선배님, 죄송하지만 안 피웁니다. 저 운동해서 폐 지켜야 해요. 학원 늦어서 가보겠습니다!' (큰길로 이동)",
+            correct: true,
+            playerSpeech: "선배님, 죄송하지만 전 안 피웁니다. 운동 중이라 폐 건강 지켜야 하고 부모님과도 약속했어요. 학원 늦어서 먼저 가보겠습니다!",
+            feedback: "🎉 지혜로운 대처! 정중하지만 단호하게 거절하고, 핑계를 대며 신속하게 안전한 곳으로 자리를 피했어요(Pass). 위험 시엔 어른께 알리세요!",
+            shield: 100
+          },
+          {
+            text: "선배가 무서워서 억지로 받아 들고 피우는 시늉을 한다.",
+            correct: false,
+            playerSpeech: "네... 알겠습니다... 그냥 한 번만 물고 있을게요...",
+            feedback: "🚨 안 돼요! 강압적인 선배 앞이라도 내 건강과 생명은 그 누구도 대신 책임져주지 않습니다. 단호히 거절하고 자리를 피해야 합니다.",
+            shield: 10
+          },
+          {
+            text: "너나 피우세요! 신고할 거예요! 소리 지르며 멱살을 잡는다.",
+            correct: false,
+            playerSpeech: "선배면 다예요? 당장 경찰에 신고할 거니까 저리 가요!",
+            feedback: "⚠️ 다치거나 폭력 상황으로 번질 위험이 있습니다. 강압적 상황에선 싸우지 말고 [신속한 자리 이탈]과 [신뢰할 수 있는 성인에게 알리기]가 최선입니다.",
+            shield: 40
+          }
+        ]
+      }
+    ];
+
+    function loadScenario(idx) {
+      playTone('click');
+      AppState.currentScenarioIdx = idx;
+
+      // Update Scenario Tabs
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`scen-btn-${i}`);
+        if (i === idx) {
+          btn.className = "flex-1 sm:flex-none px-3 py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-600 text-white transition";
+        } else {
+          btn.className = "flex-1 sm:flex-none px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition";
+        }
+      }
+
+      const scen = scenarios[idx];
+      document.getElementById('sim-tag').innerText = scen.tag;
+      document.getElementById('sim-title').innerText = scen.title;
+      document.getElementById('sim-icon').innerText = scen.icon;
+      document.getElementById('peer-avatar').innerText = scen.avatar;
+      document.getElementById('peer-name').innerText = scen.peerName;
+      document.getElementById('peer-dialogue').innerText = scen.dialogue;
+
+      // Reset Simulation Area
+      document.getElementById('player-balloon').classList.add('hidden');
+      document.getElementById('coach-feedback').classList.add('hidden');
+      document.getElementById('sim-control-footer').classList.add('hidden');
+      document.getElementById('choices-container').classList.remove('hidden');
+      document.getElementById('sim-shield-bar').style.width = '25%';
+
+      // Render Choices
+      const listEl = document.getElementById('choice-buttons-list');
+      listEl.innerHTML = '';
+      scen.choices.forEach((choice, cIdx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3.5 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition font-bold text-xs sm:text-sm text-slate-800 flex items-start gap-3 group";
+        btn.innerHTML = `
+          <span class="w-6 h-6 rounded-full bg-slate-200 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-xs font-black shrink-0 transition">
+            ${cIdx + 1}
+          </span>
+          <span class="leading-snug">${choice.text}</span>
+        `;
+        btn.onclick = () => selectScenarioChoice(idx, cIdx);
+        listEl.appendChild(btn);
+      });
+    }
+
+    function speakPeerDialogue() {
+      const scen = scenarios[AppState.currentScenarioIdx];
+      playSpeechText(scen.dialogue);
+    }
+
+    function selectScenarioChoice(scenIdx, choiceIdx) {
+      const scen = scenarios[scenIdx];
+      const choice = scen.choices[choiceIdx];
+
+      // Show Player Response
+      const playerBalloon = document.getElementById('player-balloon');
+      playerBalloon.classList.remove('hidden');
+      document.getElementById('player-dialogue').innerText = choice.playerSpeech;
+
+      // Update Shield
+      document.getElementById('sim-shield-bar').style.width = `${choice.shield}%`;
+
+      // Show Feedback
+      const feedbackBox = document.getElementById('coach-feedback');
+      feedbackBox.classList.remove('hidden');
+      if (choice.correct) {
+        feedbackBox.className = "p-4 rounded-2xl border text-xs sm:text-sm bg-green-50 border-green-300 text-green-900";
+        document.getElementById('sim-result-status').innerText = "✅ 완벽한 거절 달성! 다음 상황에 도전해보세요.";
+        playTone('correct');
+        triggerConfettiMini();
+      } else {
+        feedbackBox.className = "p-4 rounded-2xl border text-xs sm:text-sm bg-red-50 border-red-300 text-red-900";
+        document.getElementById('sim-result-status').innerText = "⚠️ 아쉬워요! 단호박 거절 4단계를 다시 떠올려보세요.";
+        playTone('wrong');
+      }
+      feedbackBox.innerHTML = `<strong>[단호박 보건선생님 피드백]</strong><br>${choice.feedback}`;
+
+      // Speak player speech
+      playSpeechText(choice.playerSpeech);
+
+      // Hide choices and show footer
+      document.getElementById('choices-container').classList.add('hidden');
+      document.getElementById('sim-control-footer').classList.remove('hidden');
+    }
+
+    function resetCurrentScenario() {
+      loadScenario(AppState.currentScenarioIdx);
+    }
+
+    // -------------------------------------------------------------
+    // 4. QUIZ BATTLE DATA & LOGIC
+    // -------------------------------------------------------------
+    const quizQuestions = [
+      {
+        q: "친구가 '딱 한 번은 몸에 아무 해가 없어!'라고 말하며 담배를 권했습니다. 올바른 사실은?",
+        options: [
+          "한두 번 정도는 중독되지 않으므로 호기심에 피워도 된다.",
+          "성장기 청소년의 뇌와 폐는 단 한 번의 흡연으로도 니코틴에 중독될 위험이 매우 높다.",
+          "어른용 담배와 달리 전자담배는 몸에 전혀 해롭지 않다.",
+          "몸에 해롭더라도 친구 사이를 위해 한 번은 같이 피워줘야 한다."
+        ],
+        answer: 1,
+        desc: "청소년기는 뇌세포가 계속 발달하는 시기이므로 성인보다 훨씬 빠르게 니코틴에 중독되며, 단 한 번의 흡연으로도 뇌 건강과 호흡기에 치명적입니다."
+      },
+      {
+        q: "STOP 거절법의 1단계인 'Say No'를 할 때 가장 올바른 태도는 무엇일까요?",
+        options: [
+          "친구가 무안하지 않게 배시시 웃으며 바닥을 쳐다본다.",
+          "화가 난 표정으로 욕을 하며 주먹을 쥔다.",
+          "상대방의 눈을 똑바로 바라보며 단호하고 또박또박한 목소리로 거절한다.",
+          "담배를 슬쩍 주머니에 넣고 나중에 버린다."
+        ],
+        answer: 2,
+        desc: "우물쭈물하거나 시선을 피하면 상대방은 '설득할 수 있겠다'고 생각합니다. 당당한 눈빛과 목소리로 분명히 거절해야 합니다."
+      },
+      {
+        q: "친구가 '너 겁쟁이라 못 피우냐? 완전 쫄보네!'라고 놀릴 때 가장 현명한 생각은?",
+        options: [
+          "내가 쫄보가 아니라는 것을 보여주기 위해 억지로 피운다.",
+          "나쁜 행동을 거절하고 내 건강을 지키는 것이 진정한 용기임을 알고 당당히 맞받아친다.",
+          "속상해서 눈물을 흘리며 도망친다.",
+          "친구를 똑같이 겁쟁이라고 놀리며 몸싸움을 한다."
+        ],
+        answer: 1,
+        desc: "진짜 용기는 위험한 유혹을 거절하는 것입니다! 놀림에 흔들려 담배를 피우는 것은 용기가 아니라 유혹에 굴복한 것입니다."
+      },
+      {
+        q: "STOP 거절법의 3단계 'Offer Alternative(대안 제시)'에 해당하는 말은?",
+        options: [
+          "담배 말고 나중에 술이나 마시자.",
+          "그거 피우지 말고 우리 운동장에 축구하러 가자!",
+          "너 혼자 다 피우고 이따가 전화해.",
+          "그냥 집에 가서 잘래."
+        ],
+        answer: 1,
+        desc: "대안 제시는 어색해진 분위기를 전환하고 건전한 다른 활동(운동, 게임, 간식 등)을 함께 하자고 제안하여 우정도 지키는 지혜로운 기술입니다."
+      },
+      {
+        q: "선배나 여러 명이 모여 위협적으로 흡연을 강요할 때 취해야 할 최우선 행동은?",
+        options: [
+          "끝까지 그 자리에서 큰 소리로 말싸움을 벌인다.",
+          "선배들의 비위를 맞추기 위해 담배를 받는다.",
+          "신속히 자리를 벗어나 사람이 많은 곳으로 피하고, 선생님이나 부모님께 알린다.",
+          "아무에게도 말하지 않고 혼자 끙끙 앓는다."
+        ],
+        answer: 2,
+        desc: "위험하거나 위압적인 상황에서는 나의 안전 확보가 최우선입니다. 즉시 자리를 피하고 믿을 수 있는 어른께 도움을 요청해야 합니다."
+      }
+    ];
+
+    function renderQuiz() {
+      AppState.quizAnswered = false;
+      const q = quizQuestions[AppState.quizCurrentIdx];
+
+      // Progress bar & text
+      document.getElementById('quiz-progress-text').innerText = `문제 ${AppState.quizCurrentIdx + 1} / ${quizQuestions.length}`;
+      document.getElementById('quiz-progress-bar').style.width = `${((AppState.quizCurrentIdx + 1) / quizQuestions.length) * 100}%`;
+      document.getElementById('quiz-q-num').innerText = `Q${AppState.quizCurrentIdx + 1}`;
+      document.getElementById('quiz-question-title').innerText = q.q;
+
+      // Reset feedback box
+      document.getElementById('quiz-explanation-box').classList.add('hidden');
+
+      // Render options
+      const optionsContainer = document.getElementById('quiz-options-list');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((optText, oIdx) => {
+        const btn = document.createElement('button');
+        btn.className = "quiz-opt-btn w-full text-left p-3.5 rounded-2xl border-2 border-slate-200 hover:border-purple-400 hover:bg-purple-50/40 transition text-xs sm:text-sm font-bold text-slate-800 flex items-start gap-3 group";
+        btn.innerHTML = `
+          <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center text-xs font-black shrink-0 transition">
+            ${oIdx + 1}
+          </span>
+          <span class="leading-relaxed">${optText}</span>
+        `;
+        btn.onclick = () => handleQuizSelect(oIdx);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleQuizSelect(selectedIdx) {
+      if (AppState.quizAnswered) return;
+      AppState.quizAnswered = true;
+
+      const q = quizQuestions[AppState.quizCurrentIdx];
+      const isCorrect = (selectedIdx === q.answer);
+      const buttons = document.querySelectorAll('.quiz-opt-btn');
+
+      // Highlight options
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.answer) {
+          btn.classList.remove('border-slate-200');
+          btn.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
+        } else if (idx === selectedIdx && !isCorrect) {
+          btn.classList.remove('border-slate-200');
+          btn.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
+        }
+      });
+
+      // Feedback display
+      const explBox = document.getElementById('quiz-explanation-box');
+      const titleEl = document.getElementById('quiz-result-title');
+      const descEl = document.getElementById('quiz-result-desc');
+      explBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        AppState.quizScore++;
+        playTone('correct');
+        titleEl.innerHTML = '<i class="fa-solid fa-circle-check text-green-600 text-lg"></i> <span class="text-green-700">정답입니다! 완벽해요!</span>';
+      } else {
+        playTone('wrong');
+        titleEl.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-600 text-lg"></i> <span class="text-red-700">아쉽지만 틀렸습니다. 정답을 확인해보세요.</span>';
+      }
+      descEl.innerText = q.desc;
+    }
+
+    function nextQuizQuestion() {
+      playTone('click');
+      AppState.quizCurrentIdx++;
+      if (AppState.quizCurrentIdx < quizQuestions.length) {
+        renderQuiz();
+      } else {
+        // Quiz completed
+        showQuizSummary();
+      }
+    }
+
+    function showQuizSummary() {
+      playTone('fanfare');
+      triggerConfettiCelebration();
+      document.getElementById('quiz-question-box').classList.add('hidden');
+      document.getElementById('quiz-explanation-box').classList.add('hidden');
+      const summaryBox = document.getElementById('quiz-summary-box');
+      summaryBox.classList.remove('hidden');
+      document.getElementById('quiz-final-score').innerText = `총 ${quizQuestions.length}문제 중 ${AppState.quizScore}문제를 맞혔습니다! (${Math.round((AppState.quizScore / quizQuestions.length) * 100)}점)`;
+    }
+
+    function restartQuiz() {
+      playTone('click');
+      AppState.quizCurrentIdx = 0;
+      AppState.quizScore = 0;
+      document.getElementById('quiz-question-box').classList.remove('hidden');
+      document.getElementById('quiz-summary-box').classList.add('hidden');
+      renderQuiz();
+    }
+
+    // -------------------------------------------------------------
+    // 5. CERTIFICATE, STAMP & CONFETTI
+    // -------------------------------------------------------------
+    function triggerStampEffect() {
+      playTone('stamp');
+      const badge = document.getElementById('cert-stamp-badge');
+      badge.classList.remove('stamp-badge');
+      void badge.offsetWidth; // reflow
+      badge.classList.add('stamp-badge');
+      triggerConfettiMini();
+      showToast('금연 & 단호박 거절 도장이 쾅! 찍혔습니다.', 'success');
+    }
+
+    function triggerConfettiMini() {
+      if (window.confetti) {
+        confetti({
+          particleCount: 35,
+          spread: 50,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    function triggerConfettiCelebration() {
+      if (window.confetti) {
+        const count = 200;
+        const defaults = { origin: { y: 0.7 } };
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+        fire(0.25, { spread: 26, startVelocity: 55 });
+        fire(0.2, { spread: 60 });
+        fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+        fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+        fire(0.1, { spread: 120, startVelocity: 45 });
+      }
+    }
+
+    function copyPledgeText() {
+      playTone('click');
+      const school = document.getElementById('cert-input-school')?.value.trim() || '5학년 1반';
+      const name = document.getElementById('cert-input-name')?.value.trim() || AppState.student.name;
+      const quote = document.getElementById('cert-custom-quote').value;
+      const text = `[나를 지키는 단호박 거절 선언서]\n소속: ${school}\n선언자: ${name}\n\n"유혹 앞에서는 STOP 거절법으로 당당하게!\n나만의 거절 한마디: '${quote}'\n\n내 건강과 소중한 꿈을 위해 평생 담배를 피우지 않겠습니다!"`;
+      
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('선언문이 클립보드에 복사되었습니다!', 'success');
+      } catch (err) {
+        showToast('복사에 실패했습니다.', 'error');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast-modal');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = message;
+      if (type === 'success') {
+        toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base';
+      } else if (type === 'error') {
+        toastIcon.className = 'fa-solid fa-triangle-exclamation text-red-400 text-base';
+      } else {
+        toastIcon.className = 'fa-solid fa-circle-info text-blue-400 text-base';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // Set today's date
+    function setTodayDate() {
+      const today = new Date();
+      const yr = today.getFullYear();
+      const mo = today.getMonth() + 1;
+      const da = today.getDate();
+      document.getElementById('cert-today-date').innerText = `${yr}년 ${mo}월 ${da}일`;
+    }
+
+    // Initialize application on window load
+    window.onload = function() {
+      setTodayDate();
+      loadScenario(0);
+      renderQuiz();
+    };
+  </script>
+</body>
+</html>
