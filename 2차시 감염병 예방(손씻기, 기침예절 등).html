@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>반짝반짝 감염병 예방 배움터</title>
+  <!-- Google Fonts: Gaegu, Jua, Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            jua: ['Jua', 'sans-serif'],
+            sans: ['Noto Sans KR', 'sans-serif'],
+          },
+          colors: {
+            pastelBlue: '#E0F2FE',
+            pastelMint: '#DCFCE7',
+            pastelYellow: '#FEF9C3',
+            pastelPink: '#FCE7F3',
+            brandBlue: '#0284C7',
+            brandGreen: '#16A34A',
+            brandOrange: '#EA580C',
+          },
+          boxShadow: {
+            'pop': '0 8px 0 rgba(0, 0, 0, 0.08), 0 15px 20px rgba(0, 0, 0, 0.05)',
+            'pop-sm': '0 4px 0 rgba(0, 0, 0, 0.08)',
+            'pop-active': '0 2px 0 rgba(0, 0, 0, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .font-jua {
+      font-family: 'Jua', sans-serif;
+    }
+    @keyframes gentle-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-gentle {
+      animation: gentle-bounce 2.2s infinite ease-in-out;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-ring {
+      animation: pulse-ring 2.5s infinite ease-in-out;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .card-drop-hover {
+      border-color: #38bdf8 !important;
+      background-color: #f0f9ff !important;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-sky-50 via-emerald-50 to-amber-50 min-h-screen text-slate-800 flex flex-col antialiased selection:bg-sky-200">
+
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b-2 border-sky-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('tab1')">
+        <div class="w-11 h-11 bg-sky-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-pop-sm transition-transform hover:scale-105">
+          🛡️
+        </div>
+        <div>
+          <h1 class="font-jua text-2xl text-sky-900 tracking-wide flex items-center gap-1.5">
+            슬기로운 감염병 예방 교실
+            <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-sans font-bold">초등 5학년</span>
+          </h1>
+          <p class="text-xs text-slate-500 font-medium hidden sm:block">손씻기 &middot; 기침예절 &middot; 건강한 생활습관 실천하기</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl w-full sm:w-auto justify-center">
+        <button id="nav-btn-tab1" onclick="switchTab('tab1')" class="nav-btn px-3.5 py-2 rounded-xl text-sm font-jua flex items-center gap-1.5 transition-all bg-white text-sky-700 shadow-sm">
+          <span>🧼</span> 손씻기 6단계
+        </button>
+        <button id="nav-btn-tab2" onclick="switchTab('tab2')" class="nav-btn px-3.5 py-2 rounded-xl text-sm font-jua flex items-center gap-1.5 transition-all text-slate-600 hover:text-sky-700">
+          <span>🦠</span> 세균 팡팡 게임
+        </button>
+        <button id="nav-btn-tab3" onclick="switchTab('tab3')" class="nav-btn px-3.5 py-2 rounded-xl text-sm font-jua flex items-center gap-1.5 transition-all text-slate-600 hover:text-sky-700">
+          <span>🧩</span> 기침예절 퍼즐
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-start">
+
+    <section id="tab1-content" class="tab-pane flex flex-col space-y-6">
+      <div class="bg-gradient-to-r from-sky-400 to-blue-500 rounded-3xl p-5 sm:p-6 text-white shadow-pop flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center sm:text-left">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">미션 1</span>
+          <h2 class="font-jua text-2xl sm:text-3xl">올바른 손씻기 6단계를 바른 순서로 완성해요!</h2>
+          <p class="text-sm text-sky-100">순서를 바르게 모두 맞추면 신나는 축하 폭죽이 자동으로 터져요! 🎆</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="resetHandwashQuiz()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl font-jua text-sm flex items-center gap-1 transition-all active:scale-95">
+            🔄 다시 섞기
+          </button>
+          <button onclick="checkHandwashQuiz()" class="bg-amber-400 hover:bg-amber-300 text-amber-950 px-5 py-2.5 rounded-xl font-jua text-base shadow-pop-sm hover:shadow-none transition-all active:translate-y-0.5 flex items-center gap-1.5">
+            ✨ 정답 확인
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Target Slots -->
+        <div class="lg:col-span-7 bg-white/80 backdrop-blur rounded-3xl p-5 border-2 border-sky-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-jua text-lg text-slate-700 flex items-center gap-2">
+              <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs">📌</span>
+              순서대로 들어갈 자리 (1 ~ 6단계)
+            </h3>
+            <span class="text-xs font-semibold text-slate-400">카드를 끌어놓거나 터치하여 배치</span>
+          </div>
+
+          <div id="slots-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1">
+            <!-- 6 Slots will be generated by JS -->
+          </div>
+        </div>
+
+        <!-- Available Cards Pool -->
+        <div class="lg:col-span-5 bg-white/80 backdrop-blur rounded-3xl p-5 border-2 border-amber-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-jua text-lg text-amber-800 flex items-center gap-2">
+              <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xs">🎲</span>
+              섞여 있는 손씻기 단계 카드
+            </h3>
+            <span id="pool-count" class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">6장 남음</span>
+          </div>
+
+          <p class="text-xs text-slate-500 mb-3">카드를 클릭(터치)하면 빈 슬롯으로 쏙 들어갑니다. 슬롯에 넣은 카드를 다시 누르면 여기로 돌아와요!</p>
+
+          <div id="pool-container" class="flex flex-col gap-2.5 min-h-[300px] p-2 rounded-2xl bg-amber-50/50 border border-dashed border-amber-200">
+            <!-- Cards populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Banner -->
+      <div id="quiz-feedback" class="hidden p-4 rounded-2xl transition-all duration-300"></div>
+    </section>
+
+    <section id="tab2-content" class="tab-pane hidden flex-col space-y-4">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-5 sm:p-6 text-white shadow-pop flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center sm:text-left">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">미션 2</span>
+          <h2 class="font-jua text-2xl sm:text-3xl">세균 팡팡! 손 지키기 터치 게임</h2>
+          <p class="text-sm text-emerald-100">30초 동안 손으로 다가오는 세균들을 터치해 물리치고 손을 깨끗하게 지키세요!</p>
+        </div>
+        <div class="flex items-center gap-3 bg-white/10 px-4 py-2.5 rounded-2xl border border-white/20">
+          <div class="text-center">
+            <span class="block text-xs text-emerald-200 font-bold">남은 시간</span>
+            <span id="game-timer" class="font-jua text-2xl text-amber-300">30초</span>
+          </div>
+          <div class="w-px h-8 bg-white/20"></div>
+          <div class="text-center">
+            <span class="block text-xs text-emerald-200 font-bold">내 점수</span>
+            <span id="game-score" class="font-jua text-2xl text-white">0점</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Stage -->
+      <div class="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[580px] bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-white select-none">
+        <canvas id="gameCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+        <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <div class="w-44 h-44 sm:w-60 sm:h-60 rounded-full border-4 border-dashed border-emerald-400/40 animate-ring flex items-center justify-center">
+            <div class="w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-emerald-500/10 backdrop-blur-[2px] flex items-center justify-center">
+              <span class="text-xs sm:text-sm font-jua text-emerald-300/80 bg-slate-900/60 px-3 py-1 rounded-full">🛡️ 방어 구역</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute top-4 left-4 bg-slate-800/80 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 pointer-events-none border border-slate-700">
+          <span>🧼 황금 비누 등장 시 터치:</span>
+          <span class="text-yellow-300">화면 전체 세균 싹쓸이!</span>
+        </div>
+
+        <!-- Start / Game Over Modal -->
+        <div id="game-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-20">
+          <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl space-y-4 transform transition-all scale-100">
+            <div id="overlay-icon" class="w-20 h-20 mx-auto bg-emerald-100 rounded-3xl flex items-center justify-center text-4xl shadow-inner">
+              🦠
+            </div>
+            <div class="space-y-1">
+              <h3 id="overlay-title" class="font-jua text-2xl sm:text-3xl text-slate-800">세균 팡팡 시작하기!</h3>
+              <p id="overlay-desc" class="text-sm text-slate-600 leading-relaxed">
+                손으로 다가오는 세균(🦠)을 클릭/터치해서 터뜨리세요!<br>
+                비누 아이템(🧼)이 나오면 바로 눌러 전체 소독을 해보세요!
+              </p>
+            </div>
+            <div id="overlay-stats" class="hidden py-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+              <span class="text-xs text-emerald-700 font-bold">최종 획득 점수</span>
+              <p id="final-score-display" class="font-jua text-3xl text-emerald-600">0점</p>
+              <p id="final-rank-badge" class="text-xs font-bold text-amber-600 mt-1">🏆 1급 감염병 예방 특공대원</p>
+              <p id="auto-redirect-msg" class="text-xs text-sky-600 font-bold mt-2 animate-pulse">🧩 3초 후 다음 미션(기침예절 퍼즐)으로 자동 이동합니다!</p>
+            </div>
+            <div id="overlay-action-btns" class="flex flex-col gap-2">
+              <button id="start-game-btn" onclick="startGame()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-jua text-xl py-3.5 rounded-2xl shadow-pop-sm hover:shadow-none transition-all active:translate-y-0.5">
+                🚀 게임 시작하기
+              </button>
+              <button id="next-puzzle-btn" onclick="goToPuzzleNow()" class="hidden w-full bg-amber-500 hover:bg-amber-600 text-white font-jua text-lg py-3 rounded-2xl shadow-pop-sm hover:shadow-none transition-all active:translate-y-0.5">
+                🧩 기침예절 퍼즐 지금 바로가기 👉
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab3-content" class="tab-pane hidden flex-col space-y-5">
+      <div class="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-3xl p-5 sm:p-6 text-white shadow-pop flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center sm:text-left">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">미션 3</span>
+          <h2 class="font-jua text-2xl sm:text-3xl">기침예절 질병관리 포스터 퍼즐 맞추기</h2>
+          <p class="text-sm text-amber-100">흩어진 3x3 퍼즐 9조각을 맞추어 올바른 기침예절 포스터를 완성해보세요!</p>
+        </div>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <button onclick="togglePuzzleHint()" id="hint-toggle-btn" class="bg-white/20 hover:bg-white/30 text-white px-3.5 py-2 rounded-xl font-jua text-sm flex items-center gap-1.5 transition-all">
+            👁️ 힌트 미리보기
+          </button>
+          <button onclick="shufflePuzzle()" class="bg-white hover:bg-amber-50 text-orange-600 px-4 py-2 rounded-xl font-jua text-sm shadow-pop-sm hover:shadow-none transition-all active:translate-y-0.5">
+            🔀 다시 섞기
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        <!-- Main Puzzle Board -->
+        <div class="md:col-span-8 flex flex-col items-center justify-center bg-white rounded-3xl p-5 sm:p-6 border-2 border-orange-100 shadow-sm relative">
+          <div class="flex items-center justify-between w-full max-w-[420px] mb-3 text-xs text-slate-500">
+            <span class="font-bold text-slate-700">🧩 2개의 조각을 번갈아 터치해 위치를 바꾸세요!</span>
+            <span id="puzzle-moves" class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold">이동 횟수: 0</span>
+          </div>
+
+          <div id="puzzle-grid" class="relative w-full max-w-[420px] aspect-[3/4] bg-slate-100 rounded-2xl border-4 border-amber-300 p-2 grid grid-cols-3 grid-rows-3 gap-1.5 shadow-inner">
+            <!-- 9 Puzzle Tiles generated via script -->
+          </div>
+
+          <div id="puzzle-completed-modal" class="hidden mt-4 w-full max-w-[420px] bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 p-4 rounded-2xl text-center space-y-2 animate-gentle">
+            <span class="text-3xl">🎉</span>
+            <h4 class="font-jua text-xl text-emerald-800">참 잘했어요! 질병관리청 포스터 완성!</h4>
+            <div class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-sm font-jua shadow-sm">
+              "기침할 땐 옷소매로 입과 코를 쏙 가려요!"
+            </div>
+            <p class="text-xs text-slate-600">올바른 기침예절 3대 수칙(마스크 착용, 옷소매로 가리기, 30초 비누 손씻기)을 꼭 실천해요!</p>
+          </div>
+        </div>
+
+        <!-- Poster Preview & Guidelines -->
+        <div class="md:col-span-4 flex flex-col gap-4">
+          <div class="bg-white rounded-3xl p-4 border-2 border-slate-100 shadow-sm">
+            <h3 class="font-jua text-base text-slate-700 mb-2 flex items-center justify-between">
+              <span>🖼️ 완성본 포스터 힌트</span>
+              <span class="text-xs text-slate-400 font-sans font-normal">질병관리청 공식</span>
+            </h3>
+            <div id="puzzle-preview-container" class="w-full aspect-[3/4] rounded-2xl overflow-hidden border-2 border-dashed border-amber-200 relative bg-amber-50/40 p-1 flex items-center justify-center">
+              <div id="poster-original-svg-wrap" class="w-full h-full flex items-center justify-center"></div>
+            </div>
+          </div>
+
+          <div class="bg-orange-50/70 border border-orange-200 rounded-3xl p-4 space-y-2">
+            <h4 class="font-jua text-orange-900 text-base flex items-center gap-1.5">
+              <span>💡</span> 올바른 기침예절 세 가지 수칙!
+            </h4>
+            <ul class="text-xs text-slate-700 space-y-2 leading-relaxed">
+              <li class="flex items-start gap-1.5">
+                <span class="bg-teal-700 text-white w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+                <span><strong>호흡기 증상 시엔 마스크 착용하기</strong>: 기침이나 재채기, 콧물이 날 때 마스크를 써요.</span>
+              </li>
+              <li class="flex items-start gap-1.5">
+                <span class="bg-teal-700 text-white w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+                <span><strong>기침할 땐 옷소매로 입과 코 가리기</strong>: 손바닥 대신 옷소매 위쪽으로 막아요.</span>
+              </li>
+              <li class="flex items-start gap-1.5">
+                <span class="bg-teal-700 text-white w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+                <span><strong>기침 후엔 30초 이상 비누로 손 씻기</strong>: 흐르는 물에 꼼꼼히 씻어요.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="app-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-4">
+    <div id="toast-body" class="bg-slate-900/90 backdrop-blur text-white px-5 py-3 rounded-2xl shadow-xl font-jua text-base flex items-center gap-2 border border-slate-700">
+      <span id="toast-icon">✨</span>
+      <span id="toast-msg">메시지 내용</span>
+    </div>
+  </div>
+
+  <script>
+    class SoundEffects {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playPop() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.09);
+        } catch (e) {}
+      }
+      playBubble() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(1100, this.ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.13);
+        } catch (e) {}
+      }
+      playSuccess() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.09);
+            gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.09 + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime + idx * 0.09);
+            osc.stop(this.ctx.currentTime + idx * 0.09 + 0.38);
+          });
+        } catch (e) {}
+      }
+      playError() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(180, this.ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.26);
+        } catch (e) {}
+      }
+    }
+    const sound = new SoundEffects();
+
+    function showToast(msg, icon = '💡') {
+      const toast = document.getElementById('app-toast');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2500);
+    }
+
+    function switchTab(tabId) {
+      sound.playPop();
+      ['tab1', 'tab2', 'tab3'].forEach(id => {
+        const pane = document.getElementById(`${id}-content`);
+        const btn = document.getElementById(`nav-btn-${id}`);
+        if (id === tabId) {
+          pane.classList.remove('hidden');
+          pane.classList.add('flex');
+          btn.classList.add('bg-white', 'text-sky-700', 'shadow-sm');
+          btn.classList.remove('text-slate-600');
+        } else {
+          pane.classList.add('hidden');
+          pane.classList.remove('flex');
+          btn.classList.remove('bg-white', 'text-sky-700', 'shadow-sm');
+          btn.classList.add('text-slate-600');
+        }
+      });
+      if (tabId === 'tab2') {
+        resizeGameCanvas();
+      }
+    }
+
+    const HANDWASH_STEPS = [
+      {
+        step: 1,
+        title: "1단계: 손바닥",
+        desc: "손바닥과 손바닥을 마주 대고 싹싹 문질러요",
+        icon: "🤲",
+        color: "from-blue-400 to-sky-400"
+      },
+      {
+        step: 2,
+        title: "2단계: 손등",
+        desc: "손등과 손바닥을 마주 대고 꼼꼼히 문질러요",
+        icon: "🖐️",
+        color: "from-teal-400 to-emerald-400"
+      },
+      {
+        step: 3,
+        title: "3단계: 손가락 사이",
+        desc: "손바닥을 마주 대고 손깍지를 끼고 문질러요",
+        icon: "🤞",
+        color: "from-emerald-400 to-green-500"
+      },
+      {
+        step: 4,
+        title: "4단계: 두 손 모아",
+        desc: "손가락을 마주 잡고 두 손을 모아 문질러요",
+        icon: "✊",
+        color: "from-amber-400 to-yellow-500"
+      },
+      {
+        step: 5,
+        title: "5단계: 엄지손가락",
+        desc: "엄지손가락을 다른 편 손바닥으로 돌려주며 문질러요",
+        icon: "👍",
+        color: "from-orange-400 to-amber-500"
+      },
+      {
+        step: 6,
+        title: "6단계: 손톱 밑",
+        desc: "손가락 끝을 반대편 손바닥에 대고 손톱 밑을 문질러요",
+        icon: "💅",
+        color: "from-pink-400 to-rose-400"
+      }
+    ];
+
+    let currentSlots = [null, null, null, null, null, null];
+    let poolCards = [];
+    let selectedCardForTouch = null;
+
+    function initHandwashQuiz() {
+      poolCards = [...HANDWASH_STEPS].sort(() => Math.random() - 0.5);
+      currentSlots = [null, null, null, null, null, null];
+      selectedCardForTouch = null;
+      renderHandwashUI();
+      hideQuizFeedback();
+    }
+
+    function resetHandwashQuiz() {
+      sound.playPop();
+      initHandwashQuiz();
+      showToast("카드를 다시 무작위로 섞었어요!", "🔄");
+    }
+
+    function renderHandwashUI() {
+      const slotsContainer = document.getElementById('slots-container');
+      const poolContainer = document.getElementById('pool-container');
+      const poolCountBadge = document.getElementById('pool-count');
+
+      slotsContainer.innerHTML = '';
+      poolContainer.innerHTML = '';
+
+      for (let i = 0; i < 6; i++) {
+        const assignedStepNum = currentSlots[i];
+        const stepData = assignedStepNum ? HANDWASH_STEPS.find(s => s.step === assignedStepNum) : null;
+
+        const slotEl = document.createElement('div');
+        slotEl.className = `relative rounded-2xl p-3 border-2 transition-all duration-200 min-h-[96px] flex flex-col justify-center ${
+          stepData 
+            ? 'bg-white border-sky-300 shadow-sm' 
+            : 'bg-slate-50 border-dashed border-slate-300 hover:border-sky-300'
+        }`;
+        slotEl.dataset.slotIndex = i;
+
+        const slotHeader = document.createElement('div');
+        slotHeader.className = "flex items-center justify-between mb-1";
+        slotHeader.innerHTML = `
+          <span class="text-xs font-jua px-2.5 py-0.5 rounded-full ${stepData ? 'bg-sky-500 text-white' : 'bg-slate-200 text-slate-600'}">
+            ${i + 1}단계 슬롯
+          </span>
+          ${stepData ? '<span class="text-[11px] text-rose-500 font-bold cursor-pointer hover:underline">빼기 ✕</span>' : '<span class="text-[11px] text-slate-400">비어 있음</span>'}
+        `;
+        slotEl.appendChild(slotHeader);
+
+        if (stepData) {
+          const cardContent = document.createElement('div');
+          cardContent.className = "flex items-center gap-2.5 cursor-pointer";
+          cardContent.innerHTML = `
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${stepData.color} text-white flex items-center justify-center text-xl shadow-sm shrink-0">
+              ${stepData.icon}
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 class="font-jua text-sm text-slate-800 truncate">${stepData.title}</h4>
+              <p class="text-[11px] text-slate-500 line-clamp-1">${stepData.desc}</p>
+            </div>
+          `;
+          slotEl.onclick = () => {
+            sound.playPop();
+            returnCardToPool(i);
+          };
+          slotEl.appendChild(cardContent);
+        } else {
+          slotEl.onclick = () => {
+            if (selectedCardForTouch !== null) {
+              sound.playBubble();
+              assignCardToSlot(selectedCardForTouch, i);
+              selectedCardForTouch = null;
+              renderHandwashUI();
+              checkAutoHandwashSuccess();
+            } else {
+              showToast("오른쪽 카드 중 하나를 선택해 주세요!", "👆");
+            }
+          };
+
+          slotEl.ondragover = (e) => {
+            e.preventDefault();
+            slotEl.classList.add('card-drop-hover');
+          };
+          slotEl.ondragleave = () => {
+            slotEl.classList.remove('card-drop-hover');
+          };
+          slotEl.ondrop = (e) => {
+            e.preventDefault();
+            slotEl.classList.remove('card-drop-hover');
+            const stepNum = parseInt(e.dataTransfer.getData('text/plain'), 10);
+            if (!isNaN(stepNum)) {
+              sound.playBubble();
+              assignCardToSlot(stepNum, i);
+              renderHandwashUI();
+              checkAutoHandwashSuccess();
+            }
+          };
+        }
+
+        slotsContainer.appendChild(slotEl);
+      }
+
+      poolCountBadge.innerText = `${poolCards.length}장 남음`;
+
+      if (poolCards.length === 0) {
+        poolContainer.innerHTML = `
+          <div class="flex-1 flex flex-col items-center justify-center text-slate-400 py-10">
+            <span class="text-3xl mb-2">🎉</span>
+            <p class="text-xs font-bold">모든 카드를 배치했어요!</p>
+            <p class="text-[11px]">순서가 바르면 자동으로 폭죽이 팡팡 터져요!</p>
+          </div>
+        `;
+      } else {
+        poolCards.forEach(card => {
+          const cardEl = document.createElement('div');
+          const isSelected = (selectedCardForTouch === card.step);
+          cardEl.className = `p-2.5 bg-white rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 shadow-pop-sm hover:shadow-none hover:translate-y-0.5 ${
+            isSelected ? 'border-sky-500 ring-2 ring-sky-300 scale-[1.02]' : 'border-slate-200'
+          }`;
+          cardEl.draggable = true;
+
+          cardEl.ondragstart = (e) => {
+            e.dataTransfer.setData('text/plain', card.step);
+          };
+
+          cardEl.onclick = () => {
+            sound.playPop();
+            const firstEmptyIndex = currentSlots.findIndex(s => s === null);
+            if (firstEmptyIndex !== -1) {
+              sound.playBubble();
+              assignCardToSlot(card.step, firstEmptyIndex);
+              selectedCardForTouch = null;
+              renderHandwashUI();
+              checkAutoHandwashSuccess();
+            } else {
+              selectedCardForTouch = (selectedCardForTouch === card.step) ? null : card.step;
+              renderHandwashUI();
+            }
+          };
+
+          cardEl.innerHTML = `
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${card.color} text-white flex items-center justify-center text-xl shadow-sm shrink-0">
+              ${card.icon}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="font-jua text-sm text-slate-800">${card.title}</h4>
+                <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-sans font-bold">터치</span>
+              </div>
+              <p class="text-[11px] text-slate-500 truncate">${card.desc}</p>
+            </div>
+          `;
+          poolContainer.appendChild(cardEl);
+        });
+      }
+    }
+
+    function assignCardToSlot(stepNum, slotIdx) {
+      poolCards = poolCards.filter(c => c.step !== stepNum);
+      if (currentSlots[slotIdx] !== null) {
+        const oldStep = HANDWASH_STEPS.find(s => s.step === currentSlots[slotIdx]);
+        if (oldStep) poolCards.push(oldStep);
+      }
+      currentSlots[slotIdx] = stepNum;
+      hideQuizFeedback();
+    }
+
+    function returnCardToPool(slotIdx) {
+      const stepNum = currentSlots[slotIdx];
+      if (stepNum !== null) {
+        const cardData = HANDWASH_STEPS.find(s => s.step === stepNum);
+        if (cardData) poolCards.push(cardData);
+        currentSlots[slotIdx] = null;
+        renderHandwashUI();
+        hideQuizFeedback();
+      }
+    }
+
+    function hideQuizFeedback() {
+      const fb = document.getElementById('quiz-feedback');
+      fb.className = 'hidden';
+      fb.innerHTML = '';
+      document.querySelectorAll('#slots-container > div').forEach(el => {
+        el.classList.remove('border-rose-500', 'border-emerald-500', 'ring-2', 'ring-rose-300', 'ring-emerald-300');
+      });
+    }
+
+    function launchHandwashMegaFireworks() {
+      const duration = 4 * 1000;
+      const animationEnd = Date.now() + duration;
+
+      const fireworksInterval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(fireworksInterval);
+        }
+
+        const particleFactor = timeLeft / duration;
+
+        confetti({
+          particleCount: Math.floor(65 * particleFactor) + 20,
+          angle: 55,
+          spread: 75,
+          startVelocity: 65,
+          origin: { x: 0.05, y: 0.75 },
+          colors: ['#38bdf8', '#34d399', '#facc15', '#f472b6', '#a78bfa', '#fb923c']
+        });
+
+        confetti({
+          particleCount: Math.floor(65 * particleFactor) + 20,
+          angle: 125,
+          spread: 75,
+          startVelocity: 65,
+          origin: { x: 0.95, y: 0.75 },
+          colors: ['#38bdf8', '#34d399', '#facc15', '#f472b6', '#a78bfa', '#fb923c']
+        });
+
+        confetti({
+          particleCount: Math.floor(50 * particleFactor) + 15,
+          spread: 120,
+          startVelocity: 45,
+          origin: { x: 0.5, y: 0.3 },
+          shapes: ['circle', 'square'],
+          scalar: 1.25,
+          colors: ['#60a5fa', '#4ade80', '#fbbf24', '#f43f5e', '#c084fc']
+        });
+      }, 250);
+    }
+
+    function checkAutoHandwashSuccess() {
+      const isAllFilled = currentSlots.every(s => s !== null);
+      if (!isAllFilled) return;
+
+      const isAllCorrect = currentSlots.every((s, idx) => s === idx + 1);
+      if (isAllCorrect) {
+        triggerHandwashSuccessCelebration();
+      }
+    }
+
+    function triggerHandwashSuccessCelebration() {
+      sound.playSuccess();
+      launchHandwashMegaFireworks();
+
+      const slotElements = document.querySelectorAll('#slots-container > div');
+      slotElements.forEach(slotEl => {
+        slotEl.classList.remove('border-rose-500', 'ring-rose-300');
+        slotEl.classList.add('border-emerald-500', 'ring-4', 'ring-emerald-300', 'animate-gentle');
+      });
+
+      const fb = document.getElementById('quiz-feedback');
+      fb.classList.remove('hidden');
+      fb.className = 'p-6 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 border-3 border-emerald-400 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left animate-gentle';
+      fb.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-3xl shadow-md shrink-0">
+            👑
+          </div>
+          <div>
+            <span class="text-xs bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full font-bold">대성공! 자동 채점 완료</span>
+            <h4 class="font-jua text-2xl text-emerald-900 mt-1">완벽해요! 손씻기 6단계 마스터 등극! 🌟</h4>
+            <p class="text-xs text-emerald-700 mt-0.5">손바닥부터 손톱 밑까지 모든 단계를 빈틈없이 정확하게 맞췄어요!</p>
+          </div>
+        </div>
+        <button onclick="switchTab('tab2')" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-jua text-base px-6 py-3 rounded-2xl shadow-pop-sm hover:shadow-none transition-all active:translate-y-0.5 shrink-0 flex items-center gap-2">
+          <span>🎮</span> 다음 미션: 세균 팡팡 하러가기 👉
+        </button>
+      `;
+
+      showToast("🎉 대단해요! 올바른 6단계 완성! 축하 폭죽이 팡팡 터져요!", "🌟");
+    }
+
+    function checkHandwashQuiz() {
+      const emptySlots = currentSlots.filter(s => s === null).length;
+      if (emptySlots > 0) {
+        sound.playError();
+        showToast(`아직 채워지지 않은 슬롯이 ${emptySlots}개 있어요!`, "⚠️");
+        return;
+      }
+
+      let allCorrect = true;
+      let wrongCount = 0;
+      const slotElements = document.querySelectorAll('#slots-container > div');
+
+      for (let i = 0; i < 6; i++) {
+        const expected = i + 1;
+        const current = currentSlots[i];
+        const slotEl = slotElements[i];
+
+        if (current === expected) {
+          slotEl.classList.remove('border-rose-500', 'ring-rose-300');
+          slotEl.classList.add('border-emerald-500', 'ring-2', 'ring-emerald-300');
+        } else {
+          allCorrect = false;
+          wrongCount++;
+          slotEl.classList.remove('border-emerald-500', 'ring-emerald-300');
+          slotEl.classList.add('border-rose-500', 'ring-2', 'ring-rose-300');
+        }
+      }
+
+      if (allCorrect) {
+        triggerHandwashSuccessCelebration();
+      } else {
+        sound.playError();
+        const fb = document.getElementById('quiz-feedback');
+        fb.classList.remove('hidden');
+        fb.className = 'p-5 rounded-2xl bg-rose-50 border-2 border-rose-300 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left';
+        fb.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🤔</span>
+            <div>
+              <h4 class="font-jua text-lg text-rose-800">다시 한 번 순서를 생각해볼까요?</h4>
+              <p class="text-xs text-rose-600">붉은색 테두리로 표시된 ${wrongCount}개 슬롯의 순서를 확인해 보세요. 힌트: '손바닥' 다음에 어디를 문지를까요?</p>
+            </div>
+          </div>
+          <button onclick="initHandwashQuiz()" class="bg-rose-500 hover:bg-rose-600 text-white font-jua text-sm px-4 py-2 rounded-xl shadow-sm shrink-0">
+            다시 도전하기 🔄
+          </button>
+        `;
+      }
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let gameRunning = false;
+    let gameTimer = 30;
+    let gameScore = 0;
+    let gameInterval = null;
+    let animationFrameId = null;
+    let germs = [];
+    let soapItems = [];
+    let particleEffects = [];
+    let autoNextMissionTimer = null;
+
+    let handCenter = { x: 0, y: 0, radius: 45 };
+
+    function resizeGameCanvas() {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      handCenter.x = rect.width / 2;
+      handCenter.y = rect.height / 2;
+    }
+    window.addEventListener('resize', () => {
+      if (!document.getElementById('tab2-content').classList.contains('hidden')) {
+        resizeGameCanvas();
+      }
+    });
+
+    const GERM_PALETTES = [
+      { body: '#EC4899', eye: '#FFFFFF', dot: '#BE185D', horns: 4 },
+      { body: '#A855F7', eye: '#FFFFFF', dot: '#7E22CE', horns: 5 },
+      { body: '#22C55E', eye: '#FFFFFF', dot: '#15803D', horns: 6 },
+      { body: '#F97316', eye: '#FFFFFF', dot: '#C2410C', horns: 4 }
+    ];
+
+    class Germ {
+      constructor(w, h, target) {
+        const side = Math.floor(Math.random() * 4);
+        const margin = 30;
+        if (side === 0) {
+          this.x = Math.random() * w;
+          this.y = -margin;
+        } else if (side === 1) {
+          this.x = w + margin;
+          this.y = Math.random() * h;
+        } else if (side === 2) {
+          this.x = Math.random() * w;
+          this.y = h + margin;
+        } else {
+          this.x = -margin;
+          this.y = Math.random() * h;
+        }
+
+        this.radius = 20 + Math.random() * 8;
+        this.palette = GERM_PALETTES[Math.floor(Math.random() * GERM_PALETTES.length)];
+        this.speed = 0.7 + Math.random() * 1.1;
+        this.wobble = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = 0.05 + Math.random() * 0.05;
+        this.alive = true;
+      }
+
+      update(target) {
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 5) {
+          this.x += (dx / dist) * this.speed;
+          this.y += (dy / dist) * this.speed;
+        }
+        this.wobble += this.wobbleSpeed;
+      }
+
+      draw(c) {
+        c.save();
+        c.translate(this.x, this.y);
+        const squish = 1 + Math.sin(this.wobble) * 0.08;
+        c.scale(squish, 2 - squish);
+
+        c.fillStyle = this.palette.body;
+        c.beginPath();
+        c.arc(0, 0, this.radius, 0, Math.PI * 2);
+        c.fill();
+
+        for (let i = 0; i < this.palette.horns; i++) {
+          const angle = (i / this.palette.horns) * Math.PI * 2 + this.wobble * 0.5;
+          const hx = Math.cos(angle) * (this.radius + 5);
+          const hy = Math.sin(angle) * (this.radius + 5);
+          c.fillStyle = this.palette.dot;
+          c.beginPath();
+          c.arc(hx, hy, 4.5, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.fillStyle = '#FFFFFF';
+        c.beginPath();
+        c.arc(-this.radius * 0.35, -this.radius * 0.2, 5, 0, Math.PI * 2);
+        c.arc(this.radius * 0.35, -this.radius * 0.2, 5, 0, Math.PI * 2);
+        c.fill();
+
+        c.fillStyle = '#0F172A';
+        c.beginPath();
+        c.arc(-this.radius * 0.35, -this.radius * 0.2, 2.5, 0, Math.PI * 2);
+        c.arc(this.radius * 0.35, -this.radius * 0.2, 2.5, 0, Math.PI * 2);
+        c.fill();
+
+        c.strokeStyle = '#0F172A';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(0, this.radius * 0.2, 5, 0, Math.PI);
+        c.stroke();
+
+        c.restore();
+      }
+
+      contains(px, py) {
+        return Math.hypot(this.x - px, this.y - py) <= this.radius + 8;
+      }
+    }
+
+    class SoapItem {
+      constructor(w, h) {
+        this.x = 40 + Math.random() * (w - 80);
+        this.y = 40 + Math.random() * (h - 80);
+        this.radius = 24;
+        this.life = 180;
+        this.angle = 0;
+      }
+      update() {
+        this.life--;
+        this.angle += 0.05;
+      }
+      draw(c) {
+        c.save();
+        c.translate(this.x, this.y);
+        const floatY = Math.sin(this.angle) * 4;
+        c.translate(0, floatY);
+
+        c.strokeStyle = '#38BDF8';
+        c.lineWidth = 2.5;
+        c.beginPath();
+        c.arc(0, 0, this.radius + 4, 0, Math.PI * 2);
+        c.stroke();
+
+        c.fillStyle = '#67E8F9';
+        c.beginPath();
+        c.roundRect(-20, -14, 40, 28, 10);
+        c.fill();
+
+        c.fillStyle = '#FFFFFF';
+        c.font = '16px sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText('🧼', 0, 0);
+
+        c.restore();
+      }
+      contains(px, py) {
+        return Math.hypot(this.x - px, this.y - py) <= this.radius + 10;
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color = '#38bdf8') {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 5;
+        this.vy = (Math.random() - 0.5) * 5;
+        this.radius = 3 + Math.random() * 5;
+        this.alpha = 1;
+        this.color = color;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= 0.035;
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.fillStyle = this.color;
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    function createBubbleBurst(x, y, count = 10, color = '#38BDF8') {
+      for (let i = 0; i < count; i++) {
+        particleEffects.push(new Particle(x, y, color));
+      }
+    }
+
+    function drawCenterHand(c, x, y) {
+      c.save();
+      c.translate(x, y);
+
+      c.fillStyle = 'rgba(56, 189, 248, 0.15)';
+      c.beginPath();
+      c.arc(0, 0, 52, 0, Math.PI * 2);
+      c.fill();
+
+      c.font = '54px sans-serif';
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText('✋', 0, -4);
+
+      const time = Date.now() * 0.003;
+      c.font = '16px sans-serif';
+      c.fillText('✨', Math.cos(time) * 44, Math.sin(time) * 44);
+      c.fillText('🫧', Math.cos(time + 2.5) * 46, Math.sin(time + 2.5) * 46);
+
+      c.restore();
+    }
+
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      drawCenterHand(ctx, handCenter.x, handCenter.y);
+
+      if (Math.random() < 0.045 && germs.length < 16) {
+        germs.push(new Germ(rect.width, rect.height, handCenter));
+      }
+
+      if (Math.random() < 0.008 && soapItems.length < 1) {
+        soapItems.push(new SoapItem(rect.width, rect.height));
+      }
+
+      for (let i = germs.length - 1; i >= 0; i--) {
+        const g = germs[i];
+        g.update(handCenter);
+        g.draw(ctx);
+
+        if (Math.hypot(g.x - handCenter.x, g.y - handCenter.y) < handCenter.radius) {
+          sound.playError();
+          createBubbleBurst(g.x, g.y, 8, '#EF4444');
+          germs.splice(i, 1);
+        }
+      }
+
+      for (let i = soapItems.length - 1; i >= 0; i--) {
+        const item = soapItems[i];
+        item.update();
+        item.draw(ctx);
+        if (item.life <= 0) {
+          soapItems.splice(i, 1);
+        }
+      }
+
+      for (let i = particleEffects.length - 1; i >= 0; i--) {
+        const p = particleEffects[i];
+        p.update();
+        p.draw(ctx);
+        if (p.alpha <= 0) {
+          particleEffects.splice(i, 1);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function handleCanvasHit(clientX, clientY) {
+      if (!gameRunning) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      for (let i = soapItems.length - 1; i >= 0; i--) {
+        if (soapItems[i].contains(x, y)) {
+          sound.playSuccess();
+          createBubbleBurst(soapItems[i].x, soapItems[i].y, 25, '#38BDF8');
+          const bonus = germs.length * 10 + 20;
+          gameScore += bonus;
+          germs.forEach(g => {
+            createBubbleBurst(g.x, g.y, 12, '#67E8F9');
+          });
+          germs = [];
+          soapItems.splice(i, 1);
+          document.getElementById('game-score').innerText = `${gameScore}점`;
+          showToast(`비누 거품 폭탄! 전체 정화 +${bonus}점!`, '🧼');
+          return;
+        }
+      }
+
+      for (let i = germs.length - 1; i >= 0; i--) {
+        if (germs[i].contains(x, y)) {
+          sound.playPop();
+          createBubbleBurst(germs[i].x, germs[i].y, 14, germs[i].palette.body);
+          germs.splice(i, 1);
+          gameScore += 10;
+          document.getElementById('game-score').innerText = `${gameScore}점`;
+          return;
+        }
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      handleCanvasHit(e.clientX, e.clientY);
+    });
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        e.preventDefault();
+        handleCanvasHit(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    function startGame() {
+      if (autoNextMissionTimer) {
+        clearInterval(autoNextMissionTimer);
+        autoNextMissionTimer = null;
+      }
+      sound.playBubble();
+      resizeGameCanvas();
+      gameScore = 0;
+      gameTimer = 30;
+      germs = [];
+      soapItems = [];
+      particleEffects = [];
+      gameRunning = true;
+
+      document.getElementById('game-score').innerText = '0점';
+      document.getElementById('game-timer').innerText = '30초';
+      document.getElementById('game-overlay').classList.add('hidden');
+
+      clearInterval(gameInterval);
+      cancelAnimationFrame(animationFrameId);
+
+      gameInterval = setInterval(() => {
+        gameTimer--;
+        document.getElementById('game-timer').innerText = `${gameTimer}초`;
+
+        if (gameTimer <= 5 && gameTimer > 0) {
+          sound.playPop();
+        }
+
+        if (gameTimer <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function goToPuzzleNow() {
+      if (autoNextMissionTimer) {
+        clearInterval(autoNextMissionTimer);
+        autoNextMissionTimer = null;
+      }
+      document.getElementById('game-overlay').classList.add('hidden');
+      switchTab('tab3');
+      showToast("기침예절 퍼즐 미션 시작! 🧩", "✨");
+    }
+
+    function endGame() {
+      gameRunning = false;
+      clearInterval(gameInterval);
+      cancelAnimationFrame(animationFrameId);
+      sound.playSuccess();
+
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.5 }
+        });
+      } catch (e) {}
+
+      let rankTitle = "🛡️ 주니어 청결 지킴이";
+      if (gameScore >= 200) {
+        rankTitle = "👑 전설의 바이러스 방패 대장!";
+      } else if (gameScore >= 120) {
+        rankTitle = "⭐ 1급 감염병 예방 특공대원!";
+      } else if (gameScore >= 60) {
+        rankTitle = "🧼 반짝반짝 손씻기 모범생!";
+      }
+
+      const overlay = document.getElementById('game-overlay');
+      const title = document.getElementById('overlay-title');
+      const desc = document.getElementById('overlay-desc');
+      const stats = document.getElementById('overlay-stats');
+      const finalScore = document.getElementById('final-score-display');
+      const rankBadge = document.getElementById('final-rank-badge');
+      const btn = document.getElementById('start-game-btn');
+      const nextPuzzleBtn = document.getElementById('next-puzzle-btn');
+      const autoRedirectMsg = document.getElementById('auto-redirect-msg');
+
+      title.innerText = "미션 2 클리어!";
+      desc.innerText = "30초 동안 튼튼하게 손을 방어했어요!";
+      stats.classList.remove('hidden');
+      finalScore.innerText = `${gameScore}점`;
+      rankBadge.innerText = rankTitle;
+      btn.innerText = "🔄 한 번 더 도전하기";
+      nextPuzzleBtn.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+
+      let remainSec = 3;
+      autoRedirectMsg.innerText = `🧩 ${remainSec}초 후 다음 미션(기침예절 퍼즐)으로 자동 이동합니다!`;
+
+      if (autoNextMissionTimer) clearInterval(autoNextMissionTimer);
+      autoNextMissionTimer = setInterval(() => {
+        remainSec--;
+        if (remainSec > 0) {
+          autoRedirectMsg.innerText = `🧩 ${remainSec}초 후 다음 미션(기침예절 퍼즐)으로 자동 이동합니다!`;
+        } else {
+          clearInterval(autoNextMissionTimer);
+          autoNextMissionTimer = null;
+          goToPuzzleNow();
+        }
+      }, 1000);
+    }
+
+    const POSTER_SVG_TEMPLATE = `
+      <svg id="etiquette-poster" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="rounded-xl overflow-hidden block select-none">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4F75BC"/>
+            <stop offset="35%" stop-color="#6E94D8"/>
+            <stop offset="100%" stop-color="#8DB3F2"/>
+          </linearGradient>
+
+          <linearGradient id="sleeveGrad" x1="0" y1="0" x2="1" y2="0.3">
+            <stop offset="0%" stop-color="#0E5E58"/>
+            <stop offset="60%" stop-color="#116D66"/>
+            <stop offset="100%" stop-color="#0E544E"/>
+          </linearGradient>
+
+          <filter id="shadowHeavy" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="3" dy="4" stdDeviation="0" flood-color="#111827"/>
+          </filter>
+        </defs>
+
+        <rect width="360" height="480" fill="url(#skyGrad)" />
+
+        <g fill="#FFFFFF" opacity="0.4" font-size="10">
+          <circle cx="28" cy="40" r="2"/>
+          <circle cx="68" cy="85" r="1.5"/>
+          <circle cx="330" cy="55" r="2.5"/>
+          <circle cx="340" cy="110" r="1.8"/>
+          <circle cx="45" cy="130" r="2"/>
+          <circle cx="310" cy="160" r="1.5"/>
+        </g>
+
+        <!-- KDCA Emblem Header -->
+        <g transform="translate(265, 12)">
+          <circle cx="10" cy="10" r="8" fill="#FFFFFF" stroke="#003B70" stroke-width="1.5"/>
+          <path d="M 6 10 C 6 6, 14 6, 14 10 C 14 14, 6 14, 6 10 Z" fill="#D32F2F" />
+          <path d="M 6 10 C 6 13, 14 13, 14 10 C 12 12, 8 12, 6 10 Z" fill="#1976D2" />
+          <text x="22" y="14" font-family="'Noto Sans KR', sans-serif" font-weight="900" font-size="11" fill="#FFFFFF" letter-spacing="-0.5">질병관리청</text>
+        </g>
+
+        <!-- Character: Boy Coughing -->
+        <path d="M 180 50 C 95 50, 68 115, 68 175 C 68 215, 100 230, 180 230 C 260 230, 292 215, 292 175 C 292 115, 265 50, 180 50 Z" fill="#FCD3B6" stroke="#1E293B" stroke-width="6"/>
+
+        <circle cx="72" cy="140" r="18" fill="#FCD3B6" stroke="#1E293B" stroke-width="5"/>
+        <circle cx="288" cy="140" r="18" fill="#FCD3B6" stroke="#1E293B" stroke-width="5"/>
+        <path d="M 72 135 Q 78 142 70 148" fill="none" stroke="#E2A682" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 288 135 Q 282 142 290 148" fill="none" stroke="#E2A682" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Hair -->
+        <path d="M 70 135 C 60 70, 110 10, 180 10 C 250 10, 300 70, 290 135 C 275 125, 275 90, 255 80 C 240 72, 230 85, 205 75 C 190 68, 175 80, 150 72 C 130 65, 120 85, 100 80 C 85 90, 85 125, 70 135 Z" fill="#111827" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+        <polygon points="68,100 55,75 75,80" fill="#111827"/>
+        <polygon points="292,100 305,75 285,80" fill="#111827"/>
+
+        <!-- Eyebrows -->
+        <path d="M 125 122 Q 145 132 165 130" fill="none" stroke="#111827" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 235 122 Q 215 132 195 130" fill="none" stroke="#111827" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 175 120 L 175 132" stroke="#111827" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 185 120 L 185 132" stroke="#111827" stroke-width="4" stroke-linecap="round"/>
+
+        <!-- Eyes closed tightly -->
+        <path d="M 125 142 L 155 146" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+        <path d="M 132 153 L 150 146" stroke="#111827" stroke-width="5" stroke-linecap="round"/>
+        <path d="M 235 142 L 205 146" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+        <path d="M 228 153 L 210 146" stroke="#111827" stroke-width="5" stroke-linecap="round"/>
+
+        <!-- Cheek blush -->
+        <ellipse cx="115" cy="165" rx="14" ry="7" fill="#F87171" opacity="0.6"/>
+        <ellipse cx="245" cy="165" rx="14" ry="7" fill="#F87171" opacity="0.6"/>
+
+        <!-- Sweater Body -->
+        <path d="M 35 240 L 35 480 L 325 480 L 325 240 Z" fill="#0E5E58" />
+        <path d="M 35 320 L 52 300 L 52 480 L 35 480 Z" fill="#E8615A" />
+        <line x1="52" y1="300" x2="52" y2="480" stroke="#FFFFFF" stroke-width="3"/>
+
+        <!-- Sleeve Covering Mouth -->
+        <path d="M -10 180 Q 80 155 180 155 Q 290 155 370 200 L 370 260 Q 280 215 180 215 Q 90 215 -10 260 Z" fill="url(#sleeveGrad)" stroke="#111827" stroke-width="6" stroke-linejoin="round"/>
+
+        <!-- Slogan Typography -->
+        <g filter="url(#shadowHeavy)">
+          <text x="24" y="222" font-family="'Jua', sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" stroke="#111827" stroke-width="7" paint-order="stroke fill" letter-spacing="-1">기침할 땐</text>
+          <text x="175" y="222" font-family="'Jua', sans-serif" font-size="44" font-weight="900" fill="#FF5E57" stroke="#111827" stroke-width="7" paint-order="stroke fill" letter-spacing="-1">옷소매로!</text>
+        </g>
+        <circle cx="202" cy="180" r="4.5" fill="#FF5E57" stroke="#111827" stroke-width="2.5"/>
+        <circle cx="238" cy="180" r="4.5" fill="#FF5E57" stroke="#111827" stroke-width="2.5"/>
+        <circle cx="274" cy="180" r="4.5" fill="#FF5E57" stroke="#111827" stroke-width="2.5"/>
+
+        <text x="180" y="266" font-family="'Jua', sans-serif" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">
+          올바른 기침예절 세 가지 수칙!
+        </text>
+
+        <!-- 3 Rule Cards -->
+        <polygon points="50,335 105,282 160,335 105,388" fill="#FFFBEB" stroke="#0E5E58" stroke-width="4"/>
+        <polygon points="53,335 105,285 157,335 105,385" fill="#FFFBEB"/>
+
+        <polygon points="125,335 180,282 235,335 180,388" fill="#FFFBEB" stroke="#0E5E58" stroke-width="4"/>
+        <polygon points="128,335 180,285 232,335 180,385" fill="#FFFBEB"/>
+
+        <polygon points="200,335 255,282 310,335 255,388" fill="#FFFBEB" stroke="#0E5E58" stroke-width="4"/>
+        <polygon points="203,335 255,285 307,335 255,385" fill="#FFFBEB"/>
+
+        <circle cx="105" cy="285" r="10" fill="#FEF08A" stroke="#111827" stroke-width="2"/>
+        <text x="105" y="289" font-family="'Jua', sans-serif" font-size="11" font-weight="bold" fill="#111827" text-anchor="middle">①</text>
+
+        <circle cx="180" cy="285" r="10" fill="#FEF08A" stroke="#111827" stroke-width="2"/>
+        <text x="180" y="289" font-family="'Jua', sans-serif" font-size="11" font-weight="bold" fill="#111827" text-anchor="middle">②</text>
+
+        <circle cx="255" cy="285" r="10" fill="#FEF08A" stroke="#111827" stroke-width="2"/>
+        <text x="255" y="289" font-family="'Jua', sans-serif" font-size="11" font-weight="bold" fill="#111827" text-anchor="middle">③</text>
+
+        <g transform="translate(105, 332) scale(0.65)">
+          <circle cx="0" cy="-12" r="22" fill="#FCD3B6"/>
+          <path d="M -22 -15 C -22 -35, 22 -35, 22 -15 C 15 -25, -15 -25, -22 -15 Z" fill="#111827"/>
+          <path d="M -12 -12 L -4 -12" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 4 -12 L 12 -12" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+          <rect x="-18" y="-5" width="36" height="22" rx="6" fill="#FFFFFF" stroke="#111827" stroke-width="2.5"/>
+          <circle cx="-22" cy="5" r="7" fill="#FCD3B6" stroke="#111827" stroke-width="2"/>
+          <circle cx="22" cy="5" r="7" fill="#FCD3B6" stroke="#111827" stroke-width="2"/>
+        </g>
+
+        <g transform="translate(180, 332) scale(0.65)">
+          <circle cx="0" cy="-14" r="22" fill="#FCD3B6"/>
+          <path d="M -22 -14 C -22 -38, 22 -38, 22 -14 Z" fill="#111827"/>
+          <path d="M -22 -18 C -22 -32, 22 -32, 22 -18" fill="none" stroke="#F43F5E" stroke-width="5"/>
+          <path d="M -8 -14 L 0 -14" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 8 -16 L 14 -12 L 8 -8" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+          <path d="M -24 16 L 12 -4 L 18 10 L -18 24 Z" fill="#F87171" stroke="#111827" stroke-width="2.5"/>
+        </g>
+
+        <g transform="translate(255, 332) scale(0.65)">
+          <circle cx="-26" cy="-8" r="13" fill="#FFFFFF" stroke="#111827" stroke-width="2.5"/>
+          <text x="-26" y="-4" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="900" fill="#111827" text-anchor="middle">30초</text>
+          <rect x="-28" y="-23" width="4" height="4" fill="#111827"/>
+          <circle cx="10" cy="-18" r="6" fill="#BAE6FD" stroke="#0284C7" stroke-width="1.5"/>
+          <circle cx="-2" cy="-15" r="4" fill="#BAE6FD" stroke="#0284C7" stroke-width="1.5"/>
+          <rect x="-4" y="-8" width="14" height="26" rx="6" fill="#FCD3B6" stroke="#111827" stroke-width="2.5" transform="rotate(-15)"/>
+          <rect x="4" y="-8" width="14" height="26" rx="6" fill="#FCD3B6" stroke="#111827" stroke-width="2.5" transform="rotate(15)"/>
+        </g>
+
+        <rect x="44" y="380" width="82" height="32" rx="5" fill="#FFFBEB" stroke="#111827" stroke-width="1.5"/>
+        <text x="85" y="394" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">호흡기 증상 시엔</text>
+        <text x="85" y="405" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">마스크 착용하기</text>
+
+        <rect x="139" y="380" width="82" height="32" rx="5" fill="#FFFBEB" stroke="#111827" stroke-width="1.5"/>
+        <text x="180" y="394" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">기침할 땐 옷소매로</text>
+        <text x="180" y="405" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">입과 코 가리기</text>
+
+        <rect x="234" y="380" width="82" height="32" rx="5" fill="#FFFBEB" stroke="#111827" stroke-width="1.5"/>
+        <text x="275" y="394" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">기침 후엔 30초 이상</text>
+        <text x="275" y="405" font-family="'Noto Sans KR', sans-serif" font-size="8.5" font-weight="900" fill="#111827" text-anchor="middle">비누로 손 씻기</text>
+
+        <rect x="35" y="430" width="290" height="38" rx="8" fill="#FF5E57" stroke="#111827" stroke-width="2.5"/>
+        <text x="180" y="454" font-family="'Jua', sans-serif" font-size="14.5" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.2">
+          올바른 기침예절로 호흡기 감염병 함께 예방해요!
+        </text>
+      </svg>
+    `;
+
+    let puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let selectedTileIndex = null;
+    let puzzleMoves = 0;
+
+    function initPuzzle() {
+      document.getElementById('poster-original-svg-wrap').innerHTML = POSTER_SVG_TEMPLATE;
+      shufflePuzzle();
+    }
+
+    function shufflePuzzle() {
+      sound.playPop();
+      puzzleMoves = 0;
+      selectedTileIndex = null;
+      document.getElementById('puzzle-moves').innerText = `이동 횟수: 0`;
+      document.getElementById('puzzle-completed-modal').classList.add('hidden');
+
+      do {
+        puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
+      } while (isPuzzleSolved());
+
+      renderPuzzleBoard();
+    }
+
+    function isPuzzleSolved() {
+      for (let i = 0; i < 9; i++) {
+        if (puzzleTiles[i] !== i) return false;
+      }
+      return true;
+    }
+
+    function renderPuzzleBoard() {
+      const grid = document.getElementById('puzzle-grid');
+      grid.innerHTML = '';
+
+      puzzleTiles.forEach((tileValue, gridIndex) => {
+        const tileBtn = document.createElement('div');
+        const isSelected = (selectedTileIndex === gridIndex);
+
+        tileBtn.className = `relative w-full h-full rounded-xl overflow-hidden cursor-pointer border-2 transition-transform duration-150 ${
+          isSelected 
+            ? 'border-sky-500 scale-95 ring-4 ring-sky-300 z-10' 
+            : 'border-white hover:scale-[0.98] shadow-sm'
+        }`;
+
+        const origRow = Math.floor(tileValue / 3);
+        const origCol = tileValue % 3;
+
+        const innerClip = document.createElement('div');
+        innerClip.className = 'absolute w-[300%] h-[300%] pointer-events-none';
+        innerClip.style.left = `-${origCol * 100}%`;
+        innerClip.style.top = `-${origRow * 100}%`;
+        innerClip.innerHTML = POSTER_SVG_TEMPLATE;
+
+        const badge = document.createElement('span');
+        badge.className = 'absolute top-1 left-1 bg-slate-900/60 text-white font-jua text-[10px] w-4 h-4 rounded-full flex items-center justify-center';
+        badge.innerText = tileValue + 1;
+
+        tileBtn.appendChild(innerClip);
+        tileBtn.appendChild(badge);
+
+        tileBtn.onclick = () => {
+          handleTileClick(gridIndex);
+        };
+
+        grid.appendChild(tileBtn);
+      });
+    }
+
+    function handleTileClick(clickedIndex) {
+      sound.playBubble();
+
+      if (selectedTileIndex === null) {
+        selectedTileIndex = clickedIndex;
+        renderPuzzleBoard();
+      } else if (selectedTileIndex === clickedIndex) {
+        selectedTileIndex = null;
+        renderPuzzleBoard();
+      } else {
+        const temp = puzzleTiles[selectedTileIndex];
+        puzzleTiles[selectedTileIndex] = puzzleTiles[clickedIndex];
+        puzzleTiles[clickedIndex] = temp;
+
+        puzzleMoves++;
+        document.getElementById('puzzle-moves').innerText = `이동 횟수: ${puzzleMoves}`;
+        selectedTileIndex = null;
+        renderPuzzleBoard();
+
+        if (isPuzzleSolved()) {
+          onPuzzleSolved();
+        }
+      }
+    }
+
+    function launchGrandFireworks() {
+      const duration = 3.5 * 1000;
+      const animationEnd = Date.now() + duration;
+
+      const fireworksInterval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(fireworksInterval);
+        }
+
+        const particleCount = 60 * (timeLeft / duration);
+
+        confetti({
+          particleCount,
+          angle: 60,
+          spread: 65,
+          origin: { x: 0.1, y: 0.7 },
+          colors: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6']
+        });
+
+        confetti({
+          particleCount,
+          angle: 120,
+          spread: 65,
+          origin: { x: 0.9, y: 0.7 },
+          colors: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6']
+        });
+
+        confetti({
+          particleCount: Math.floor(particleCount * 0.75),
+          spread: 100,
+          origin: { x: 0.5, y: 0.4 },
+          shapes: ['circle', 'square'],
+          scalar: 1.2
+        });
+      }, 300);
+    }
+
+    function onPuzzleSolved() {
+      sound.playSuccess();
+      launchGrandFireworks();
+      document.getElementById('puzzle-completed-modal').classList.remove('hidden');
+      showToast("축하합니다! 기침예절 포스터 퍼즐을 완벽하게 맞췄어요! 🎉", "🌟");
+    }
+
+    function togglePuzzleHint() {
+      sound.playPop();
+      const wrap = document.getElementById('poster-original-svg-wrap');
+      if (wrap.style.opacity === '0.2') {
+        wrap.style.opacity = '1';
+        showToast("힌트 포스터를 선명하게 켰어요!", "👁️");
+      } else {
+        wrap.style.opacity = '0.2';
+        showToast("힌트 포스터를 흐리게 감췄어요!", "🙈");
+      }
+    }
+
+    window.onload = function () {
+      initHandwashQuiz();
+      initPuzzle();
+      resizeGameCanvas();
+    };
+  </script>
+</body>
+</html>
