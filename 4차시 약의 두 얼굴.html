@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>약의 두 얼굴 - 5학년 보건교육 탐구실</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tone.js for Web Audio Effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F0F7FF',
+              100: '#E0EFFF',
+              500: '#2563EB',
+              600: '#1D4ED8',
+              700: '#1E40AF',
+            },
+            coral: {
+              400: '#FB7185',
+              500: '#F43F5E',
+            },
+            amberSoft: '#FEF3C7',
+            mint: '#10B981',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Pretendard', sans-serif;
+      user-select: none;
+    }
+    .pulse-pill {
+      animation: float 2.5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(5deg); }
+    }
+    .organ-glow {
+      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md">
+          <i data-lucide="pill" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">초등 5학년 보건</span>
+            <span class="text-xs text-slate-600">4차시: 약의 두 얼굴</span>
+          </div>
+          <h1 class="text-lg md:text-xl font-extrabold text-slate-800 tracking-tight">슬기로운 어린이 의약 탐구소</h1>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex space-x-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-sm font-semibold">
+        <button id="nav-btn-1" onclick="switchSection('journey')" class="tab-btn active px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all bg-white text-blue-600 shadow-sm">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>1. 몸속 여행</span>
+        </button>
+        <button id="nav-btn-2" onclick="switchSection('quiz')" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-600 hover:text-slate-900">
+          <i data-lucide="search" class="w-4 h-4"></i>
+          <span>2. OX 탐정</span>
+        </button>
+        <button id="nav-btn-3" onclick="switchSection('pharmacist')" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-600 hover:text-slate-900">
+          <i data-lucide="award" class="w-4 h-4"></i>
+          <span>3. 명예 약사</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-1">
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: 약의 몸속 대사 여행 시뮬레이터 -->
+    <!-- ============================================== -->
+    <section id="section-journey" class="section-content space-y-6">
+      <!-- Title banner -->
+      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-xl">
+          <span class="bg-white/20 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">탐구 활동 1</span>
+          <h2 class="text-2xl md:text-3xl font-black mt-2">삼킨 약은 우리 몸속에서 어디로 갈까요?</h2>
+          <p class="text-blue-100 mt-2 text-sm md:text-base leading-relaxed">
+            약은 아플 때 병을 이기도록 돕지만 올바르게 먹어야 해요. 
+            <strong>흡수 &rarr; 분포 &rarr; 대사 &rarr; 배설</strong>의 4단계 여정을 버튼을 눌러 확인해 보세요!
+          </p>
+        </div>
+        <div class="absolute -right-6 -bottom-6 w-36 h-36 bg-white/10 rounded-full blur-2xl"></div>
+      </div>
+
+      <!-- Medicine Classification quick peek -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex gap-3.5 items-start">
+          <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sky-900 text-sm md:text-base">전문의약품</h3>
+              <span class="text-xs bg-sky-200 text-sky-800 px-1.5 py-0.5 rounded font-semibold">처방전 필수</span>
+            </div>
+            <p class="text-xs md:text-sm text-sky-800 mt-1">부작용이 클 수 있어 반드시 <strong>의사의 진찰과 처방전</strong>이 있어야만 구입할 수 있는 약이에요.</p>
+          </div>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex gap-3.5 items-start">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-emerald-900 text-sm md:text-base">일반의약품 (안전상비의약품)</h3>
+              <span class="text-xs bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">처방전 없음</span>
+            </div>
+            <p class="text-xs md:text-sm text-emerald-800 mt-1">부작용이 비교적 적어 약국이나 편의점에서 <strong>처방전 없이</strong> 간편하게 구입할 수 있는 약이에요.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Body Simulation -->
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <!-- Human Body Graphic Canvas/SVG -->
+        <div class="lg:col-span-6 flex flex-col items-center justify-center bg-slate-50 border border-slate-100 rounded-2xl p-6 relative min-h-[340px]">
+          
+          <svg viewBox="0 0 300 420" class="w-56 h-auto max-h-[380px]">
+            <!-- Body Silhouette -->
+            <path d="M150,30 C175,30 190,50 190,75 C190,95 175,115 165,120 C185,125 210,135 225,160 C240,185 245,230 240,270 C235,275 225,275 220,265 C220,230 215,190 205,175 C205,210 205,270 200,320 C195,370 190,400 170,400 C160,400 155,360 152,300 C148,300 145,360 135,400 C115,400 110,370 105,320 C100,270 100,210 100,175 C90,190 85,230 85,265 C80,275 70,275 65,270 C60,230 65,185 80,160 C95,135 120,125 140,120 C130,115 115,95 115,75 C115,50 130,30 150,30 Z" 
+                  fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2" />
+            
+            <!-- Step 1: Stomach & Intestine (Absorption) -->
+            <g id="organ-stomach" class="transition-all duration-300 opacity-30 cursor-pointer" onclick="goToStep(0)">
+              <circle cx="150" cy="180" r="22" fill="#F87171" />
+              <path d="M140,170 Q160,165 160,185 Q160,205 142,198" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+              <text x="150" y="215" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">위 & 소장 (흡수)</text>
+            </g>
+
+            <!-- Step 2: Blood Vessels (Distribution) -->
+            <g id="organ-blood" class="transition-all duration-300 opacity-30 cursor-pointer" onclick="goToStep(1)">
+              <circle cx="150" cy="140" r="14" fill="#EF4444" />
+              <path d="M150,140 L185,160 M150,140 L115,160 M150,140 L150,90 M150,154 L150,260" stroke="#EF4444" stroke-width="3.5" stroke-dasharray="4" stroke-linecap="round" />
+              <text x="150" y="125" font-size="10" font-weight="bold" fill="#DC2626" text-anchor="middle">혈관 (분포)</text>
+            </g>
+
+            <!-- Step 3: Liver (Metabolism) -->
+            <g id="organ-liver" class="transition-all duration-300 opacity-30 cursor-pointer" onclick="goToStep(2)">
+              <path d="M135,165 C160,155 175,165 172,185 C170,195 150,195 135,185 Z" fill="#F59E0B" />
+              <text x="175" y="165" font-size="10" font-weight="bold" fill="#B45309" text-anchor="start">간 (대사)</text>
+            </g>
+
+            <!-- Step 4: Kidneys & Bladder (Excretion) -->
+            <g id="organ-kidney" class="transition-all duration-300 opacity-30 cursor-pointer" onclick="goToStep(3)">
+              <circle cx="138" cy="235" r="9" fill="#10B981" />
+              <circle cx="162" cy="235" r="9" fill="#10B981" />
+              <circle cx="150" cy="275" r="11" fill="#059669" />
+              <path d="M138,244 L146,268 M162,244 L154,268" stroke="#10B981" stroke-width="2" stroke-dasharray="2" />
+              <text x="150" y="302" font-size="10" font-weight="bold" fill="#047857" text-anchor="middle">신장·방광 (배설)</text>
+            </g>
+
+            <!-- Pill Pointer Indicator -->
+            <g id="pill-token" class="pulse-pill transition-transform duration-500" transform="translate(150, 180)">
+              <rect x="-14" y="-7" width="28" height="14" rx="7" fill="#2563EB" stroke="#FFFFFF" stroke-width="1.5" />
+              <path d="M0,-7 L0,7" stroke="#FFFFFF" stroke-width="1.5"/>
+            </g>
+          </svg>
+
+          <span class="text-xs text-slate-600 mt-2">인체 부위를 클릭하거나 아래 다음 버튼을 눌러보세요!</span>
+        </div>
+
+        <!-- Step Description Card -->
+        <div class="lg:col-span-6 flex flex-col justify-between h-full space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div class="flex items-center gap-2">
+              <span id="step-badge" class="px-2.5 py-1 bg-red-100 text-red-700 font-extrabold text-xs rounded-full">1단계</span>
+              <h3 id="step-title" class="font-extrabold text-xl text-slate-800">흡수 (Absorption)</h3>
+            </div>
+            <span id="step-counter" class="text-xs font-semibold text-slate-600">1 / 4 단계</span>
+          </div>
+
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 min-h-[140px] flex flex-col justify-center">
+            <div class="flex items-center gap-3 mb-2">
+              <span id="step-icon-box" class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                🥤
+              </span>
+              <p id="step-subtitle" class="font-bold text-slate-700 text-sm">약이 소화관을 통해 몸 안으로 들어와요</p>
+            </div>
+            <p id="step-desc" class="text-slate-600 text-sm leading-relaxed">
+              입으로 꿀꺽 삼킨 알약이나 물약은 식도를 거쳐 <strong>위와 소장</strong>을 지나면서 작은 알갱이로 녹아 체내로 스며듭니다.
+            </p>
+          </div>
+
+          <!-- Step Mini Tip -->
+          <div id="step-tip" class="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl flex items-start gap-2">
+            <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+            <span><strong>보건 꿀팁:</strong> 찬물보다는 미지근한 물 한 컵과 함께 삼켜야 위벽을 보호하고 흡수가 잘 돼요!</span>
+          </div>
+
+          <!-- Step Controllers -->
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="prevStep()" class="flex-1 py-3 px-4 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-sm">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> 이전 단계
+            </button>
+            <button onclick="nextStep()" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 text-sm">
+              다음 단계 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: OX 약사 탐정 (교과서 사례 해결) -->
+    <!-- ============================================== -->
+    <section id="section-quiz" class="section-content hidden space-y-6">
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-xl">
+          <span class="bg-white/20 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">탐구 활동 2</span>
+          <h2 class="text-2xl md:text-3xl font-black mt-2">사건 파일: 약의 두 얼굴 OX 탐정단</h2>
+          <p class="text-emerald-100 mt-2 text-sm md:text-base">
+            교과서 속 친구들의 행동을 관찰하고, 이것이 올바른 행동인지 O/X로 감별해 주세요!
+          </p>
+        </div>
+        <div class="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+      </div>
+
+      <!-- Quiz Card Shell -->
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-center justify-between border-b pb-4 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">사건 번호</span>
+            <span id="quiz-number-tag" class="font-extrabold text-slate-800 text-lg">Case 1</span>
+          </div>
+          <div class="text-xs text-slate-600 font-bold">
+            해결 점수: <span id="quiz-score" class="text-emerald-600 text-sm font-black">0</span> / 60점
+          </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-6">
+          <!-- Illustration / Situation -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
+            <div id="quiz-avatar" class="w-24 h-24 rounded-2xl bg-white shadow-inner border border-slate-100 flex items-center justify-center text-4xl shrink-0">
+              👧
+            </div>
+            <div class="space-y-2 text-center md:text-left flex-1">
+              <span id="quiz-character-role" class="text-xs font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded-full">민지의 이야기</span>
+              <blockquote id="quiz-quote" class="text-base md:text-lg font-extrabold text-slate-800 leading-snug">
+                "가루약이 너무 써서 맛있는 탄산음료수랑 같이 꿀꺽 삼킬 거야!"
+              </blockquote>
+              <p id="quiz-subtext" class="text-xs text-slate-600">이 말은 약을 안전하게 복용하는 올바른 방법일까요?</p>
+            </div>
+          </div>
+
+          <!-- OX Buttons -->
+          <div class="grid grid-cols-2 gap-4">
+            <button onclick="answerQuiz(true)" class="quiz-btn group py-6 rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/70 hover:border-emerald-400 transition-all flex flex-col items-center justify-center gap-1 active:scale-95 shadow-sm">
+              <span class="text-3xl md:text-4xl font-black text-emerald-600 group-hover:scale-110 transition-transform">⭕ O</span>
+              <span class="text-xs md:text-sm font-bold text-emerald-700">올바른 행동이에요</span>
+            </button>
+            <button onclick="answerQuiz(false)" class="quiz-btn group py-6 rounded-2xl border-2 border-rose-200 bg-rose-50/50 hover:bg-rose-100/70 hover:border-rose-400 transition-all flex flex-col items-center justify-center gap-1 active:scale-95 shadow-sm">
+              <span class="text-3xl md:text-4xl font-black text-rose-600 group-hover:scale-110 transition-transform">❌ X</span>
+              <span class="text-xs md:text-sm font-bold text-rose-700">잘못된 행동이에요</span>
+            </button>
+          </div>
+
+          <!-- Feedback Box (Hidden initially) -->
+          <div id="quiz-feedback-box" class="hidden rounded-2xl p-5 border text-sm leading-relaxed transition-all">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span id="feedback-icon" class="text-xl">✅</span>
+              <h4 id="feedback-title" class="font-extrabold text-base">정답입니다!</h4>
+            </div>
+            <p id="feedback-desc" class="text-slate-700">
+              주스나 탄산음료, 우유는 약의 성분과 반응하여 약효를 떨어뜨리거나 위를 자극할 수 있어요. 약은 반드시 <strong>미지근한 물</strong>과 함께 마셔야 해요!
+            </p>
+            <div class="mt-4 flex justify-end">
+              <button onclick="nextQuizQuestion()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition flex items-center gap-1.5">
+                다음 사건 조사하기 <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Completion Screen -->
+        <div id="quiz-finish-box" class="hidden text-center py-10 space-y-4">
+          <div class="w-20 h-20 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl font-bold shadow-inner">
+            <i data-lucide="badge-check" class="w-10 h-10"></i>
+          </div>
+          <h3 class="text-2xl font-black text-slate-800">모든 사건을 해결했어요!</h3>
+          <p id="quiz-final-score-text" class="text-slate-600 text-sm max-w-md mx-auto">
+            축하합니다! 훌륭한 탐정의 눈으로 잘못된 의약품 사용 사례를 모두 바로잡았습니다.
+          </p>
+          <div class="pt-4 flex justify-center gap-3">
+            <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50 transition text-sm">
+              다시 도전하기
+            </button>
+            <button onclick="switchSection('pharmacist')" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition text-sm shadow-md">
+              나만의 복약 봉투 만들기 &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: 어린이 명예 약사 (복약 봉투 & 실천 서약) -->
+    <!-- ============================================== -->
+    <section id="section-pharmacist" class="section-content hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-xl">
+          <span class="bg-white/20 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">탐구 활동 3</span>
+          <h2 class="text-2xl md:text-3xl font-black mt-2">어린이 명예 약사 면허증 받기</h2>
+          <p class="text-amber-100 mt-2 text-sm md:text-base">
+            환자의 상태에 맞게 안전한 <strong>복약 지도 봉투</strong>를 완성하고, 약 복용 수칙을 실천하여 면허증을 획득해 보세요!
+          </p>
+        </div>
+        <div class="absolute -right-4 -bottom-4 w-36 h-36 bg-white/10 rounded-full blur-2xl"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Prescription Envelope Creator Form -->
+        <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
+          <div class="flex items-center gap-2 border-b pb-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
+              <i data-lucide="clipboard-pen" class="w-4 h-4"></i>
+            </div>
+            <h3 class="font-extrabold text-slate-800 text-lg">나만의 안전 복약 봉투 작성</h3>
+          </div>
+
+          <div class="space-y-4 text-sm">
+            <!-- Patient Name -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">복용자 (학생 이름)</label>
+              <input type="text" id="input-patient-name" placeholder="예: 김건강 (5학년 1반)" 
+                     class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <!-- Medicine Selection -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">조제 의약품 선택</label>
+              <select id="select-medicine" onchange="updateMedPrescription()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                <option value="fever">해열진통제 (열이 나거나 두통·치통이 있을 때)</option>
+                <option value="digest">소화제 (속이 더부룩하고 체했을 때)</option>
+                <option value="cold">종합감기약 (기침, 콧물, 목 통증이 있을 때)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">1일 복용 횟수</label>
+                <select id="select-frequency" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                  <option value="하루 3회 (아침, 점심, 저녁 식후 30분)">하루 3회 (식후 30분)</option>
+                  <option value="하루 2회 (아침, 저녁 식후)">하루 2회 (아침, 저녁)</option>
+                  <option value="필요시 4~6시간 간격 복용">필요시 (4~6시간 간격)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">보관 방법</label>
+                <select id="select-storage" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                  <option value="실온 보관 (햇빛 없고 서늘한 곳)">실온 보관 (햇빛 없는 서늘한 곳)</option>
+                  <option value="냉장 보관 (2~8℃ 보관)">냉장 보관 (물약 시럽 일부)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Shelf Life info guide modal trigger -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-between text-xs text-blue-900">
+              <span class="flex items-center gap-1.5 font-semibold">
+                <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
+                의약품 보관 가능 기간 확인하기
+              </span>
+              <button onclick="openModal('modal-storage-guide')" class="px-2.5 py-1 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">
+                기준표 보기
+              </button>
+            </div>
+
+            <!-- Pledge Checkboxes -->
+            <div class="pt-2">
+              <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-1">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                내가 지킬 안전 약속 (모두 체크하세요)
+              </h4>
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-700">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-1" class="pledge-chk w-4 h-4 text-blue-600 rounded">
+                  <span>약은 반드시 <strong>미지근한 충분한 물</strong>과 함께 마셔요.</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-2" class="pledge-chk w-4 h-4 text-blue-600 rounded">
+                  <span>친구 약이나 다른 사람의 약을 <strong>절대 나눠 먹지 않아요</strong>.</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-3" class="pledge-chk w-4 h-4 text-blue-600 rounded">
+                  <span>알약을 함부로 쪼개거나 캡슐을 열어 가루로 먹지 않아요.</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-4" class="pledge-chk w-4 h-4 text-blue-600 rounded">
+                  <span>유효기간이 지난 약은 하수구가 아닌 <strong>폐의약품 전용 수거함</strong>에 버려요.</span>
+                </label>
+              </div>
+            </div>
+
+            <button onclick="issueLicense()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-base shadow-lg shadow-amber-500/20 hover:brightness-105 active:scale-[0.99] transition">
+              약 봉투 발행 및 명예 약사증 받기 🎓
+            </button>
+          </div>
+        </div>
+
+        <!-- Medicine Bag Preview (Visual Representation of Page 46) -->
+        <div class="lg:col-span-5 flex flex-col items-center">
+          <div id="medicine-envelope-card" class="w-full max-w-sm bg-amber-50/70 border-2 border-dashed border-amber-300 rounded-3xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[440px]">
+            <!-- Top Hospital Green Cross -->
+            <div class="text-center border-b border-amber-200 pb-4">
+              <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-2xl shadow-sm mb-1">
+                ✚
+              </div>
+              <h4 class="font-black text-slate-800 tracking-wider text-base">안 전 복 약 봉 투</h4>
+              <p class="text-[11px] text-slate-500">배우고 실천하는 보건 5학년</p>
+            </div>
+
+            <!-- Envelope Content Body -->
+            <div class="my-4 space-y-3 text-xs">
+              <div class="bg-white p-3 rounded-xl border border-amber-200/80 shadow-xs">
+                <span class="text-slate-600 font-bold block text-[11px]">환 자 성 명</span>
+                <span id="prev-patient" class="font-extrabold text-slate-800 text-sm">[ 이름을 입력하세요 ] 님 귀하</span>
+              </div>
+
+              <div class="bg-white p-3 rounded-xl border border-amber-200/80 shadow-xs space-y-1.5">
+                <div>
+                  <span class="text-slate-600 font-bold text-[11px]">조제 의약품명:</span>
+                  <span id="prev-med-name" class="font-extrabold text-blue-700 ml-1">어린이 아세트아미노펜 (해열진통)</span>
+                </div>
+                <div>
+                  <span class="text-slate-600 font-bold text-[11px]">용법 및 용량:</span>
+                  <span id="prev-med-freq" class="font-semibold text-slate-800 ml-1">하루 3회 (식후 30분)</span>
+                </div>
+                <div>
+                  <span class="text-slate-600 font-bold text-[11px]">주의할 부작용:</span>
+                  <span id="prev-med-side" class="text-rose-600 font-semibold ml-1">몸에 붉은 반점, 가려움, 속 쓰림</span>
+                </div>
+                <div>
+                  <span class="text-slate-600 font-bold text-[11px]">보관 주의사항:</span>
+                  <span id="prev-med-store" class="text-slate-700 font-semibold ml-1">어린이 손이 닿지 않는 서늘한 곳</span>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-slate-500 bg-amber-100/50 p-2.5 rounded-lg border border-amber-200/50">
+                ⚠️ 복용 후 숨이 차거나 심한 두드러기가 발생하면 즉시 부모님 또는 보건선생님께 알립니다.
+              </div>
+            </div>
+
+            <!-- Envelope Footer Pharmacy Stamp -->
+            <div class="border-t border-amber-200 pt-3 flex justify-between items-center text-[11px] text-slate-600">
+              <span id="prev-date">2026. 09. 18</span>
+              <span class="font-extrabold text-amber-800 flex items-center gap-1">
+                학교 보건실 약국 
+                <span class="inline-block w-4 h-4 rounded-full border border-red-500 text-red-500 font-bold text-[9px] text-center leading-3">印</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 1. Custom Alert / Message Modal (NO native browser alert) -->
+  <div id="modal-alert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-4 transform transition-all scale-95 duration-200" id="modal-alert-card">
+      <div id="modal-alert-icon" class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-bold">
+        🔔
+      </div>
+      <h3 id="modal-alert-title" class="font-black text-xl text-slate-800">알림</h3>
+      <p id="modal-alert-msg" class="text-slate-600 text-sm leading-relaxed">내용</p>
+      <button onclick="closeModal('modal-alert')" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition">
+        확인했습니다
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Storage Guidelines Modal (From 교과서 45쪽) -->
+  <div id="modal-storage-guide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+            <i data-lucide="archive" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-extrabold text-slate-800 text-lg">교과서 의약품 보관 가능 기간</h3>
+        </div>
+        <button onclick="closeModal('modal-storage-guide')" class="text-slate-600 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2.5 text-xs md:text-sm">
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">💧 다회용 안약</span>
+          <span class="font-extrabold text-rose-600">개봉 후 1개월 이내</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">🧪 일회용 안약</span>
+          <span class="font-extrabold text-rose-600">사용 즉시 폐기</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">🧴 튜브형 연고</span>
+          <span class="font-extrabold text-blue-600">개봉 후 6개월 이내</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">🥄 시럽형 원병 물약</span>
+          <span class="font-extrabold text-blue-600">개봉 후 6개월 이내</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">🍼 덜어서 조제해 준 물약</span>
+          <span class="font-extrabold text-amber-600">28일 이내</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">🍚 조제 가루약</span>
+          <span class="font-extrabold text-amber-600">6개월 이내</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+          <span class="font-bold text-slate-700">💊 처방 조제 알약</span>
+          <span class="font-extrabold text-emerald-600">처방일수 내 복용 (최대 1년)</span>
+        </div>
+      </div>
+
+      <div class="bg-rose-50 border border-rose-200 text-rose-900 p-3.5 rounded-xl text-xs leading-relaxed">
+        <strong>⚠️ 주의:</strong> 사용 기한이 지난 약은 약효가 사라질 뿐 아니라 유해 물질로 변할 수 있어요. 싱크대나 변기에 버리지 말고 반드시 <strong>폐의약품 수거함</strong>에 넣어주세요!
+      </div>
+
+      <button onclick="closeModal('modal-storage-guide')" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition">
+        확인하고 닫기
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. License Award Modal -->
+  <div id="modal-license-award" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 text-center space-y-4 relative overflow-hidden">
+      <!-- Background Badge Watermark -->
+      <div class="absolute -right-8 -top-8 w-32 h-32 bg-amber-100/50 rounded-full blur-xl pointer-events-none"></div>
+
+      <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-orange-400 text-white flex items-center justify-center text-3xl shadow-lg shadow-orange-400/30">
+        🏆
+      </div>
+
+      <div>
+        <span class="text-xs font-bold text-amber-700 uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full">어린이 보건 안전 공인</span>
+        <h3 class="text-2xl font-black text-slate-900 mt-2">어린이 명예 약사 인증서</h3>
+      </div>
+
+      <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 text-xs md:text-sm text-slate-800 space-y-2 leading-relaxed">
+        <p class="font-extrabold text-base text-blue-700" id="award-student-name">김건강 어린이</p>
+        <p>
+          위 학생은 초등학교 5학년 보건 단원 <strong>'약의 두 얼굴'</strong>을 이수하고, 
+          올바른 의약품 복용 수칙과 분리배출을 성실히 실천할 것을 서약하였으므로 
+          <strong>어린이 명예 약사</strong>로 위촉합니다.
+        </p>
+        <div class="pt-2 text-[11px] text-slate-500 flex justify-between border-t border-amber-200">
+          <span>인증 기관: 학교 보건위원회</span>
+          <span id="award-date">2026. 09. 18</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeModal('modal-license-award')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition">
+          닫기
+        </button>
+        <button onclick="window.print()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-1.5">
+          <i data-lucide="printer" class="w-4 h-4"></i> 인쇄하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    초등 5학년 보건교육 단원 [약의 두 얼굴] 디지털 학습 보조 자료
+  </footer>
+
+  <script>
+    /* -------------------------------------------------------------
+       1. TONE.JS AUDIO HELPER (Web Audio API Synthesizers)
+       ------------------------------------------------------------- */
+    let synth = null;
+
+    function initAudio() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -8;
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (Tone.context.state !== 'running') {
+          Tone.start();
+        }
+        if (!synth) return;
+
+        const now = Tone.now();
+        if (type === 'click') {
+          synth.triggerAttackRelease('C5', '16n', now);
+        } else if (type === 'correct') {
+          synth.triggerAttackRelease(['C5', 'E5', 'G5'], '8n', now);
+        } else if (type === 'wrong') {
+          synth.triggerAttackRelease(['F4', 'B3'], '6n', now);
+        } else if (type === 'celebrate') {
+          synth.triggerAttackRelease(['C5', 'E5', 'G5', 'C6'], '4n', now);
+        }
+      } catch (e) {
+        // Fallback gracefully without breaking
+      }
+    }
+
+    /* -------------------------------------------------------------
+       2. MODAL CONTROLLER (Zero Native Alert Rule)
+       ------------------------------------------------------------- */
+    function showAlert(title, message, icon = '💡') {
+      playSound('click');
+      document.getElementById('modal-alert-title').innerText = title;
+      document.getElementById('modal-alert-msg').innerText = message;
+      document.getElementById('modal-alert-icon').innerText = icon;
+      document.getElementById('modal-alert').classList.remove('hidden');
+    }
+
+    function openModal(id) {
+      playSound('click');
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      playSound('click');
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    /* -------------------------------------------------------------
+       3. NAVIGATION CONTROLLER
+       ------------------------------------------------------------- */
+    function switchSection(sectionId) {
+      playSound('click');
+      document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+        btn.classList.add('text-slate-600');
+      });
+
+      if (sectionId === 'journey') {
+        document.getElementById('section-journey').classList.remove('hidden');
+        const b = document.getElementById('nav-btn-1');
+        b.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+        b.classList.remove('text-slate-600');
+      } else if (sectionId === 'quiz') {
+        document.getElementById('section-quiz').classList.remove('hidden');
+        const b = document.getElementById('nav-btn-2');
+        b.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+        b.classList.remove('text-slate-600');
+      } else if (sectionId === 'pharmacist') {
+        document.getElementById('section-pharmacist').classList.remove('hidden');
+        const b = document.getElementById('nav-btn-3');
+        b.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+        b.classList.remove('text-slate-600');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       4. SECTION 1: METABOLISM STEP ENGINE
+       ------------------------------------------------------------- */
+    const journeyData = [
+      {
+        stage: "1단계",
+        title: "흡수 (Absorption)",
+        badgeClass: "bg-red-100 text-red-700",
+        icon: "🥤",
+        iconBg: "bg-red-500",
+        subtitle: "약이 소화관을 통해 몸 안으로 스며들어요",
+        desc: "입으로 삼킨 알약과 물약은 식도를 거쳐 <strong>위와 소장</strong>에서 잘게 분해되어 혈액 속으로 흡수됩니다.",
+        tip: "<strong>보건 꿀팁:</strong> 찬물보다는 미지근한 물 한 컵과 함께 삼켜야 위벽을 보호하고 흡수가 부드럽게 이뤄져요.",
+        organId: "organ-stomach",
+        tokenPos: "translate(150, 185)"
+      },
+      {
+        stage: "2단계",
+        title: "분포 (Distribution)",
+        badgeClass: "bg-rose-100 text-rose-700",
+        icon: "🩸",
+        iconBg: "bg-rose-500",
+        subtitle: "혈액을 타고 온몸 구석구석으로 퍼져요",
+        desc: "소장에서 흡수된 약 성분은 혈관을 통해 <strong>심장과 온몸의 세포</strong>로 전달되어 열을 내리거나 염증을 가라앉히는 치료 효과를 냅니다.",
+        tip: "<strong>보건 꿀팁:</strong> 약을 쪼개 먹으면 설계된 방출 속도가 깨져 한꺼번에 혈액으로 쏟아져 부작용 위험이 커져요.",
+        organId: "organ-blood",
+        tokenPos: "translate(150, 140)"
+      },
+      {
+        stage: "3단계",
+        title: "대사 (Metabolism)",
+        badgeClass: "bg-amber-100 text-amber-700",
+        icon: "🧪",
+        iconBg: "bg-amber-500",
+        subtitle: "간(Liver)에서 쉽게 빠져나가도록 분해돼요",
+        desc: "제 역할을 마친 약은 우리 몸의 해독 공장인 <strong>간</strong>에서 화학적 변화를 거쳐 몸 밖으로 안전하게 빠져나갈 수 있는 상태로 변해요.",
+        tip: "<strong>보건 꿀팁:</strong> 정해진 양보다 약을 많이 먹으면 간이 과부하에 걸려 심각한 손상을 입을 수 있어요!",
+        organId: "organ-liver",
+        tokenPos: "translate(160, 175)"
+      },
+      {
+        stage: "4단계",
+        title: "배설 (Excretion)",
+        badgeClass: "bg-emerald-100 text-emerald-700",
+        icon: "🚽",
+        iconBg: "bg-emerald-500",
+        subtitle: "신장과 방광을 거쳐 몸 밖으로 배출돼요",
+        desc: "분해된 잔여물은 <strong>신장(콩팥)</strong>에서 걸러져 소변으로 나가거나 대변, 땀, 눈물 등을 통해 완전히 몸 밖으로 빠져나갑니다.",
+        tip: "<strong>보건 꿀팁:</strong> 복용 후 물을 충분히 섭취하면 노폐물이 원활하게 배설되어 몸이 가벼워집니다.",
+        organId: "organ-kidney",
+        tokenPos: "translate(150, 275)"
+      }
+    ];
+
+    let currentJourneyIndex = 0;
+
+    function renderJourneyStep() {
+      const data = journeyData[currentJourneyIndex];
+      document.getElementById('step-badge').innerText = data.stage;
+      document.getElementById('step-badge').className = `px-2.5 py-1 font-extrabold text-xs rounded-full ${data.badgeClass}`;
+      document.getElementById('step-title').innerText = data.title;
+      document.getElementById('step-counter').innerText = `${currentJourneyIndex + 1} / 4 단계`;
+      document.getElementById('step-icon-box').innerText = data.icon;
+      document.getElementById('step-icon-box').className = `w-10 h-10 rounded-xl text-white flex items-center justify-center font-bold text-lg shadow-sm ${data.iconBg}`;
+      document.getElementById('step-subtitle').innerText = data.subtitle;
+      document.getElementById('step-desc').innerHTML = data.desc;
+      document.getElementById('step-tip').innerHTML = `<i data-lucide="lightbulb" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i><span>${data.tip}</span>`;
+
+      // SVG update
+      const organs = ['organ-stomach', 'organ-blood', 'organ-liver', 'organ-kidney'];
+      organs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.replace('opacity-100', 'opacity-30');
+      });
+
+      const activeOrgan = document.getElementById(data.organId);
+      if (activeOrgan) {
+        activeOrgan.classList.replace('opacity-30', 'opacity-100');
+      }
+
+      const pill = document.getElementById('pill-token');
+      if (pill) {
+        pill.setAttribute('transform', data.tokenPos);
+      }
+
+      lucide.createIcons();
+    }
+
+    function nextStep() {
+      playSound('click');
+      currentJourneyIndex = (currentJourneyIndex + 1) % journeyData.length;
+      renderJourneyStep();
+    }
+
+    function prevStep() {
+      playSound('click');
+      currentJourneyIndex = (currentJourneyIndex - 1 + journeyData.length) % journeyData.length;
+      renderJourneyStep();
+    }
+
+    function goToStep(index) {
+      playSound('click');
+      currentJourneyIndex = index;
+      renderJourneyStep();
+    }
+
+    /* -------------------------------------------------------------
+       5. SECTION 2: OX 약사 탐정 QUIZ ENGINE
+       ------------------------------------------------------------- */
+    const quizCases = [
+      {
+        character: "민지의 고백",
+        avatar: "👧",
+        quote: "약이 너무 써서 맛있는 탄산음료나 과일주스랑 같이 꿀꺽 삼킬 거야!",
+        isCorrect: false, // O is wrong, X is right
+        explanation: "주스나 탄산음료, 우유는 약 성분의 화학적 구조를 바꾸어 약효를 크게 떨어뜨리거나 위장 장애를 유발할 수 있어요. 약은 반드시 '물 한 컵'과 함께 먹어야 안전합니다!"
+      },
+      {
+        character: "지훈이의 생각",
+        avatar: "👦",
+        quote: "이 알약은 너무 커서 목에 걸릴 것 같아. 가위로 반으로 뚝 잘라서 먹어야겠어!",
+        isCorrect: false,
+        explanation: "코팅된 서방형 정제나 캡슐약은 약 성분이 장까지 가서 천천히 방출되도록 특수 설계된 약입니다. 마음대로 자르거나 가루로 만들면 위벽에 화상을 입히거나 과다 흡수 부작용이 생길 수 있어요."
+      },
+      {
+        character: "서연이의 질문",
+        avatar: "👩‍🦰",
+        quote: "먹다 남은 감기 시럽 약이 있네? 싱크대나 세면대 수도관에 콸콸 부어 버려도 되겠지?",
+        isCorrect: false,
+        explanation: "약을 하수구나 변기에 버리면 항생제 등 화학물질이 강과 토양을 오염시키고 슈퍼박테리아를 발생시킬 위험이 있어요. 남은 약은 반드시 '약국이나 주민센터의 폐의약품 수거함'에 넣어야 해요!"
+      },
+      {
+        character: "준우의 착각",
+        avatar: "🧑",
+        quote: "아침 약을 깜빡하고 학교에 왔어! 점심에 아침 약이랑 같이 2알을 한꺼번에 먹어야 빨리 낫겠지?",
+        isCorrect: false,
+        explanation: "약을 잊었다고 2배로 복용하면 혈중 약물 농도가 급격히 높아져 간과 콩팥에 큰 무리를 주고 치명적인 부작용이 생길 수 있어요. 생각난 즉시 먹거나 다음 시간대부터 1회분만 복용해야 해요."
+      },
+      {
+        character: "보건실 교과서 퀴즈",
+        avatar: "🩺",
+        quote: "처방전 없이 약국에서 바로 구입할 수 있는 약은 일반의약품(안전상비의약품)이다.",
+        isCorrect: true, // O is right
+        explanation: "맞습니다! 부작용 위험이 비교적 적은 가벼운 감기약, 소화제, 진통제 등은 처방전 없이 약국이나 편의점에서 살 수 있는 일반의약품입니다."
+      },
+      {
+        character: "교과서 대사 퀴즈",
+        avatar: "🔬",
+        quote: "대사 과정을 거친 약의 찌꺼기는 오직 소변으로만 몸 밖으로 배설된다.",
+        isCorrect: false, // X is right
+        explanation: "약은 소변뿐만 아니라 대변, 땀, 침, 눈물, 호흡(숨) 등 다양한 배출 통로를 통해 몸 밖으로 배설됩니다."
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    function renderQuizQuestion() {
+      const q = quizCases[currentQuizIndex];
+      document.getElementById('quiz-number-tag').innerText = `Case ${currentQuizIndex + 1} / ${quizCases.length}`;
+      document.getElementById('quiz-character-role').innerText = q.character;
+      document.getElementById('quiz-avatar').innerText = q.avatar;
+      document.getElementById('quiz-quote').innerText = `"${q.quote}"`;
+
+      // Reset feedback box & buttons
+      const fbBox = document.getElementById('quiz-feedback-box');
+      fbBox.classList.add('hidden');
+      document.querySelectorAll('.quiz-btn').forEach(btn => btn.removeAttribute('disabled'));
+    }
+
+    function answerQuiz(selectedO) {
+      const q = quizCases[currentQuizIndex];
+      const isRightChoice = (selectedO === q.isCorrect);
+
+      document.querySelectorAll('.quiz-btn').forEach(btn => btn.setAttribute('disabled', 'true'));
+
+      const fbBox = document.getElementById('quiz-feedback-box');
+      const fbIcon = document.getElementById('feedback-icon');
+      const fbTitle = document.getElementById('feedback-title');
+      const fbDesc = document.getElementById('feedback-desc');
+
+      fbBox.classList.remove('hidden');
+
+      if (isRightChoice) {
+        playSound('correct');
+        quizScore += 10;
+        document.getElementById('quiz-score').innerText = quizScore;
+        fbBox.className = "rounded-2xl p-5 border text-sm leading-relaxed bg-emerald-50 border-emerald-200 text-emerald-900";
+        fbIcon.innerText = "⭕";
+        fbTitle.innerText = "정답입니다! 훌륭한 탐정이군요.";
+      } else {
+        playSound('wrong');
+        fbBox.className = "rounded-2xl p-5 border text-sm leading-relaxed bg-rose-50 border-rose-200 text-rose-900";
+        fbIcon.innerText = "❌";
+        fbTitle.innerText = "아쉬워요! 올바른 의약 상식을 확인해 보세요.";
+      }
+
+      fbDesc.innerText = q.explanation;
+      lucide.createIcons();
+    }
+
+    function nextQuizQuestion() {
+      playSound('click');
+      currentQuizIndex++;
+      if (currentQuizIndex < quizCases.length) {
+        renderQuizQuestion();
+      } else {
+        // Quiz completed
+        playSound('celebrate');
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('quiz-finish-box').classList.remove('hidden');
+        document.getElementById('quiz-final-score-text').innerText = 
+          `총 ${quizScore}점을 기록했습니다! 교과서 속 잘못된 복약 습관을 바르게 분별하는 능력을 증명했습니다.`;
+      }
+    }
+
+    function resetQuiz() {
+      playSound('click');
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById('quiz-score').innerText = 0;
+      document.getElementById('quiz-container').classList.remove('hidden');
+      document.getElementById('quiz-finish-box').classList.add('hidden');
+      renderQuizQuestion();
+    }
+
+    /* -------------------------------------------------------------
+       6. SECTION 3: PHARMACIST ENVELOPE & CERTIFICATE
+       ------------------------------------------------------------- */
+    const medicineDatabase = {
+      fever: {
+        name: "어린이 아세트아미노펜 정 (해열진통)",
+        sideEffect: "두드러기, 메스꺼움, 피부 발진",
+        defaultStore: "어린이 손이 닿지 않는 서늘한 실온 보관"
+      },
+      digest: {
+        name: "효소 복합 소화제 캡슐 (위장 기능 활성화)",
+        sideEffect: "설사, 변비, 복통",
+        defaultStore: "직사광선을 피하고 습기가 적은 곳"
+      },
+      cold: {
+        name: "어린이 종합감기약 시럽 (기침·콧물 완화)",
+        sideEffect: "졸림, 나른함, 입마름 증상",
+        defaultStore: "개봉 후 1개월 이내 복용 및 실온 보관"
+      }
+    };
+
+    function updateMedPrescription() {
+      const selectedKey = document.getElementById('select-medicine').value;
+      const med = medicineDatabase[selectedKey];
+      document.getElementById('prev-med-name').innerText = med.name;
+      document.getElementById('prev-med-side').innerText = med.sideEffect;
+      document.getElementById('prev-med-store').innerText = med.defaultStore;
+      
+      const freq = document.getElementById('select-frequency').value;
+      document.getElementById('prev-med-freq').innerText = freq;
+    }
+
+    // Dynamic input sync
+    document.getElementById('input-patient-name').addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      document.getElementById('prev-patient').innerText = val ? `${val} 님 귀하` : "[ 이름을 입력하세요 ] 님 귀하";
+    });
+
+    document.getElementById('select-frequency').addEventListener('change', (e) => {
+      document.getElementById('prev-med-freq').innerText = e.target.value;
+    });
+
+    function issueLicense() {
+      const name = document.getElementById('input-patient-name').value.trim();
+      if (!name) {
+        showAlert("이름 확인 필요", "복약 봉투를 발행받을 학생 이름을 입력해 주세요!", "✍️");
+        return;
+      }
+
+      const checkedCount = document.querySelectorAll('.pledge-chk:checked').length;
+      if (checkedCount < 4) {
+        showAlert("실천 수칙 미완료", "안전한 복약을 위해 아래 4가지 안전 약속을 모두 읽고 체크해 주세요!", "🛡️");
+        return;
+      }
+
+      // Success
+      playSound('celebrate');
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 }
+      });
+
+      document.getElementById('award-student-name').innerText = `${name} 어린이`;
+      openModal('modal-license-award');
+    }
+
+    // Initialize defaults on window load
+    window.onload = function() {
+      renderJourneyStep();
+      renderQuizQuestion();
+      updateMedPrescription();
+      
+      const todayStr = new Date().toISOString().split('T')[0].replace(/-/g, '. ');
+      document.getElementById('prev-date').innerText = todayStr;
+      document.getElementById('award-date').innerText = todayStr;
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
