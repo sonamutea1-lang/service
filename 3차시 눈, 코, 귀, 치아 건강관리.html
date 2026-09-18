@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 몸의 오감·치아 수호대</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Gaegu & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-cute {
+      font-family: 'Gaegu', cursive, sans-serif;
+    }
+    /* 애니메이션 효과 */
+    @keyframes bounce-slow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-bounce-slow {
+      animation: bounce-slow 2s infinite ease-in-out;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-pulse-ring {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-amber-50/60 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- ==================== 상단 네비게이션 ==================== -->
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-amber-200 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <span class="text-3xl">🛡️</span>
+        <div>
+          <h1 class="text-lg md:text-xl font-extrabold text-amber-900 leading-tight">내 몸의 오감·치아 수호대</h1>
+          <p class="text-xs text-amber-600 font-medium">초등 5학년 보건 탐험대</p>
+        </div>
+      </div>
+      
+      <!-- 상태 요약 뱃지 -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-amber-100 text-amber-800 text-xs px-3 py-1.5 rounded-full font-bold flex items-center shadow-inner">
+          <span class="mr-1">⭐ 실천 스탬프:</span>
+          <span id="headerStampCount" class="text-amber-700 font-extrabold text-sm">0</span>
+          <span class="text-xs text-amber-500 ml-0.5">/ 5</span>
+        </div>
+        <button onclick="playChime()" class="bg-amber-50 hover:bg-amber-200 p-2 rounded-full text-lg transition" title="효과음 테스트">
+          🔔
+        </button>
+      </div>
+    </div>
+
+    <!-- 3대 모듈 탭 네비게이션 -->
+    <nav class="max-w-4xl mx-auto px-4 flex justify-around border-t border-amber-100 bg-amber-50/40">
+      <button onclick="switchTab('explore')" id="tabBtn-explore" class="tab-btn flex-1 py-3 text-center font-bold text-sm md:text-base border-b-4 border-amber-500 text-amber-800 flex items-center justify-center gap-1.5 transition">
+        <span>🔍</span> ① [탐험관] 인체 돋보기
+      </button>
+      <button onclick="switchTab('train')" id="tabBtn-train" class="tab-btn flex-1 py-3 text-center font-bold text-sm md:text-base border-b-4 border-transparent text-slate-500 hover:text-amber-700 flex items-center justify-center gap-1.5 transition">
+        <span>🎮</span> ② [실천관] 트레이닝
+      </button>
+      <button onclick="switchTab('diary')" id="tabBtn-diary" class="tab-btn flex-1 py-3 text-center font-bold text-sm md:text-base border-b-4 border-transparent text-slate-500 hover:text-amber-700 flex items-center justify-center gap-1.5 transition">
+        <span>📝</span> ③ [습관관] 건강 다이어리
+      </button>
+    </nav>
+  </header>
+
+  <!-- ==================== 메인 콘텐츠 ==================== -->
+  <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-1">
+
+    <!-- ---------------------------------------------------- -->
+    <!-- 모듈 1: [탐험관] 인터랙티브 3D 인체 돋보기               -->
+    <!-- ---------------------------------------------------- -->
+    <section id="module-explore" class="space-y-6">
+      <div class="bg-gradient-to-r from-blue-500 to-teal-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-2">교과서 29p·35p 연계</span>
+          <h2 class="text-2xl md:text-3xl font-black mb-1">인체 돋보기로 구조와 질환 살펴보기</h2>
+          <p class="text-blue-100 text-xs md:text-sm">눈과 치아를 직접 조절하며 질환이 생기는 이유를 관찰해 보세요!</p>
+        </div>
+        <div class="absolute -right-4 -bottom-6 text-8xl opacity-20 pointer-events-none">🔬</div>
+      </div>
+
+      <!-- 탐험 서브탭 선택기 (눈, 치아 2개 구성) -->
+      <div class="grid grid-cols-2 gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+        <button onclick="switchExploreOrg('eye')" id="expTab-eye" class="exp-subtab py-2.5 rounded-xl text-xs md:text-sm font-bold bg-blue-500 text-white shadow transition">
+          👁️ 눈 (시력)
+        </button>
+        <button onclick="switchExploreOrg('tooth')" id="expTab-tooth" class="exp-subtab py-2.5 rounded-xl text-xs md:text-sm font-bold text-slate-600 hover:bg-slate-100 transition">
+          🦷 치아 (충치 단계)
+        </button>
+      </div>
+
+      <!-- 1) 눈 시뮬레이터 -->
+      <div id="exploreContent-eye" class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-6">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-blue-500">●</span> 눈의 굴절 이상 (근시 vs 원시 vs 정상)
+            </h3>
+            <p class="text-xs text-slate-500">수정체의 굴절과 망막에 맺히는 초점을 관찰하세요.</p>
+          </div>
+          <div class="flex gap-1.5 text-xs">
+            <button onclick="setEyeVision('myopia')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-100 font-bold text-blue-700">근시(먼곳 흐림)</button>
+            <button onclick="setEyeVision('normal')" class="px-2.5 py-1 rounded-lg bg-blue-600 font-bold text-white shadow">정상 시력</button>
+            <button onclick="setEyeVision('hyperopia')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-100 font-bold text-blue-700">원시(가까운곳 흐림)</button>
+          </div>
+        </div>
+
+        <!-- 캔버스 시각화 -->
+        <div class="relative bg-slate-900 rounded-2xl p-4 overflow-hidden flex flex-col items-center">
+          <canvas id="eyeCanvas" width="600" height="240" class="w-full max-w-lg h-auto rounded-lg"></canvas>
+          <div id="eyeStatusBadge" class="mt-3 bg-blue-500/30 border border-blue-400 text-blue-200 text-xs px-4 py-1.5 rounded-full font-semibold">
+            정상: 평행한 빛이 망막에 정확히 초점을 맺습니다.
+          </div>
+        </div>
+
+        <!-- 눈 상호작용 컨트롤 -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+          <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+            <span>수정체 굴절력 조절 슬라이더</span>
+            <span id="eyeLensVal" class="text-blue-600">초점 위치: 망막 중앙</span>
+          </div>
+          <input type="range" id="eyeFocusSlider" min="0" max="100" value="50" oninput="onEyeSliderChange(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>망막 앞 (근시 형태)</span>
+            <span>정확한 망막 초점</span>
+            <span>망막 뒤 (원시 형태)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) 치아 시뮬레이터 (귀, 코 영역 제거) -->
+      <div id="exploreContent-tooth" class="hidden bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-6">
+        <div class="border-b pb-3">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="text-rose-500">●</span> 치아우식증(충치) 4단계 침투 과정
+          </h3>
+          <p class="text-xs text-slate-500">교과서 35p: 플라크 속 세균이 산을 만들어 치아를 갉아먹는 단계입니다.</p>
+        </div>
+
+        <!-- 4단계 선택 탭 -->
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <button onclick="setToothStage(1)" id="tStageBtn-1" class="t-stage-btn py-2 px-1 rounded-xl text-xs font-bold border-2 border-rose-500 bg-rose-50 text-rose-700">
+            1단계<br><span class="font-normal text-[10px]">법랑질</span>
+          </button>
+          <button onclick="setToothStage(2)" id="tStageBtn-2" class="t-stage-btn py-2 px-1 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50">
+            2단계<br><span class="font-normal text-[10px]">상아질</span>
+          </button>
+          <button onclick="setToothStage(3)" id="tStageBtn-3" class="t-stage-btn py-2 px-1 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50">
+            3단계<br><span class="font-normal text-[10px]">치수(신경)</span>
+          </button>
+          <button onclick="setToothStage(4)" id="tStageBtn-4" class="t-stage-btn py-2 px-1 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50">
+            4단계<br><span class="font-normal text-[10px]">치조골(뼈)</span>
+          </button>
+        </div>
+
+        <!-- 단계별 상세 설명 카드 -->
+        <div id="toothStageCard" class="bg-rose-50/50 border border-rose-200 rounded-2xl p-5 flex flex-col md:flex-row gap-5 items-center">
+          <div class="w-36 h-36 bg-white rounded-2xl shadow-inner border border-rose-200 flex flex-col items-center justify-center p-3 text-center flex-shrink-0">
+            <span id="toothEmoji" class="text-6xl">🦷</span>
+            <span id="toothPainLevel" class="text-[11px] font-extrabold text-emerald-600 mt-2 bg-emerald-100 px-2 py-0.5 rounded-full">통증 없음</span>
+          </div>
+          <div class="space-y-2 text-left flex-1">
+            <div class="flex items-center gap-2">
+              <span id="toothStageBadge" class="bg-rose-500 text-white text-xs px-2.5 py-0.5 rounded-full font-bold">1단계: 법랑질 손상</span>
+              <span id="toothDanger" class="text-xs text-rose-600 font-semibold">정기 구강검진 필수!</span>
+            </div>
+            <p id="toothDescription" class="text-xs text-slate-700 leading-relaxed font-medium">
+              치아 표면의 딱딱한 법랑질에만 충치가 생긴 상태입니다. 아프지 않아 스스로 발견하기 어려우므로 치과 정기 검진을 받아야 까만 점이나 선을 찾을 수 있습니다.
+            </p>
+            <div id="toothAction" class="bg-white p-2.5 rounded-xl border border-rose-100 text-xs text-slate-600">
+              <strong>💡 대처법:</strong> 불소 치약 사용 및 정기 검진으로 조기 치료 가능!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- 모듈 2: [실천관] 참여형 트레이닝 게임 & 타이머           -->
+    <!-- ---------------------------------------------------- -->
+    <section id="module-train" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-2">교과서 33p·37p 연계</span>
+          <h2 class="text-2xl md:text-3xl font-black mb-1">몸으로 익히는 건강 트레이닝</h2>
+          <p class="text-emerald-100 text-xs md:text-sm">눈 운동 숫자 찾기와 3분 회전법 칫솔질 가이드를 직접 체험해 보세요!</p>
+        </div>
+        <div class="absolute -right-4 -bottom-6 text-8xl opacity-20 pointer-events-none">🏃</div>
+      </div>
+
+      <!-- 실천 메뉴 2개 선택 -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="switchTrainTool('eyeGame')" id="trainToolBtn-eye" class="train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-emerald-600 text-white shadow-md flex items-center justify-center gap-2 transition">
+          <span>🌸</span> 1~35 눈 튼튼 숫자 찾기
+        </button>
+        <button onclick="switchTrainTool('brushing')" id="trainToolBtn-brush" class="train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2 transition">
+          <span>🪥</span> 3분 회전법 양치 코치
+        </button>
+      </div>
+
+      <!-- 1) 눈 튼튼 1~35 숫자 찾기 게임 (교과서 33p 원형 구현) -->
+      <div id="trainTool-eyeGame" class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-lg font-bold text-slate-900">🌸 1~35 숫자 추적 눈 운동</h3>
+              <span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-bold">교과서 33p</span>
+            </div>
+            <p class="text-xs text-slate-500">1부터 35까지 순서대로 눈으로 쫓아가며 터치하세요. 눈 근육이 튼튼해집니다!</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-center">
+              <span class="block text-[10px] text-emerald-600 font-bold">찾아야 할 다음 숫자</span>
+              <span id="nextTargetNum" class="text-2xl font-black text-emerald-700">1</span>
+            </div>
+            <button onclick="restartEyeGame()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow transition">
+              다시 섞기 🔄
+            </button>
+          </div>
+        </div>
+
+        <!-- 게임 안내 및 타이머 -->
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-600 px-1">
+          <span id="eyeGameMsg">1번 꽃을 찾아 누르고 눈동자로 다음 꽃을 따라가세요!</span>
+          <span>경과 시간: <span id="eyeGameTimer" class="font-mono text-emerald-600 font-bold">0.0초</span></span>
+        </div>
+
+        <!-- 35개 꽃 숫자 그리드 -->
+        <div id="flowerGrid" class="grid grid-cols-5 sm:grid-cols-7 gap-2 p-3 bg-amber-50/50 rounded-2xl border border-amber-200">
+          <!-- JS로 동적 생성 -->
+        </div>
+
+        <div class="bg-slate-50 p-3.5 rounded-xl text-xs text-slate-600 flex items-center justify-between">
+          <span>✨ <strong>보건 팁:</strong> 책이나 스마트폰 50분 시청 후에는 5분간 먼 곳(산, 나무)을 바라보세요!</span>
+          <button onclick="showEyeStretchModal()" class="text-blue-600 font-bold underline hover:text-blue-700">눈 체조 보기</button>
+        </div>
+      </div>
+
+      <!-- 2) 3분 회전법 칫솔질 가이드 (교과서 37p 연계) -->
+      <div id="trainTool-brushing" class="hidden bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-6">
+        <div class="border-b pb-4 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-blue-500">🪥</span> 3분 회전법 칫솔질 인터랙티브 코치
+            </h3>
+            <p class="text-xs text-slate-500">교과서 37p의 5구역(윗니, 아랫니, 씹는 면, 앞니 안쪽, 혀)을 순서대로 닦습니다.</p>
+          </div>
+          <span class="text-xs bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full">3분 타이머</span>
+        </div>
+
+        <!-- 양치 애니메이션 및 타이머 뷰 -->
+        <div class="bg-gradient-to-b from-sky-50 to-blue-50 rounded-2xl p-6 border border-sky-200 text-center space-y-4">
+          <div class="flex justify-center items-center gap-6">
+            <div class="w-32 h-32 rounded-full border-4 border-sky-400 bg-white flex flex-col items-center justify-center shadow-inner relative">
+              <span id="brushStepEmoji" class="text-4xl animate-bounce-slow">🦷</span>
+              <span id="brushTimeDisplay" class="text-lg font-black text-sky-800 font-mono mt-1">03:00</span>
+            </div>
+            <div class="text-left space-y-1">
+              <span id="brushStepTag" class="text-[11px] font-extrabold bg-blue-600 text-white px-2.5 py-0.5 rounded-full">준비 단계</span>
+              <h4 id="brushStepTitle" class="text-base font-bold text-slate-800">칫솔에 불소 치약을 콩알만큼!</h4>
+              <p id="brushStepDesc" class="text-xs text-slate-600 max-w-xs">
+                시작 버튼을 누르면 신나는 비트와 함께 구역별 회전법 가이드가 시작됩니다.
+              </p>
+            </div>
+          </div>
+
+          <!-- 조작 버튼 -->
+          <div class="flex justify-center gap-3 pt-2">
+            <button id="brushStartBtn" onclick="toggleBrushingTimer()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-1.5">
+              <span>▶️</span> 3분 양치 시작!
+            </button>
+            <button onclick="resetBrushingTimer()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl transition text-sm">
+              초기화
+            </button>
+          </div>
+        </div>
+
+        <!-- 5단계 가이드 카드 -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
+            <span class="font-bold text-blue-600 block mb-1">1. 윗니 바깥/안</span>
+            <span class="text-slate-500 text-[11px]">위에서 아래로 쓸어내리기</span>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
+            <span class="font-bold text-blue-600 block mb-1">2. 아랫니 바깥/안</span>
+            <span class="text-slate-500 text-[11px]">아래에서 위로 쓸어올리기</span>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
+            <span class="font-bold text-blue-600 block mb-1">3. 씹는 면</span>
+            <span class="text-slate-500 text-[11px]">어금니 틈 앞뒤로 왕복</span>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
+            <span class="font-bold text-blue-600 block mb-1">4. 앞니 안쪽</span>
+            <span class="text-slate-500 text-[11px]">칫솔 세워서 긁어내기</span>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center col-span-2 sm:col-span-1">
+            <span class="font-bold text-blue-600 block mb-1">5. 혀 닦기</span>
+            <span class="text-slate-500 text-[11px]">안쪽에서 바깥으로 쓸기</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- 모듈 3: [습관관] 나만의 건강 증진 다이어리 & 퀘스트        -->
+    <!-- ---------------------------------------------------- -->
+    <section id="module-diary" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+          <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-2">교과서 32p·38p 연계</span>
+          <h2 class="text-2xl md:text-3xl font-black mb-1">나만의 건강 다이어리 & 미션</h2>
+          <p class="text-purple-100 text-xs md:text-sm">스스로 실천 목표를 정하고 오늘의 감각 수호 퀘스트를 달성해 보세요!</p>
+        </div>
+        <div class="absolute -right-4 -bottom-6 text-8xl opacity-20 pointer-events-none">📜</div>
+      </div>
+
+      <!-- 다이어리 탭 서브선택 -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="switchDiarySub('quest')" id="diarySubBtn-quest" class="diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-purple-600 text-white shadow-md transition">
+          ⭐ 오늘의 실천 퀘스트 & 스탬프
+        </button>
+        <button onclick="switchDiarySub('plan')" id="diarySubBtn-plan" class="diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">
+          📋 교과서 건강 카드 & 치아 계획표
+        </button>
+      </div>
+
+      <!-- 1) 오늘의 퀘스트 & 아바타 성장 -->
+      <div id="diarySub-quest" class="space-y-6">
+        <!-- 아바타 카드 -->
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 flex flex-col md:flex-row items-center gap-6">
+          <div class="w-32 h-32 bg-purple-50 rounded-3xl border-2 border-purple-200 flex flex-col items-center justify-center relative shadow-inner">
+            <span id="avatarIcon" class="text-6xl animate-bounce-slow">🌱</span>
+            <span id="avatarTitle" class="text-[10px] font-extrabold bg-purple-600 text-white px-2 py-0.5 rounded-full absolute -bottom-2 shadow">
+              보건 수습대원
+            </span>
+          </div>
+          <div class="space-y-2 flex-1 text-center md:text-left">
+            <h3 class="text-lg font-bold text-slate-800">오감 수호자 캐릭터 성장</h3>
+            <p class="text-xs text-slate-500">
+              매일 퀘스트를 실천하여 스탬프를 모으면 수습대원에서 <strong>‘전설의 감각 마스터’</strong>로 진화합니다!
+            </p>
+            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+              <div id="questProgressBar" class="bg-purple-600 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <div class="text-xs text-slate-500 flex justify-between font-semibold">
+              <span id="questStatusText">오늘 실천한 항목: 0개</span>
+              <span class="text-purple-600 font-bold">목표: 5개 달성</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5가지 데일리 퀘스트 리스트 -->
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-3">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+            <span>✅</span> 오늘 실천 체크리스트 (터치하여 완료하기)
+          </h4>
+
+          <div class="space-y-2 text-xs font-semibold">
+            <!-- 퀘스트 1 -->
+            <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="toggleQuest(0)" class="w-4 h-4 rounded text-purple-600 accent-purple-600 quest-chk">
+                <span class="text-slate-800">🪥 식사 후 & 자기 전 3분 회전법 양치 실천하기</span>
+              </div>
+              <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">치아</span>
+            </label>
+
+            <!-- 퀘스트 2 -->
+            <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="toggleQuest(1)" class="w-4 h-4 rounded text-purple-600 accent-purple-600 quest-chk">
+                <span class="text-slate-800">👁️ 독서·스마트폰 50분 후 5분 눈 휴식 및 눈 운동하기</span>
+              </div>
+              <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">눈</span>
+            </label>
+
+            <!-- 퀘스트 3 -->
+            <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="toggleQuest(2)" class="w-4 h-4 rounded text-purple-600 accent-purple-600 quest-chk">
+                <span class="text-slate-800">🎧 이어폰 볼륨 60% 이하로 듣고 60분 이내 사용하기</span>
+              </div>
+              <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">귀</span>
+            </label>
+
+            <!-- 퀘스트 4 -->
+            <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="toggleQuest(3)" class="w-4 h-4 rounded text-purple-600 accent-purple-600 quest-chk">
+                <span class="text-slate-800">👃 실내 습도 40% 이상 유지하고 물 충분히 마시기</span>
+              </div>
+              <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">코</span>
+            </label>
+
+            <!-- 퀘스트 5 -->
+            <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="toggleQuest(4)" class="w-4 h-4 rounded text-purple-600 accent-purple-600 quest-chk">
+                <span class="text-slate-800">🏃 근시 예방을 위해 낮 시간 야외 활동 40분 이상 하기</span>
+              </div>
+              <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">눈·전신</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) 교과서 서식 작성기 (32p & 38p) -->
+      <div id="diarySub-plan" class="hidden space-y-6">
+        <!-- 32p 건강 증진 카드 -->
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <span>📇</span> 나만의 눈·코·귀 건강 증진 카드 (교과서 32p)
+            </h4>
+            <button onclick="saveCardData()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition">
+              카드 저장 💾
+            </button>
+          </div>
+          <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-200 space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">내가 실천할 건강 목표 1 (눈 건강):</label>
+              <input type="text" id="cardEyeGoal" value="책을 30분 읽으면 먼 산을 5분 바라보며 눈 운동하기" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-purple-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">내가 실천할 건강 목표 2 (코·귀 건강):</label>
+              <input type="text" id="cardEarNoseGoal" value="이어폰 음량 60% 안 넘기기, 면봉으로 귀 깊이 후비지 않기" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-purple-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- 38p 치아 관리 계획표 -->
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <span>🦷</span> 건강한 치아 관리 계획표 (교과서 38p)
+            </h4>
+            <span class="text-xs text-slate-500">나만의 구강 건강 루틴</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4 text-xs">
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+              <span class="font-bold text-slate-800 block">🪥 칫솔질 계획</span>
+              <div>
+                <span class="text-slate-500 block mb-0.5">하루 칫솔질 횟수:</span>
+                <select id="planBrushCount" class="w-full bg-white border rounded-lg p-1.5 text-xs">
+                  <option>하루 3번 (아침, 점심, 저녁 식후)</option>
+                  <option selected>하루 4번 (아침, 점심, 저녁 식후 및 자기 전)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+              <span class="font-bold text-slate-800 block">🍎 음식 섭취 계획</span>
+              <div>
+                <span class="text-slate-500 block mb-0.5">자주 먹을 음식(섬유질/채소):</span>
+                <input type="text" id="planFoodGood" value="사과, 당근, 우유, 멸치" class="w-full bg-white border rounded-lg p-1.5 text-xs">
+              </div>
+              <div>
+                <span class="text-slate-500 block mb-0.5">줄여야 할 음식(당분/끈적임):</span>
+                <input type="text" id="planFoodBad" value="젤리, 탄산음료, 사탕" class="w-full bg-white border rounded-lg p-1.5 text-xs">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== 모달창: 눈 체조 가이드 ==================== -->
+  <div id="eyeStretchModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-base text-slate-900">👀 눈 피로 싹! 8단계 눈 운동법 (교과서 30p)</h3>
+        <button onclick="closeEyeStretchModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs text-slate-700">
+        <div class="bg-slate-50 p-2.5 rounded-xl border">1. 오른쪽 끝을 보세요 👉</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border">2. 왼쪽 끝을 보세요 👈</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border">3. 위쪽 하늘을 보세요 👆</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border">4. 아래쪽 땅을 보세요 👇</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border">5. 시계 방향으로 천천히 회전 🔄</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border">6. 반시계 방향으로 회전 🔄</div>
+        <div class="bg-slate-50 p-2.5 rounded-xl border col-span-2">7. 양 손바닥을 30초간 빠르게 비벼 열을 내세요 👏</div>
+        <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 col-span-2 font-bold text-blue-800">
+          8. 따뜻해진 손으로 두 눈을 지그시 감싸 피로를 풉니다! 🤲
+        </div>
+      </div>
+      <button onclick="closeEyeStretchModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+        확인하고 닫기
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 푸터 ==================== -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-500">
+    <p class="font-semibold text-slate-600">초등학교 5학년 보건 교과서 (4단원 눈·코·귀 건강 / 5단원 치아 건강) 맞춤형 디지털 러닝 앱</p>
+    <p class="text-[11px] text-slate-400 mt-0.5">건강한 습관이 평생의 밝은 눈과 튼튼한 치아를 만듭니다.</p>
+  </footer>
+
+  <!-- ==================== 애플리케이션 스크립트 ==================== -->
+  <script>
+    // ----------------------------------------------------------------
+    // 1. Audio Context (효과음 합성기 - 외부 음원 없이 동작)
+    // ----------------------------------------------------------------
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playChime() {
+      playTone(523.25, 'sine', 0.12);
+      setTimeout(() => playTone(659.25, 'sine', 0.12), 100);
+      setTimeout(() => playTone(783.99, 'sine', 0.25), 200);
+    }
+
+    function playAlert() {
+      playTone(330, 'square', 0.15);
+      setTimeout(() => playTone(220, 'square', 0.2), 160);
+    }
+
+    // ----------------------------------------------------------------
+    // 2. 메인 모듈 탭 전환
+    // ----------------------------------------------------------------
+    function switchTab(tabName) {
+      playTone(440, 'triangle', 0.08);
+      ['explore', 'train', 'diary'].forEach(tab => {
+        const mod = document.getElementById(`module-${tab}`);
+        const btn = document.getElementById(`tabBtn-${tab}`);
+        if (tab === tabName) {
+          mod.classList.remove('hidden');
+          btn.classList.add('border-amber-500', 'text-amber-800');
+          btn.classList.remove('border-transparent', 'text-slate-500');
+        } else {
+          mod.classList.add('hidden');
+          btn.classList.remove('border-amber-500', 'text-amber-800');
+          btn.classList.add('border-transparent', 'text-slate-500');
+        }
+      });
+      if (tabName === 'explore') drawEye();
+    }
+
+    // ----------------------------------------------------------------
+    // 3. [탐험관] 서브 탭 & 인터랙션 로직
+    // ----------------------------------------------------------------
+    function switchExploreOrg(org) {
+      playTone(520, 'triangle', 0.08);
+      ['eye', 'tooth'].forEach(o => {
+        const content = document.getElementById(`exploreContent-${o}`);
+        const btn = document.getElementById(`expTab-${o}`);
+        if (content && btn) {
+          if (o === org) {
+            content.classList.remove('hidden');
+            btn.className = 'exp-subtab py-2.5 rounded-xl text-xs md:text-sm font-bold bg-blue-500 text-white shadow transition';
+          } else {
+            content.classList.add('hidden');
+            btn.className = 'exp-subtab py-2.5 rounded-xl text-xs md:text-sm font-bold text-slate-600 hover:bg-slate-100 transition';
+          }
+        }
+      });
+      if (org === 'eye') setTimeout(drawEye, 50);
+    }
+
+    // --- 1) 눈 시뮬레이션 캔버스 ---
+    const eyeCanvas = document.getElementById('eyeCanvas');
+    const eyeCtx = eyeCanvas.getContext('2d');
+    let eyeFocusXOffset = 0; // -60: 근시, 0: 정상, +60: 원시
+
+    function drawEye() {
+      if (!eyeCanvas) return;
+      const w = eyeCanvas.width;
+      const h = eyeCanvas.height;
+      eyeCtx.clearRect(0, 0, w, h);
+
+      const eyeCenterY = h / 2;
+      const corneaX = 140;
+      const retinaX = 460;
+      const focusX = retinaX + eyeFocusXOffset;
+
+      // 안구 단면 외형 그리기
+      eyeCtx.strokeStyle = '#64748b';
+      eyeCtx.lineWidth = 3;
+      eyeCtx.beginPath();
+      eyeCtx.arc(330, eyeCenterY, 130, -Math.PI / 1.7, Math.PI / 1.7, false);
+      eyeCtx.stroke();
+
+      // 망막 (노란색/오렌지 빛 감지층)
+      eyeCtx.strokeStyle = '#f59e0b';
+      eyeCtx.lineWidth = 6;
+      eyeCtx.beginPath();
+      eyeCtx.arc(330, eyeCenterY, 126, -Math.PI / 2.3, Math.PI / 2.3, false);
+      eyeCtx.stroke();
+
+      // 각막 & 수정체
+      eyeCtx.fillStyle = '#38bdf8';
+      eyeCtx.beginPath();
+      eyeCtx.ellipse(corneaX + 50, eyeCenterY, 12, 45, 0, 0, Math.PI * 2);
+      eyeCtx.fill();
+
+      // 빛줄기 들어오기
+      eyeCtx.lineWidth = 2;
+      const rayYs = [eyeCenterY - 40, eyeCenterY, eyeCenterY + 40];
+      
+      rayYs.forEach((y, i) => {
+        eyeCtx.strokeStyle = '#fde047';
+        eyeCtx.beginPath();
+        eyeCtx.moveTo(20, y);
+        eyeCtx.lineTo(corneaX + 50, y);
+        eyeCtx.stroke();
+
+        // 굴절 후 초점으로 모이기
+        eyeCtx.strokeStyle = '#ef4444';
+        eyeCtx.beginPath();
+        eyeCtx.moveTo(corneaX + 50, y);
+        eyeCtx.lineTo(focusX, eyeCenterY);
+        eyeCtx.stroke();
+      });
+
+      // 초점 포인트 마커
+      eyeCtx.fillStyle = '#ef4444';
+      eyeCtx.beginPath();
+      eyeCtx.arc(focusX, eyeCenterY, 5, 0, Math.PI * 2);
+      eyeCtx.fill();
+
+      // 구조 명칭 라벨 렌더링
+      eyeCtx.fillStyle = '#94a3b8';
+      eyeCtx.font = '12px Noto Sans KR';
+      eyeCtx.fillText('빛', 30, eyeCenterY - 50);
+      eyeCtx.fillText('수정체', corneaX + 32, eyeCenterY - 55);
+      eyeCtx.fillText('망막(상 맺힘)', retinaX - 45, eyeCenterY - 80);
+    }
+
+    function onEyeSliderChange(val) {
+      // 0: 근시(-60), 50: 정상(0), 100: 원시(+60)
+      eyeFocusXOffset = (val - 50) * 1.4;
+      const statusBadge = document.getElementById('eyeStatusBadge');
+      const lensValText = document.getElementById('eyeLensVal');
+
+      if (val < 40) {
+        statusBadge.innerText = '⚠️ 근시: 초점이 망막 앞에 맺혀 먼 곳이 흐릿하게 보입니다!';
+        statusBadge.className = 'mt-3 bg-red-500/30 border border-red-400 text-red-200 text-xs px-4 py-1.5 rounded-full font-semibold';
+        lensValText.innerText = '초점 위치: 망막 앞 (근시)';
+      } else if (val > 60) {
+        statusBadge.innerText = '⚠️ 원시: 초점이 망막 뒤에 맺혀 가까운 곳이 잘 보이지 않습니다!';
+        statusBadge.className = 'mt-3 bg-amber-500/30 border border-amber-400 text-amber-200 text-xs px-4 py-1.5 rounded-full font-semibold';
+        lensValText.innerText = '초점 위치: 망막 뒤 (원시)';
+      } else {
+        statusBadge.innerText = '✅ 정상: 평행한 빛이 망막에 정확히 맺혀 모든 거리가 선명합니다.';
+        statusBadge.className = 'mt-3 bg-blue-500/30 border border-blue-400 text-blue-200 text-xs px-4 py-1.5 rounded-full font-semibold';
+        lensValText.innerText = '초점 위치: 망막 중앙 (정상)';
+      }
+      drawEye();
+    }
+
+    function setEyeVision(mode) {
+      const slider = document.getElementById('eyeFocusSlider');
+      if (mode === 'myopia') slider.value = 15;
+      else if (mode === 'normal') slider.value = 50;
+      else if (mode === 'hyperopia') slider.value = 85;
+      onEyeSliderChange(slider.value);
+    }
+
+    // --- 2) 치아 시뮬레이션 (귀·코 핸들러 제거) ---
+    const toothData = {
+      1: {
+        title: '1단계: 법랑질 손상',
+        danger: '초기 구강검진 필수!',
+        desc: '치아 표면의 딱딱한 법랑질에만 세균(충치균) 산이 침투한 상태입니다. 신경이 없어 통증이 전혀 느껴지지 않으므로 구강 검진을 받아야 어금니 틈의 까만 점이나 줄을 찾을 수 있습니다.',
+        action: '💡 대처법: 정기 검진으로 발견 시 불소 도포 및 간단한 홈메우기(실란트)로 해결!',
+        pain: '통증 없음',
+        painClass: 'text-emerald-600 bg-emerald-100',
+        emoji: '🦷'
+      },
+      2: {
+        title: '2단계: 상아질 손상',
+        danger: '음식 먹을 때 시린 단계',
+        desc: '법랑질 밑의 부드러운 상아질까지 구멍이 파였습니다. 찬물이나 달콤한 음식을 먹을 때 치아가 찌릿하게 아프지만 안 먹을 땐 멈춥니다.',
+        action: '💡 대처법: 충치 부위를 긁어내고 레진 등으로 메우는 충전 치료가 필요합니다.',
+        pain: '식사 시 통증',
+        painClass: 'text-amber-600 bg-amber-100',
+        emoji: '😖'
+      },
+      3: {
+        title: '3단계: 치수(신경) 손상',
+        danger: '극심한 통증 & 신경 치료',
+        desc: '혈관과 신경이 모여있는 치수까지 세균 염증이 침범했습니다. 특히 뜨거운 음식이 닿거나 밤에 가만히 있어도 욱신거려 잠을 잘 수 없습니다.',
+        action: '💡 대처법: 감염된 치수를 제거하는 신경 치료(근관 치료)를 받아야 합니다.',
+        pain: '심한 통증!',
+        painClass: 'text-rose-600 bg-rose-100',
+        emoji: '😭'
+      },
+      4: {
+        title: '4단계: 치조골(잇몸뼈) 염증',
+        danger: '발치(치아 뽑기) 위험',
+        desc: '염증이 뿌리 끝을 지나 치아를 지탱해 주는 뼈인 치조골까지 번졌습니다. 잇몸에 고름이 차고 치아가 흔들려 영구치를 잃게 될 수 있습니다.',
+        action: '💡 대처법: 치아를 뽑아야(발치) 할 수도 있는 매우 위험한 단계입니다.',
+        pain: '가만히 있어도 극통',
+        painClass: 'text-purple-600 bg-purple-100',
+        emoji: '💀'
+      }
+    };
+
+    function setToothStage(stage) {
+      playTone(400 + stage * 80, 'triangle', 0.1);
+      for (let s = 1; s <= 4; s++) {
+        const btn = document.getElementById(`tStageBtn-${s}`);
+        if (s === stage) {
+          btn.className = 't-stage-btn py-2 px-1 rounded-xl text-xs font-bold border-2 border-rose-500 bg-rose-50 text-rose-700 shadow-sm';
+        } else {
+          btn.className = 't-stage-btn py-2 px-1 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50';
+        }
+      }
+      const d = toothData[stage];
+      document.getElementById('toothStageBadge').innerText = d.title;
+      document.getElementById('toothDanger').innerText = d.danger;
+      document.getElementById('toothDescription').innerText = d.desc;
+      document.getElementById('toothAction').innerHTML = d.action;
+      document.getElementById('toothPainLevel').innerText = d.pain;
+      document.getElementById('toothPainLevel').className = `text-[11px] font-extrabold mt-2 px-2 py-0.5 rounded-full ${d.painClass}`;
+      document.getElementById('toothEmoji').innerText = d.emoji;
+    }
+
+    // ----------------------------------------------------------------
+    // 4. [실천관] 트레이닝 게임 로직 (교과서 33p & 37p)
+    // ----------------------------------------------------------------
+    function switchTrainTool(tool) {
+      playTone(480, 'triangle', 0.08);
+      const isEye = tool === 'eyeGame';
+      document.getElementById('trainTool-eyeGame').classList.toggle('hidden', !isEye);
+      document.getElementById('trainTool-brushing').classList.toggle('hidden', isEye);
+
+      document.getElementById('trainToolBtn-eye').className = isEye
+        ? 'train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-emerald-600 text-white shadow-md flex items-center justify-center gap-2 transition'
+        : 'train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2 transition';
+
+      document.getElementById('trainToolBtn-brush').className = !isEye
+        ? 'train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-md flex items-center justify-center gap-2 transition'
+        : 'train-tool-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2 transition';
+    }
+
+    // --- 1~35 꽃 숫자 찾기 게임 ---
+    let currentEyeNum = 1;
+    let eyeStartTime = null;
+    let eyeTimerInterval = null;
+
+    function initEyeGame() {
+      currentEyeNum = 1;
+      document.getElementById('nextTargetNum').innerText = currentEyeNum;
+      document.getElementById('eyeGameMsg').innerText = '1번 꽃을 눌러 눈 운동을 시작하세요!';
+      document.getElementById('eyeGameTimer').innerText = '0.0초';
+      clearInterval(eyeTimerInterval);
+      eyeStartTime = null;
+
+      // 1~35 무작위 셔플
+      const nums = Array.from({length: 35}, (_, i) => i + 1);
+      for (let i = nums.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [nums[i], nums[j]] = [nums[j], nums[i]];
+      }
+
+      const grid = document.getElementById('flowerGrid');
+      grid.innerHTML = '';
+
+      nums.forEach(n => {
+        const btn = document.createElement('button');
+        btn.id = `flowerBtn-${n}`;
+        btn.className = 'h-12 sm:h-14 rounded-2xl bg-white border-2 border-amber-300 hover:border-amber-500 text-amber-900 font-extrabold text-sm sm:text-base shadow-sm hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center';
+        btn.innerHTML = `<span class="text-[9px] text-amber-500 font-normal">🌸</span><span>${n}</span>`;
+        btn.onclick = () => onFlowerClick(n);
+        grid.appendChild(btn);
+      });
+    }
+
+    function restartEyeGame() {
+      playChime();
+      initEyeGame();
+    }
+
+    function onFlowerClick(num) {
+      if (num === currentEyeNum) {
+        // 첫 번째 클릭 시 타이머 시작
+        if (currentEyeNum === 1) {
+          eyeStartTime = Date.now();
+          eyeTimerInterval = setInterval(() => {
+            const elapsed = ((Date.now() - eyeStartTime) / 1000).toFixed(1);
+            document.getElementById('eyeGameTimer').innerText = `${elapsed}초`;
+          }, 100);
+        }
+
+        playTone(300 + num * 20, 'sine', 0.1);
+        const btn = document.getElementById(`flowerBtn-${num}`);
+        btn.className = 'h-12 sm:h-14 rounded-2xl bg-emerald-500 border-2 border-emerald-600 text-white font-extrabold text-sm sm:text-base shadow-inner flex flex-col items-center justify-center opacity-60 pointer-events-none scale-95';
+        btn.innerHTML = `<span>✓</span><span class="text-xs">${num}</span>`;
+
+        currentEyeNum++;
+        if (currentEyeNum <= 35) {
+          document.getElementById('nextTargetNum').innerText = currentEyeNum;
+          document.getElementById('eyeGameMsg').innerText = `눈동자로 화면을 스캔하여 [${currentEyeNum}번]을 찾으세요!`;
+        } else {
+          clearInterval(eyeTimerInterval);
+          document.getElementById('nextTargetNum').innerText = '🎉';
+          const totalTime = document.getElementById('eyeGameTimer').innerText;
+          document.getElementById('eyeGameMsg').innerText = `대성공! ${totalTime} 만에 35개 완주! 눈 근육이 매우 유연해졌습니다!`;
+          playChime();
+          checkAutoQuest(1); // 퀘스트 2번 자동 체크
+        }
+      } else {
+        playTone(200, 'sawtooth', 0.1);
+      }
+    }
+
+    // --- 3분 회전법 양치 코치 타이머 ---
+    let brushTimer = null;
+    let brushRemaining = 180; // 3분 = 180초
+    let isBrushing = false;
+
+    const brushSteps = [
+      { sec: 180, tag: '1단계 (30초)', title: '윗니 바깥쪽 쓸어내리기', desc: '잇몸 쪽에서 치아 씹는 면 방향으로 칫솔을 회전하며 쓸어내립니다.', emoji: '🦷' },
+      { sec: 145, tag: '2단계 (30초)', title: '아랫니 바깥쪽 쓸어올리기', desc: '아랫니는 잇몸에서 위쪽으로 손목을 돌리며 부드럽게 쓸어올립니다.', emoji: '🪥' },
+      { sec: 110, tag: '3단계 (30초)', title: '윗니 & 아랫니 안쪽 면', desc: '치아 안쪽 면도 동일하게 윗니는 아래로, 아랫니는 위로 쓸어 닦습니다.', emoji: '✨' },
+      { sec: 75, tag: '4단계 (30초)', title: '어금니 씹는 면 닦기', desc: '칫솔을 수평으로 대고 앞뒤로 짧고 빠르게 왕복하며 홈 속 플라크를 제거합니다.', emoji: '😁' },
+      { sec: 40, tag: '5단계 (25초)', title: '앞니 안쪽 & 혀 닦기', desc: '앞니 안쪽은 칫솔을 세워서 긁어내고, 마지막은 혀를 안에서 밖으로 쓸어냅니다!', emoji: '👅' }
+    ];
+
+    function toggleBrushingTimer() {
+      const btn = document.getElementById('brushStartBtn');
+      if (!isBrushing) {
+        isBrushing = true;
+        btn.innerHTML = '<span>⏸️</span> 일시 정지';
+        btn.className = 'bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-1.5';
+        playTone(600, 'triangle', 0.15);
+
+        brushTimer = setInterval(() => {
+          brushRemaining--;
+          updateBrushDisplay();
+
+          if (brushRemaining <= 0) {
+            clearInterval(brushTimer);
+            isBrushing = false;
+            btn.innerHTML = '<span>▶️</span> 다시 시작';
+            playChime();
+            alert('🎉 3분 회전법 양치 완료! 입안이 상쾌해졌어요!');
+            checkAutoQuest(0); // 퀘스트 1번 자동 달성
+          }
+        }, 1000);
+      } else {
+        isBrushing = false;
+        clearInterval(brushTimer);
+        btn.innerHTML = '<span>▶️</span> 이어서 하기';
+        btn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-1.5';
+      }
+    }
+
+    function resetBrushingTimer() {
+      clearInterval(brushTimer);
+      isBrushing = false;
+      brushRemaining = 180;
+      updateBrushDisplay();
+      const btn = document.getElementById('brushStartBtn');
+      btn.innerHTML = '<span>▶️</span> 3분 양치 시작!';
+      btn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-1.5';
+    }
+
+    function updateBrushDisplay() {
+      const mins = Math.floor(brushRemaining / 60);
+      const secs = brushRemaining % 60;
+      document.getElementById('brushTimeDisplay').innerText = 
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      // 현재 단계 판별
+      const currentStep = brushSteps.find(s => brushRemaining >= s.sec - 35) || brushSteps[brushSteps.length - 1];
+      document.getElementById('brushStepTag').innerText = currentStep.tag;
+      document.getElementById('brushStepTitle').innerText = currentStep.title;
+      document.getElementById('brushStepDesc').innerText = currentStep.desc;
+      document.getElementById('brushStepEmoji').innerText = currentStep.emoji;
+    }
+
+    // ----------------------------------------------------------------
+    // 5. [습관관] 다이어리 및 퀘스트 관리
+    // ----------------------------------------------------------------
+    function switchDiarySub(sub) {
+      playTone(460, 'triangle', 0.08);
+      const isQuest = sub === 'quest';
+      document.getElementById('diarySub-quest').classList.toggle('hidden', !isQuest);
+      document.getElementById('diarySub-plan').classList.toggle('hidden', isQuest);
+
+      document.getElementById('diarySubBtn-quest').className = isQuest
+        ? 'diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-purple-600 text-white shadow-md transition'
+        : 'diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition';
+
+      document.getElementById('diarySubBtn-plan').className = !isQuest
+        ? 'diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-purple-600 text-white shadow-md transition'
+        : 'diary-sub-btn py-3 px-4 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition';
+    }
+
+    const questList = [false, false, false, false, false];
+
+    function toggleQuest(index) {
+      questList[index] = !questList[index];
+      playTone(520, 'sine', 0.1);
+      updateQuestUI();
+    }
+
+    function checkAutoQuest(index) {
+      const chks = document.querySelectorAll('.quest-chk');
+      if (chks[index] && !chks[index].checked) {
+        chks[index].checked = true;
+        questList[index] = true;
+        updateQuestUI();
+      }
+    }
+
+    function updateQuestUI() {
+      const count = questList.filter(Boolean).length;
+      document.getElementById('headerStampCount').innerText = count;
+      document.getElementById('questStatusText').innerText = `오늘 실천한 항목: ${count}개`;
+      const pct = (count / 5) * 100;
+      document.getElementById('questProgressBar').style.width = `${pct}%`;
+
+      // 캐릭터 레벨업 피드백
+      const avatarIcon = document.getElementById('avatarIcon');
+      const avatarTitle = document.getElementById('avatarTitle');
+
+      if (count === 0) {
+        avatarIcon.innerText = '🌱';
+        avatarTitle.innerText = '보건 수습대원';
+      } else if (count < 3) {
+        avatarIcon.innerText = '🌿';
+        avatarTitle.innerText = '건강 훈련대원';
+      } else if (count < 5) {
+        avatarIcon.innerText = '🌳';
+        avatarTitle.innerText = '오감 수호 기사';
+      } else {
+        avatarIcon.innerText = '👑';
+        avatarTitle.innerText = '전설의 감각 마스터!';
+        playChime();
+      }
+    }
+
+    function saveCardData() {
+      playChime();
+      alert('💾 [건강 증진 카드 & 치아 관리 계획표]가 저장되었습니다!\n교과서의 실천 약속을 매일 꾸준히 지켜보아요.');
+    }
+
+    // ----------------------------------------------------------------
+    // 6. 눈 체조 모달
+    // ----------------------------------------------------------------
+    function showEyeStretchModal() {
+      playTone(500, 'triangle', 0.1);
+      document.getElementById('eyeStretchModal').classList.remove('hidden');
+    }
+    function closeEyeStretchModal() {
+      document.getElementById('eyeStretchModal').classList.add('hidden');
+    }
+
+    // ----------------------------------------------------------------
+    // 초기화 실행
+    // ----------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      initEyeGame();
+      drawEye();
+    });
+  </script>
+</body>
+</html>
