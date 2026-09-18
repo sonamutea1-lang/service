@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>당당한 5학년! 나의 건강 지킴이 교실</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js for Web Audio Effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Google Fonts: Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #eefbf4 0%, #f0f7ff 100%);
+    }
+    .custom-bounce-short {
+      animation: bounceShort 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes bounceShort {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+    /* Hide scrollbar for clean tab scrolling on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased">
+  <header class="bg-white/90 backdrop-blur border-b border-emerald-100 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xl shadow-md shadow-emerald-200">
+          🌱
+        </div>
+        <div>
+          <span class="text-xs font-bold text-emerald-600 tracking-wider bg-emerald-50 px-2 py-0.5 rounded-md">초등 5학년 보건교실</span>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-800">건강 지킴이 챌린지</h1>
+        </div>
+      </div>
+      
+      <!-- Audio Toggle Button -->
+      <button id="soundToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition">
+        <span id="soundIcon">🔊</span>
+        <span id="soundLabel">소리 켜짐</span>
+      </button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-4xl mx-auto px-4 flex space-x-2 border-t border-slate-100 overflow-x-auto no-scrollbar py-2 text-sm">
+      <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn flex-1 min-w-[110px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-500 text-white shadow-sm shadow-emerald-200">
+        <span>🧩</span> 1. 건강 3요소 퀴즈
+      </button>
+      <button onclick="switchTab('habits')" id="tab-habits" class="tab-btn flex-1 min-w-[110px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-emerald-50">
+        <span>📋</span> 2. 생활습관 점검
+      </button>
+      <button onclick="switchTab('plan')" id="tab-plan" class="tab-btn flex-1 min-w-[110px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-emerald-50">
+        <span>🏥</span> 3. 건강검사 & 계획
+      </button>
+      <button onclick="switchTab('summary')" id="tab-summary" class="tab-btn flex-1 min-w-[100px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-emerald-50">
+        <span>📜</span> 4. 나의 약속카드
+      </button>
+    </div>
+  </header>
+
+  <!-- Floating Toast Notification -->
+  <div id="toastBox" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 transform opacity-0 pointer-events-none scale-95">
+    <div id="toastMessage" class="bg-slate-900/90 text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-xl flex items-center gap-2">
+      알림 메시지
+    </div>
+  </div>
+
+  <!-- Custom Alert Modal Dialog -->
+  <div id="customModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center transform transition-all">
+      <div id="modalEmoji" class="text-4xl mb-3">💡</div>
+      <h3 id="modalTitle" class="text-lg font-bold text-slate-800 mb-2">알림</h3>
+      <p id="modalDesc" class="text-sm text-slate-600 mb-6 break-keep leading-relaxed"></p>
+      <button onclick="closeModal()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold rounded-xl transition shadow-md shadow-emerald-200">
+        확인했어요
+      </button>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+    
+    <!-- ==============================================
+         TAB 1: HEALTH TRIPLE ASPECT QUIZ
+    ============================================== -->
+    <section id="section-quiz" class="space-y-6">
+      <!-- Banner Guide -->
+      <div class="bg-gradient-to-r from-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-lg shadow-emerald-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center md:text-left">
+          <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold">교과서 1단원 : 건강의 의미</span>
+          <h2 class="text-xl sm:text-2xl font-black">건강은 몸만 안 아프면 끝일까요?</h2>
+          <p class="text-emerald-50 text-xs sm:text-sm">WHO(세계보건기구)는 <b>신체적 · 정신적 · 사회적</b>으로 모두 온전한 상태를 '건강'이라고 해요!</p>
+        </div>
+        <div class="flex items-center gap-2 bg-white/15 px-4 py-2 rounded-2xl backdrop-blur">
+          <span class="text-2xl">🏆</span>
+          <div class="text-left">
+            <div class="text-xs text-emerald-100">나의 점수</div>
+            <div id="quizScoreDisplay" class="text-lg font-extrabold text-white">0 / 6 문제</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive 3 Aspects Reference Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-center">
+          <div class="text-2xl mb-1">💪</div>
+          <h3 class="font-bold text-amber-800 text-sm">신체적 건강</h3>
+          <p class="text-xs text-amber-700 mt-1">질병 없이 영양섭취, 수면, 운동으로 몸을 튼튼하게 유지하는 상태</p>
+        </div>
+        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-3.5 text-center">
+          <div class="text-2xl mb-1">🧠</div>
+          <h3 class="font-bold text-sky-800 text-sm">정신적 건강</h3>
+          <p class="text-xs text-sky-700 mt-1">감정과 생각을 조절하고 스트레스에 긍정적으로 잘 대처하는 상태</p>
+        </div>
+        <div class="bg-pink-50 border border-pink-200 rounded-2xl p-3.5 text-center">
+          <div class="text-2xl mb-1">🤝</div>
+          <h3 class="font-bold text-pink-800 text-sm">사회적 건강</h3>
+          <p class="text-xs text-pink-700 mt-1">친구, 가족과 배려하며 좋은 관계를 맺고 함께 살아가는 상태</p>
+        </div>
+      </div>
+
+      <!-- Quiz Play Area -->
+      <div id="quizCard" class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 relative">
+        <div class="flex items-center justify-between mb-4">
+          <span id="quizBadge" class="bg-emerald-100 text-emerald-700 font-extrabold text-xs px-3 py-1 rounded-full">문제 1 / 6</span>
+          <span class="text-xs text-slate-400 font-medium">상황에 맞는 건강 측면을 골라보세요!</span>
+        </div>
+
+        <div class="py-6 text-center">
+          <div id="quizQuestionIcon" class="text-5xl mb-3 custom-bounce-short">🤔</div>
+          <p id="quizQuestionText" class="text-lg sm:text-xl font-extrabold text-slate-800 leading-relaxed px-2">
+            "힘든 일이 있어도 '다음엔 더 잘할 수 있어!' 하며 긍정적으로 생각해요."
+          </p>
+        </div>
+
+        <!-- Choice Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+          <button onclick="answerQuiz('physical')" class="quiz-choice-btn group p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/50 hover:bg-amber-100 hover:border-amber-400 active:scale-95 transition flex flex-col items-center">
+            <span class="text-2xl mb-1 group-hover:scale-110 transition">🏃</span>
+            <span class="font-bold text-amber-900 text-sm">신체적 건강</span>
+          </button>
+          <button onclick="answerQuiz('mental')" class="quiz-choice-btn group p-4 rounded-2xl border-2 border-sky-200 bg-sky-50/50 hover:bg-sky-100 hover:border-sky-400 active:scale-95 transition flex flex-col items-center">
+            <span class="text-2xl mb-1 group-hover:scale-110 transition">🌈</span>
+            <span class="font-bold text-sky-900 text-sm">정신적 건강</span>
+          </button>
+          <button onclick="answerQuiz('social')" class="quiz-choice-btn group p-4 rounded-2xl border-2 border-pink-200 bg-pink-50/50 hover:bg-pink-100 hover:border-pink-400 active:scale-95 transition flex flex-col items-center">
+            <span class="text-2xl mb-1 group-hover:scale-110 transition">💬</span>
+            <span class="font-bold text-pink-900 text-sm">사회적 건강</span>
+          </button>
+        </div>
+
+        <!-- Result / Feedback Container -->
+        <div id="quizFeedbackBox" class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 hidden">
+          <div class="flex items-start gap-3">
+            <span id="feedbackIcon" class="text-2xl">🎉</span>
+            <div class="flex-1">
+              <h4 id="feedbackTitle" class="font-bold text-slate-800 text-sm">정답입니다!</h4>
+              <p id="feedbackDesc" class="text-xs text-slate-600 mt-1 leading-relaxed">해설 설명 영역입니다.</p>
+            </div>
+            <button id="nextQuizBtn" onclick="nextQuizQuestion()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 whitespace-nowrap">
+              다음 문제 👉
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Completed View (Hidden by default) -->
+      <div id="quizCompleteView" class="hidden bg-white rounded-3xl p-8 text-center shadow-md border border-slate-100">
+        <div class="text-6xl mb-3">🎓</div>
+        <h3 class="text-2xl font-black text-slate-800">건강 3요소 마스터 달성!</h3>
+        <p class="text-sm text-slate-500 mt-1">신체적·정신적·사회적 건강의 균형이 중요하다는 것을 배웠어요.</p>
+        <div class="inline-block bg-emerald-50 border border-emerald-200 px-6 py-3 rounded-2xl my-5 text-emerald-800 font-bold text-lg">
+          최종 퀴즈 점수: <span id="finalScoreVal" class="text-emerald-600 text-2xl font-black">0</span> / 6점
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-50 transition">
+            다시 풀어보기 🔄
+          </button>
+          <button onclick="switchTab('habits')" class="px-6 py-2.5 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-md shadow-emerald-200 transition">
+            2단계: 생활습관 점검하러 가기 🚀
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         TAB 2: HEALTH HABIT CHECKLIST (교과서 14쪽)
+    ============================================== -->
+    <section id="section-habits" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-3xl p-5 text-white shadow-lg shadow-indigo-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center md:text-left">
+          <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold">교과서 14쪽 : 생활 습관 점검하기</span>
+          <h2 class="text-xl sm:text-2xl font-black">나의 하루 생활습관 셀프 체크</h2>
+          <p class="text-blue-100 text-xs sm:text-sm">건강에 가장 큰 영향을 미치는 것은 바로 <b>우리의 매일 습관</b>이에요!</p>
+        </div>
+        <div class="flex items-center gap-3 bg-white/15 px-4 py-2 rounded-2xl backdrop-blur">
+          <div class="text-center">
+            <span class="text-xs text-blue-100 block">실천율</span>
+            <span id="habitProgressPct" class="text-xl font-extrabold text-white">0%</span>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
+            ✨
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist Container -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 text-xs text-slate-500 gap-2">
+          <span>최근 일주일 동안 나의 모습을 솔직하게 체크해 보세요.</span>
+          <span class="font-semibold text-emerald-600">8개 항목 중 <span id="checkedCount">0</span>개 체크됨</span>
+        </div>
+
+        <div id="habitListContainer" class="space-y-3">
+          <!-- Dynamically filled with JS -->
+        </div>
+
+        <!-- Weekly Focus Goal Selection -->
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">🎯</span>
+              <h4 class="font-bold text-amber-900 text-sm">교과서 미션 : 가장 부족했던 항목 1개 골라 실천 약속하기</h4>
+            </div>
+            <p class="text-xs text-amber-800 mb-3">
+              '부족함'으로 체크된 항목 중 다음 주 동안 특별히 집중해서 바꿀 1가지를 골라보세요.
+            </p>
+            <select id="weakHabitSelect" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-amber-400 outline-none">
+              <option value="">-- 부족했던 습관 1개를 선택하세요 --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-4 flex justify-end">
+          <button onclick="confirmHabitSelection()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 transition active:scale-95 flex items-center gap-2">
+            <span>생활습관 분석 완료 & 3단계 이동</span>
+            <span>👉</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         TAB 3: HEALTH EXAM & PROMOTION PLAN (교과서 15~19쪽)
+    ============================================== -->
+    <section id="section-plan" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-rose-500 to-pink-600 rounded-3xl p-5 text-white shadow-lg shadow-pink-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-center md:text-left">
+          <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold">교과서 2단원 : 건강 검사</span>
+          <h2 class="text-xl sm:text-2xl font-black">건강검사 결과로 건강증진 계획 세우기</h2>
+          <p class="text-rose-100 text-xs sm:text-sm">검진 결과를 통해 질병을 미리 예방하고, 올바른 성장 계획을 만들어요!</p>
+        </div>
+        <div class="text-3xl bg-white/20 p-3 rounded-2xl backdrop-blur">
+          🩺
+        </div>
+      </div>
+
+      <!-- Mode Selector: Use Woosol's sample or Custom Selection -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-sm font-bold text-slate-700">검사 대상자 선택:</span>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="setExamMode('woosol')" id="modeBtn-woosol" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm">
+            👦 교과서 19쪽 우솔이 사례
+          </button>
+          <button onclick="setExamMode('custom')" id="modeBtn-custom" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+            🙋 내가 직접 항목 고르기
+          </button>
+        </div>
+      </div>
+
+      <!-- Health Exam Knowledge Pill (교과서 17쪽 요약) -->
+      <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4">
+        <h4 class="text-xs font-bold text-indigo-900 mb-2 flex items-center gap-1.5">
+          <span>🔍</span> 초등학생 건강검사 주요 검사 항목
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-indigo-800">
+          <div class="bg-white/80 p-2 rounded-lg">📏 <b>신체발달</b> : 키, 체중, 비만도</div>
+          <div class="bg-white/80 p-2 rounded-lg">👀 <b>시력 검사</b> : 시력 이상 확인</div>
+          <div class="bg-white/80 p-2 rounded-lg">🦴 <b>척추 검사</b> : 척추옆굽음증 확인</div>
+          <div class="bg-white/80 p-2 rounded-lg">🦷 <b>구강 검사</b> : 충치 및 잇몸 관리</div>
+        </div>
+      </div>
+
+      <!-- Doctor's Findings Card & Action Planner -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-6">
+        <div class="border-b pb-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-slate-800 text-base flex items-center gap-2">
+              <span>📄</span> <span id="reportOwnerName">우솔이의</span> 학생 건강 검사 결과 통보서
+            </h3>
+            <span class="text-xs text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full font-bold">의사 소견 집중 관리</span>
+          </div>
+        </div>
+
+        <!-- Custom Mode Checkboxes (Shown only in custom mode) -->
+        <div id="customSelectionArea" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+          <p class="text-xs font-bold text-slate-700">관리하고 싶은 소견 항목을 선택해주세요 (복수 선택 가능):</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" id="chk-weight" onchange="toggleCustomItem('weight')" class="w-4 h-4 text-pink-600 rounded">
+              <span>⚖️ 체중 및 영양 관리</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" id="chk-vision" onchange="toggleCustomItem('vision')" class="w-4 h-4 text-pink-600 rounded">
+              <span>👓 시력 및 눈 건강 관리</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" id="chk-spine" onchange="toggleCustomItem('spine')" class="w-4 h-4 text-pink-600 rounded">
+              <span>🧍 척추 자세 (척추옆굽음증)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Findings List with Action Input -->
+        <div id="findingsContainer" class="space-y-5">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p class="text-xs text-slate-500">
+            * 교과서 18쪽 건강 가이드(30분 운동, 8시간 수면, 바른 자세, 안과/치과 정기검진)를 참고하세요.
+          </p>
+          <button onclick="generatePromiseCard()" class="w-full sm:w-auto px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl shadow-md shadow-pink-200 transition active:scale-95 flex items-center justify-center gap-2">
+            <span>나의 건강 다짐 카드 발행하기</span>
+            <span>🎖️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         TAB 4: SUMMARY & PROMISE CARD (실천 다짐 카드)
+    ============================================== -->
+    <section id="section-summary" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl p-5 text-white shadow-lg shadow-orange-100 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold">최종 실천 서약</span>
+          <h2 class="text-xl sm:text-2xl font-black mt-1">내가 완성한 「건강 지킴이 실천 카드」</h2>
+          <p class="text-amber-100 text-xs sm:text-sm">배운 지식을 바탕으로 이번 주부터 튼튼하고 씩씩하게 실천해요!</p>
+        </div>
+        <button onclick="printCard()" class="px-4 py-2 bg-white text-orange-600 hover:bg-orange-50 rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5 active:scale-95">
+          <span>🖨️</span> 인쇄 / 보관하기
+        </button>
+      </div>
+
+      <!-- Printable Certificate / Card UI -->
+      <div id="printableCard" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-emerald-400 relative overflow-hidden">
+        <!-- Stamp Watermark -->
+        <div class="absolute -right-6 -bottom-6 text-9xl text-emerald-100/60 pointer-events-none select-none font-black rotate-12">
+          HEALTH
+        </div>
+
+        <div class="text-center border-b pb-4 mb-5">
+          <div class="inline-flex items-center gap-2 text-emerald-700 bg-emerald-50 px-4 py-1 rounded-full font-bold text-xs mb-2">
+            <span>🏫</span> 초등학교 5학년 보건교육 실천 서약서
+          </div>
+          <h3 class="text-2xl font-black text-slate-800 tracking-tight">건강 실천 약속 카드</h3>
+          <p class="text-xs text-slate-500 mt-1">이름: <span id="cardStudentName" class="font-bold text-slate-800 underline decoration-emerald-500 decoration-2">5학년 건강지킴이</span> 학생</p>
+        </div>
+
+        <div class="space-y-4 text-sm relative z-10">
+          <!-- Box 1: 3 Aspects of Health Definition -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+            <h4 class="font-bold text-slate-700 text-xs flex items-center gap-1.5 mb-2">
+              <span>💡</span> 내가 배운 건강의 진짜 의미
+            </h4>
+            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+              "건강은 단지 아프지 않은 것뿐만 아니라, <b class="text-emerald-700">신체적</b>, <b class="text-sky-700">정신적</b>, 그리고 주변과의 <b class="text-pink-700">사회적 관계</b>까지 모두 좋은 상태를 의미합니다!"
+            </p>
+          </div>
+
+          <!-- Box 2: Habit Goal -->
+          <div class="bg-amber-50/70 rounded-2xl p-4 border border-amber-200">
+            <h4 class="font-bold text-amber-900 text-xs flex items-center gap-1.5 mb-2">
+              <span>🎯</span> 이번 주 최우선 개선 생활 습관
+            </h4>
+            <p id="cardHabitGoal" class="text-sm font-bold text-amber-950">
+              선택된 목표가 아직 없습니다. 2단계에서 목표를 설정해 보세요.
+            </p>
+          </div>
+
+          <!-- Box 3: Health Exam Action Plan -->
+          <div class="bg-pink-50/70 rounded-2xl p-4 border border-pink-200">
+            <h4 class="font-bold text-pink-900 text-xs flex items-center gap-1.5 mb-2">
+              <span>📋</span> 건강검사 소견에 따른 나의 실천 계획
+            </h4>
+            <div id="cardPlansList" class="space-y-2 text-xs sm:text-sm text-pink-950">
+              <p class="text-slate-400 italic">3단계에서 계획을 세우면 이곳에 멋지게 표시됩니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="mt-6 pt-5 border-t flex items-center justify-between text-xs text-slate-500">
+          <div>
+            발행일: <span id="cardDate" class="font-semibold text-slate-700">2026.09.18</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>서약 확인 도장:</span>
+            <span class="w-10 h-10 rounded-full border-2 border-red-500 text-red-500 flex items-center justify-center font-black text-xs rotate-[-12deg]">
+              참잘했음
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button Group -->
+      <div class="flex flex-wrap gap-3 justify-center pt-2">
+        <button onclick="copyPromiseSummary()" class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 font-bold text-xs text-slate-700 transition flex items-center gap-1.5 shadow-sm">
+          <span>📋</span> 나의 다짐 글 복사하기
+        </button>
+        <button onclick="switchTab('quiz')" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md">
+          <span>🔄</span> 처음부터 다시 복습하기
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 mt-12 py-5 text-center text-xs text-slate-400">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>초등학교 5학년 보건 교과서 연계 교육용 웹 프로그램</p>
+      <p class="text-slate-500 font-medium">1단원 건강의 의미 & 2단원 건강 검사</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================
+       AUDIO SYNTHESIZER SETUP (Tone.js)
+    ========================================================== */
+    let soundEnabled = true;
+    let synth = null;
+
+    function initAudio() {
+      if (!synth && typeof Tone !== 'undefined') {
+        try {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.2 }
+          }).toDestination();
+          synth.volume.value = -8;
+        } catch (e) {
+          console.log("Audio not allowed yet");
+        }
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!synth) return;
+      
+      try {
+        if (Tone.context.state !== 'running') {
+          Tone.start();
+        }
+        const now = Tone.now();
+        if (type === 'correct') {
+          synth.triggerAttackRelease(["E5", "G5", "C6"], "8n", now);
+        } else if (type === 'wrong') {
+          synth.triggerAttackRelease(["C4", "A#3"], "8n", now);
+        } else if (type === 'click') {
+          synth.triggerAttackRelease(["C5"], "16n", now);
+        } else if (type === 'badge') {
+          synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n", now);
+        }
+      } catch (err) {
+        // audio fallback silent
+      }
+    }
+
+    document.getElementById('soundToggleBtn').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('soundIcon');
+      const label = document.getElementById('soundLabel');
+      if (soundEnabled) {
+        icon.innerText = '🔊';
+        label.innerText = '소리 켜짐';
+        showToast('소리가 켜졌습니다.');
+        playSound('click');
+      } else {
+        icon.innerText = '🔇';
+        label.innerText = '음소거';
+        showToast('소리가 꺼졌습니다.');
+      }
+    });
+
+    /* ==========================================================
+       MODAL & TOAST HELPERS
+    ========================================================== */
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      const text = document.getElementById('toastMessage');
+      text.innerText = msg;
+      box.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+      box.classList.add('opacity-100', 'scale-100');
+      setTimeout(() => {
+        box.classList.remove('opacity-100', 'scale-100');
+        box.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+      }, 2400);
+    }
+
+    function showModal(title, desc, emoji = '💡') {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDesc').innerText = desc;
+      document.getElementById('modalEmoji').innerText = emoji;
+      document.getElementById('customModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('customModal').classList.add('hidden');
+    }
+
+    /* ==========================================================
+       TAB SWITCHING
+    ========================================================== */
+    function switchTab(tabId) {
+      playSound('click');
+      const tabs = ['quiz', 'habits', 'plan', 'summary'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const sec = document.getElementById(`section-${t}`);
+        if (t === tabId) {
+          btn.className = 'tab-btn flex-1 min-w-[110px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-emerald-500 text-white shadow-sm shadow-emerald-200';
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = 'tab-btn flex-1 min-w-[110px] py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-emerald-50';
+          sec.classList.add('hidden');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ==========================================================
+       QUIZ SYSTEM DATA & LOGIC (교과서 12쪽 예제 반영)
+    ========================================================== */
+    const quizQuestions = [
+      {
+        text: "힘든 일이 있어도 '괜찮아, 다시 해보자!'라며 긍정적으로 생각하려고 노력해요.",
+        icon: "😊",
+        category: "mental",
+        catName: "정신적 건강",
+        explanation: "자신의 감정과 생각을 잘 조절하고 스트레스에 긍정적으로 대처하는 것은 '정신적 건강'이에요."
+      },
+      {
+        text: "친구들과 쉬는 시간에 사이좋게 이야기를 나누고 서로 도우며 배려해요.",
+        icon: "👫",
+        category: "social",
+        catName: "사회적 건강",
+        explanation: "다른 사람들과 좋은 관계를 유지하고 함께 잘 어울려 살아가는 것은 '사회적 건강'이에요."
+      },
+      {
+        text: "매일 밤 일찍 자서 하루 8시간 이상 충분히 자고, 아침밥과 과일을 골고루 먹어요.",
+        icon: "🥗",
+        category: "physical",
+        catName: "신체적 건강",
+        explanation: "균형 잡힌 영양 섭취와 충분한 수면, 운동으로 몸에 병이 없도록 하는 것은 '신체적 건강'이에요."
+      },
+      {
+        text: "속상하거나 슬픈 일이 있을 때 부모님이나 선생님께 털어놓고 따뜻한 위로를 받아요.",
+        icon: "💬",
+        category: "social",
+        catName: "사회적 건강",
+        explanation: "가족, 친구, 선생님과의 원만한 소통과 유대감을 맺는 것은 '사회적 건강'에 속합니다."
+      },
+      {
+        text: "열이 나고 기침이 나면 보건실에 가거나 병원에서 진료를 받아 몸을 회복해요.",
+        icon: "🩺",
+        category: "physical",
+        catName: "신체적 건강",
+        explanation: "신체 질병을 치료하고 일상적인 신체 활동을 활기차게 유지하는 것은 '신체적 건강'입니다."
+      },
+      {
+        text: "화가 불쑥 날 때 길게 숨을 내쉬며 차분하게 마음을 가라앉혀요.",
+        icon: "🧘",
+        category: "mental",
+        catName: "정신적 건강",
+        explanation: "분노와 감정을 조절하고 마음의 평안을 찾는 것은 '정신적 건강'을 지키는 올바른 행동이에요."
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let hasAnsweredCurrent = false;
+
+    function renderCurrentQuiz() {
+      const q = quizQuestions[currentQuizIndex];
+      document.getElementById('quizBadge').innerText = `문제 ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+      document.getElementById('quizQuestionIcon').innerText = q.icon;
+      document.getElementById('quizQuestionText').innerText = `"${q.text}"`;
+      document.getElementById('quizFeedbackBox').classList.add('hidden');
+      hasAnsweredCurrent = false;
+
+      // Enable choice buttons
+      document.querySelectorAll('.quiz-choice-btn').forEach(btn => {
+        btn.classList.remove('opacity-50', 'pointer-events-none');
+      });
+    }
+
+    function answerQuiz(selectedCategory) {
+      if (hasAnsweredCurrent) return;
+      hasAnsweredCurrent = true;
+
+      const q = quizQuestions[currentQuizIndex];
+      const isCorrect = (selectedCategory === q.category);
+
+      // Disable choice buttons during review
+      document.querySelectorAll('.quiz-choice-btn').forEach(btn => {
+        btn.classList.add('opacity-50', 'pointer-events-none');
+      });
+
+      const feedbackBox = document.getElementById('quizFeedbackBox');
+      const feedbackIcon = document.getElementById('feedbackIcon');
+      const feedbackTitle = document.getElementById('feedbackTitle');
+      const feedbackDesc = document.getElementById('feedbackDesc');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        quizScore++;
+        playSound('correct');
+        feedbackIcon.innerText = "⭕";
+        feedbackTitle.innerText = `정답입니다! (${q.catName})`;
+        feedbackTitle.className = "font-bold text-emerald-700 text-sm";
+      } else {
+        playSound('wrong');
+        feedbackIcon.innerText = "❌";
+        feedbackTitle.innerText = `아쉬워요! 정답은 [${q.catName}] 입니다.`;
+        feedbackTitle.className = "font-bold text-rose-600 text-sm";
+      }
+
+      feedbackDesc.innerText = q.explanation;
+      document.getElementById('quizScoreDisplay').innerText = `${quizScore} / ${quizQuestions.length} 문제`;
+    }
+
+    function nextQuizQuestion() {
+      playSound('click');
+      currentQuizIndex++;
+      if (currentQuizIndex < quizQuestions.length) {
+        renderCurrentQuiz();
+      } else {
+        // Complete Quiz
+        playSound('badge');
+        document.getElementById('quizCard').classList.add('hidden');
+        document.getElementById('quizCompleteView').classList.remove('hidden');
+        document.getElementById('finalScoreVal').innerText = quizScore;
+      }
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById('quizScoreDisplay').innerText = `0 / ${quizQuestions.length} 문제`;
+      document.getElementById('quizCard').classList.remove('hidden');
+      document.getElementById('quizCompleteView').classList.add('hidden');
+      renderCurrentQuiz();
+    }
+
+    /* ==========================================================
+       HABIT CHECKLIST (교과서 14쪽 내용 완벽 일치)
+    ========================================================== */
+    const habitItems = [
+      { id: 'h1', text: '오늘 아침밥을 꼭 챙겨 먹었어요.', category: '식습관' },
+      { id: 'h2', text: '하루 6~8컵 이상의 깨끗한 물을 마셨어요.', category: '수분섭취' },
+      { id: 'h3', text: '채소와 과일을 편식하지 않고 골고루 먹으려 노력했어요.', category: '영양균형' },
+      { id: 'h4', text: '하루 30분 이상 몸을 활발하게 움직였어요. (운동, 놀이, 체육 등)', category: '신체활동' },
+      { id: 'h5', text: '밤 10시 전에 잠자리에 들었어요. (하루 8시간 이상 수면)', category: '수면습관' },
+      { id: 'h6', text: '잠자기 전에 스마트폰이나 TV를 오래 보지 않았어요.', category: '전자기기절제' },
+      { id: 'h7', text: '스트레스를 받을 때 건전하고 건강한 방법으로 풀었어요.', category: '스트레스관리' },
+      { id: 'h8', text: '친구나 가족에게 예의 바르고 친절하게 말하고 지냈어요.', category: '대인관계' }
+    ];
+
+    // State of user answers: { h1: 'good' | 'poor' }
+    const habitAnswers = {};
+
+    function renderHabits() {
+      const container = document.getElementById('habitListContainer');
+      container.innerHTML = habitItems.map((item, idx) => {
+        const val = habitAnswers[item.id] || null;
+        return `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border ${val === 'good' ? 'bg-emerald-50/70 border-emerald-300' : val === 'poor' ? 'bg-amber-50/70 border-amber-300' : 'bg-slate-50 border-slate-200'} transition gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0">${idx + 1}</span>
+              <span class="text-sm font-semibold text-slate-800">${item.text}</span>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+              <button onclick="setHabit('${item.id}', 'good')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${val === 'good' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50'}">
+                <span>👍</span> 잘했음
+              </button>
+              <button onclick="setHabit('${item.id}', 'poor')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${val === 'poor' ? 'bg-amber-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-amber-50'}">
+                <span>🌱</span> 부족함
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateHabitStats();
+      updateWeakHabitOptions();
+    }
+
+    function setHabit(id, type) {
+      playSound('click');
+      habitAnswers[id] = type;
+      renderHabits();
+    }
+
+    function updateHabitStats() {
+      const total = habitItems.length;
+      const answeredKeys = Object.keys(habitAnswers);
+      const goodCount = answeredKeys.filter(k => habitAnswers[k] === 'good').length;
+      const checkedCount = answeredKeys.length;
+      const pct = Math.round((goodCount / total) * 100);
+
+      document.getElementById('checkedCount').innerText = checkedCount;
+      document.getElementById('habitProgressPct').innerText = `${pct}%`;
+    }
+
+    function updateWeakHabitOptions() {
+      const select = document.getElementById('weakHabitSelect');
+      const currentSelected = select.value;
+      const poorItems = habitItems.filter(item => habitAnswers[item.id] === 'poor');
+
+      let html = '<option value="">-- 부족했던 습관 1개를 선택하세요 --</option>';
+      if (poorItems.length > 0) {
+        poorItems.forEach(item => {
+          html += `<option value="${item.text}">[${item.category}] ${item.text}</option>`;
+        });
+      } else {
+        habitItems.forEach(item => {
+          html += `<option value="${item.text}">[${item.category}] ${item.text}</option>`;
+        });
+      }
+      select.innerHTML = html;
+      if (currentSelected) select.value = currentSelected;
+    }
+
+    function confirmHabitSelection() {
+      const selectedGoal = document.getElementById('weakHabitSelect').value;
+      if (!selectedGoal) {
+        showModal('습관 목표 선택', '가장 부족했던 항목 중 1개를 골라 다음 주 실천 목표로 지정해주세요!', '🎯');
+        return;
+      }
+      playSound('badge');
+      showToast('이번 주 습관 개선 목표가 등록되었습니다!');
+      // Update the Summary Card text
+      document.getElementById('cardHabitGoal').innerHTML = `🌟 <b>약속 목표</b> : "${selectedGoal}"<br><span class="text-xs text-amber-800 font-normal">→ 하루 한 번 체크하며 1주일 동안 정성껏 실천하기</span>`;
+      switchTab('plan');
+    }
+
+    /* ==========================================================
+       HEALTH EXAM & PROMOTION PLAN BUILDER (우솔이 및 맞춤형)
+    ========================================================== */
+    let examMode = 'woosol'; // 'woosol' or 'custom'
+
+    const examProfiles = {
+      woosol: [
+        {
+          id: 'plan_weight',
+          title: '의사 소견 1 : 체중 및 식생활 관리',
+          doctorNote: '비만 예방을 위한 체중 관리 요함 (음식 조절 및 규칙적인 운동을 통한 생활 습관 개선 필요)',
+          guideHint: '단 음식·탄산음료 줄이기, 채소 골고루 먹기, 매일 30분 이상 걷기/줄넘기',
+          defaultAction: '탄산음료와 단 과자를 줄이고, 방과 후에 매일 30분씩 줄넘기를 하겠습니다.'
+        },
+        {
+          id: 'plan_vision',
+          title: '의사 소견 2 : 시력 저하 및 눈 건강',
+          doctorNote: '시력 이상 소견 (정밀 안과 검진 권고 및 올바른 눈 관리 생활습관 필요)',
+          guideHint: '스마트폰 사용 줄이기, 어두운 곳에서 책 읽지 않기, 50분마다 먼 곳 쳐다보기',
+          defaultAction: '잠자기 전 침대에서 스마트폰을 보지 않고, 안과에 가서 정확한 시력 검진을 받겠습니다.'
+        },
+        {
+          id: 'plan_spine',
+          title: '의사 소견 3 : 척추옆굽음증(척추측만증) 주의',
+          doctorNote: '척추 이상 소견 (정기적인 척추 관찰과 바른 앉기 자세, 척추 스트레칭 요함)',
+          guideHint: '양쪽 어깨로 메는 배낭 사용, 다리 꼬지 않기, 허리 펴고 앉기, 자주 기지개 켜기',
+          defaultAction: '의자에 앉을 때 허리를 꼿꼿이 세우고, 가방은 한쪽으로 메지 않고 양쪽으로 메겠습니다.'
+        }
+      ]
+    };
+
+    // User customized selections
+    const customItemsState = {
+      weight: true,
+      vision: true,
+      spine: true
+    };
+
+    function setExamMode(mode) {
+      playSound('click');
+      examMode = mode;
+      const woosolBtn = document.getElementById('modeBtn-woosol');
+      const customBtn = document.getElementById('modeBtn-custom');
+      const customArea = document.getElementById('customSelectionArea');
+      const ownerName = document.getElementById('reportOwnerName');
+
+      if (mode === 'woosol') {
+        woosolBtn.className = 'flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm';
+        customBtn.className = 'flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+        customArea.classList.add('hidden');
+        ownerName.innerText = '우솔이의';
+        document.getElementById('cardStudentName').innerText = '우솔이와 5학년 친구';
+      } else {
+        customBtn.className = 'flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm';
+        woosolBtn.className = 'flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+        customArea.classList.remove('hidden');
+        ownerName.innerText = '나의';
+        document.getElementById('cardStudentName').innerText = '나(5학년 건강지킴이)';
+
+        // sync checkboxes
+        document.getElementById('chk-weight').checked = customItemsState.weight;
+        document.getElementById('chk-vision').checked = customItemsState.vision;
+        document.getElementById('chk-spine').checked = customItemsState.spine;
+      }
+      renderFindings();
+    }
+
+    function toggleCustomItem(itemKey) {
+      playSound('click');
+      customItemsState[itemKey] = document.getElementById(`chk-${itemKey}`).checked;
+      renderFindings();
+    }
+
+    function renderFindings() {
+      const container = document.getElementById('findingsContainer');
+      let activeList = [];
+
+      if (examMode === 'woosol') {
+        activeList = examProfiles.woosol;
+      } else {
+        if (customItemsState.weight) activeList.push(examProfiles.woosol[0]);
+        if (customItemsState.vision) activeList.push(examProfiles.woosol[1]);
+        if (customItemsState.spine) activeList.push(examProfiles.woosol[2]);
+      }
+
+      if (activeList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs">
+            선택된 검사 소견 항목이 없습니다. 위의 체크박스에서 1개 이상 골라주세요!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeList.map((item, idx) => {
+        return `
+          <div class="bg-rose-50/40 border border-rose-200 rounded-2xl p-4.5 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="font-extrabold text-rose-900 text-sm">${item.title}</span>
+              <span class="text-xs bg-rose-100 text-rose-700 px-2.5 py-0.5 rounded-full font-semibold">가정 실천 과제</span>
+            </div>
+            
+            <div class="bg-white/90 p-3 rounded-xl border border-rose-100 text-xs">
+              <p class="font-bold text-slate-700">🩺 의사 소견 및 권고사항 :</p>
+              <p class="text-slate-600 mt-0.5">${item.doctorNote}</p>
+              <p class="text-emerald-600 font-semibold mt-1">💡 교과서 실천 팁: ${item.guideHint}</p>
+            </div>
+
+            <div>
+              <label for="${item.id}_input" class="block text-xs font-bold text-slate-700 mb-1">
+                ✍️ 나의 건강 증진 실천 계획 :
+              </label>
+              <input type="text" id="${item.id}_input" value="${item.defaultAction}" 
+                class="w-full bg-white border border-slate-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none transition"
+                placeholder="어떻게 실천할 것인지 구체적으로 적어보세요">
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function generatePromiseCard() {
+      playSound('badge');
+      const plansContainer = document.getElementById('cardPlansList');
+      
+      let itemsToCheck = [];
+      if (examMode === 'woosol') {
+        itemsToCheck = examProfiles.woosol;
+      } else {
+        if (customItemsState.weight) itemsToCheck.push(examProfiles.woosol[0]);
+        if (customItemsState.vision) itemsToCheck.push(examProfiles.woosol[1]);
+        if (customItemsState.spine) itemsToCheck.push(examProfiles.woosol[2]);
+      }
+
+      if (itemsToCheck.length === 0) {
+        showModal('계획 확인', '소견 항목을 최소 1개 이상 선택해야 카드를 완성할 수 있어요!', '⚠️');
+        return;
+      }
+
+      let generatedHtml = '';
+      itemsToCheck.forEach((it, i) => {
+        const inputElem = document.getElementById(`${it.id}_input`);
+        const userAction = inputElem ? inputElem.value.trim() : it.defaultAction;
+        generatedHtml += `
+          <div class="p-2.5 bg-white rounded-xl border border-pink-100 flex items-start gap-2">
+            <span class="text-base font-bold text-pink-600">${i + 1}.</span>
+            <div>
+              <div class="font-bold text-slate-800 text-xs">${it.title.split(':')[1] || it.title}</div>
+              <div class="text-slate-600 text-xs mt-0.5">실천 다짐: "<b>${userAction || it.defaultAction}</b>"</div>
+            </div>
+          </div>
+        `;
+      });
+
+      plansContainer.innerHTML = generatedHtml;
+
+      // Set today's date
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+      document.getElementById('cardDate').innerText = dateStr;
+
+      showToast('멋진 건강 실천 약속 카드가 완성되었습니다!');
+      switchTab('summary');
+    }
+
+    function copyPromiseSummary() {
+      playSound('click');
+      const studentName = document.getElementById('cardStudentName').innerText;
+      const habitGoal = document.getElementById('cardHabitGoal').innerText;
+      
+      let summaryText = `[초등 5학년 건강 지킴이 실천 서약]\n`;
+      summaryText += `이름: ${studentName}\n\n`;
+      summaryText += `■ 내가 배운 건강이란?\n`;
+      summaryText += `신체적 건강, 정신적 건강, 사회적 관계까지 모두 온전한 상태!\n\n`;
+      summaryText += `■ 이번 주 나의 생활습관 실천 목표:\n${habitGoal}\n\n`;
+      summaryText += `■ 건강 검사 결과를 통한 다짐:\n`;
+
+      const planBlocks = document.querySelectorAll('#cardPlansList > div');
+      planBlocks.forEach((block, idx) => {
+        summaryText += `${idx + 1}) ${block.innerText.replace(/\n/g, ' ')}\n`;
+      });
+
+      summaryText += `\n매일 성실하게 실천하여 튼튼하고 행복한 5학년이 되겠습니다! 🌟`;
+
+      // Copy to clipboard using textarea execCommand fallback
+      const dummyArea = document.createElement('textarea');
+      dummyArea.value = summaryText;
+      dummyArea.style.position = 'fixed';
+      dummyArea.style.opacity = '0';
+      document.body.appendChild(dummyArea);
+      dummyArea.select();
+      try {
+        document.execCommand('copy');
+        showModal('복사 완료', '클립보드에 나의 건강 실천 다짐이 복사되었습니다! 보건 수업 과제방이나 알림장에 붙여넣기 해보세요.', '🎉');
+      } catch (err) {
+        showToast('복사에 실패했습니다.');
+      }
+      document.body.removeChild(dummyArea);
+    }
+
+    function printCard() {
+      playSound('click');
+      window.print();
+    }
+
+    // Initial setup on window load
+    window.onload = function () {
+      renderCurrentQuiz();
+      renderHabits();
+      renderFindings();
+    };
+  </script>
+</body>
+</html>
