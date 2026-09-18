@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>폐활량 팡팡! 몬스터 키우기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #f0fdf4; /* 맑은 공기 느낌의 연한 초록색 */
+            touch-action: manipulation;
+        }
+        .monster-bounce {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .pulse-fast {
+            animation: pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .8; transform: scale(1.05); }
+        }
+        .progress-bar-transition {
+            transition: width 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // 퀴즈 데이터
+        const QUIZ_DATA = [
+            {
+                question: "담배를 직접 피우지 않아도, 다른 사람이 피우는 담배 연기를 마시는 것을 '간접흡연'이라고 한다.",
+                answer: true,
+                explanation: "맞아요! 직접 피우지 않아도 연기를 마시면 우리 몸에 아주 해롭답니다."
+            },
+            {
+                question: "밖에 나가서 담배를 피우고 들어오면 옷이나 머리카락에 냄새가 뱁니다. 이 냄새를 맡는 것은 건강에 아무런 문제가 없다.",
+                answer: false,
+                explanation: "틀렸어요! 눈에 보이지 않는 나쁜 물질이 옷에 묻어 있어서 냄새만 맡아도 해롭습니다. 이를 '3차 흡연'이라고 해요."
+            },
+            {
+                question: "어린이는 어른보다 숨을 더 빨리 쉬기 때문에 간접흡연에 더 큰 피해를 받는다.",
+                answer: true,
+                explanation: "정답! 몸이 아직 자라고 있어서 나쁜 연기가 몸속에 더 많이, 빨리 퍼지게 됩니다."
+            },
+            {
+                question: "전자담배는 연기가 나지 않거나 과일향이 나기 때문에 간접흡연의 위험이 없다.",
+                answer: false,
+                explanation: "땡! 전자담배도 눈에 잘 보이지 않는 나쁜 발암물질을 뿜어내므로 매우 위험합니다."
+            }
+        ];
+
+        // 상황극 훈련 데이터
+        const SCENARIO_DATA = [
+            {
+                situation: "길을 가는데, 버스 정류장에서 어떤 아저씨가 담배를 피우고 있어요. 연기가 나에게로 날아오네요! 어떻게 할까요?",
+                options: [
+                    { text: "\"아저씨! 담배 당장 끄세요!\" 하고 소리친다.", isCorrect: false },
+                    { text: "코와 입을 막고 연기가 오지 않는 먼 곳으로 빠르게 자리를 피한다.", isCorrect: true }
+                ],
+                feedback: "가장 좋은 방법은 위험을 피하는 거예요. 코와 입을 가리고 그 자리를 벗어나는 것이 가장 안전하고 현명한 대처법입니다."
+            },
+            {
+                situation: "놀이터에서 친구들과 놀고 있는데, 누군가 버리고 간 담배꽁초가 미끄럼틀 옆에 있어요.",
+                options: [
+                    { text: "손으로 만지지 않고 피해서 놀거나, 어른에게 치워달라고 부탁한다.", isCorrect: true },
+                    { text: "나뭇가지로 콕콕 찔러보며 장난감처럼 가지고 논다.", isCorrect: false }
+                ],
+                feedback: "담배꽁초에는 아주 무서운 독성 물질이 묻어있어요. 절대 만지면 안 돼요!"
+            }
+        ];
+
+        // 몬스터 도감 데이터
+        const MONSTERS = [
+            { level: 1, name: "투명한 알", emoji: "🥚", description: "아직 태어나지 않은 공기 방울 알이에요.", requiredAir: 0 },
+            { level: 2, name: "새싹 몬스터", emoji: "🌱", description: "맑은 공기를 먹고 귀여운 새싹이 되었어요!", requiredAir: 100 },
+            { level: 3, name: "튼튼 구름이", emoji: "☁️", description: "폐활량이 커져서 튼튼한 구름 몬스터로 자랐어요!", requiredAir: 300 },
+            { level: 4, name: "맑은 공기 수호신", emoji: "🐉", description: "간접흡연으로부터 친구들을 지켜주는 전설의 수호신!", requiredAir: 600 }
+        ];
+
+        function Home({ setView }) {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+                    <div className="text-6xl mb-6 monster-bounce">🌬️🐉</div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-teal-600 mb-4 drop-shadow-md">
+                        폐활량 팡팡!<br/>몬스터 키우기
+                    </h1>
+                    <p className="text-xl text-gray-700 mb-8">
+                        간접흡연을 예방하고 맑은 공기를 모아<br/>나만의 수호신을 진화시켜요!
+                    </p>
+                    <button 
+                        onClick={() => setView('dashboard')}
+                        className="bg-teal-500 hover:bg-teal-600 text-white text-2xl font-bold py-4 px-10 rounded-full shadow-lg transform transition active:scale-95"
+                    >
+                        시작하기!
+                    </button>
+                </div>
+            );
+        }
+
+        function Dashboard({ setView, airPoints, currentLevel, nextLevel, progress }) {
+            return (
+                <div className="flex flex-col min-h-screen p-4 max-w-lg mx-auto w-full">
+                    <header className="flex justify-between items-center mb-6 p-4 bg-white rounded-2xl shadow">
+                        <div>
+                            <p className="text-gray-500 text-sm">보유한 맑은 공기</p>
+                            <p className="text-2xl font-bold text-blue-500">🫧 {airPoints} 방울</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-teal-600 font-bold">Lv.{currentLevel.level} {currentLevel.name}</p>
+                        </div>
+                    </header>
+
+                    {/* 몬스터 디스플레이 */}
+                    <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-3xl shadow-md p-6 mb-6">
+                        <div className="text-9xl mb-4 monster-bounce filter drop-shadow-xl">
+                            {currentLevel.emoji}
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{currentLevel.name}</h2>
+                        <p className="text-gray-600 text-center mb-6">{currentLevel.description}</p>
+                        
+                        {/* 경험치 바 */}
+                        <div className="w-full">
+                            <div className="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>진화도</span>
+                                <span>{nextLevel ? `${airPoints} / ${nextLevel.requiredAir}` : 'MAX'}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                                <div 
+                                    className="bg-gradient-to-r from-teal-400 to-blue-500 h-4 rounded-full progress-bar-transition"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 활동 메뉴 */}
+                    <div className="grid grid-cols-1 gap-4 mb-4">
+                        <button onClick={() => setView('quiz')} className="bg-orange-100 hover:bg-orange-200 border-2 border-orange-300 p-4 rounded-2xl flex items-center shadow-sm transition active:scale-95">
+                            <div className="text-4xl mr-4">🤔</div>
+                            <div className="text-left">
+                                <h3 className="text-xl font-bold text-orange-700">도전! OX 퀴즈</h3>
+                                <p className="text-gray-600 text-sm">간접흡연 지식을 뽐내고 방울을 모아요!</p>
+                            </div>
+                        </button>
+                        
+                        <button onClick={() => setView('game')} className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 p-4 rounded-2xl flex items-center shadow-sm transition active:scale-95">
+                            <div className="text-4xl mr-4">🧺</div>
+                            <div className="text-left">
+                                <h3 className="text-xl font-bold text-blue-700">맑은 공기 캐치!</h3>
+                                <p className="text-gray-600 text-sm">담배 연기를 피해 맑은 공기를 모아요!</p>
+                            </div>
+                        </button>
+
+                        <button onClick={() => setView('scenario')} className="bg-purple-100 hover:bg-purple-200 border-2 border-purple-300 p-4 rounded-2xl flex items-center shadow-sm transition active:scale-95">
+                            <div className="text-4xl mr-4">🛡️</div>
+                            <div className="text-left">
+                                <h3 className="text-xl font-bold text-purple-700">간접흡연 방어막</h3>
+                                <p className="text-gray-600 text-sm">위험한 상황에서 올바르게 대처해봐요!</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function Quiz({ setView, addPoints }) {
+            const [qIndex, setQIndex] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [isFinished, setIsFinished] = useState(false);
+
+            const playCorrectSound = async () => {
+                await Tone.start();
+                const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            };
+
+            const playWrongSound = async () => {
+                await Tone.start();
+                const synth = new Tone.Synth().toDestination();
+                synth.triggerAttackRelease("C3", "8n");
+            };
+
+            const handleAnswer = (answer) => {
+                const correct = QUIZ_DATA[qIndex].answer === answer;
+                setIsCorrect(correct);
+                setShowResult(true);
+                
+                if (correct) {
+                    addPoints(20); // 정답 시 20포인트
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        zIndex: 1000,
+                        colors: ['#2dd4bf', '#3b82f6', '#fcd34d']
+                    });
+                    playCorrectSound();
+                } else {
+                    playWrongSound();
+                }
+            };
+
+            const nextQuestion = () => {
+                if (qIndex < QUIZ_DATA.length - 1) {
+                    setQIndex(qIndex + 1);
+                    setShowResult(false);
+                } else {
+                    setIsFinished(true);
+                }
+            };
+
+            if (isFinished) {
+                return (
+                    <div className="flex flex-col min-h-screen p-6 max-w-lg mx-auto w-full bg-orange-50">
+                        <div className="bg-white rounded-3xl shadow-lg p-8 flex-1 flex flex-col justify-center text-center my-6">
+                            <div className="text-6xl mb-4 monster-bounce">🎓</div>
+                            <h2 className="text-3xl font-bold text-orange-600 mb-6">퀴즈 완료! 참 잘했어요!</h2>
+                            
+                            <div className="text-left bg-orange-50 p-6 rounded-2xl mb-8 space-y-4 shadow-inner">
+                                <h3 className="font-bold text-gray-800 text-xl border-b-2 border-orange-200 pb-2 mb-4">💡 우리가 배운 내용</h3>
+                                <ul className="text-gray-700 space-y-4 font-medium text-lg">
+                                    <li className="flex items-start"><span className="mr-2">❌</span> <span><b className="text-red-500">간접흡연</b>: 남이 피우는 연기를 맡는 것도 해로워요.</span></li>
+                                    <li className="flex items-start"><span className="mr-2">👕</span> <span><b className="text-purple-500">3차 흡연</b>: 옷이나 머리에 묻은 냄새도 위험해요.</span></li>
+                                    <li className="flex items-start"><span className="mr-2">🧒</span> <span><b className="text-blue-500">어린이</b>는 어른보다 담배 연기에 훨씬 약해요.</span></li>
+                                    <li className="flex items-start"><span className="mr-2">🚭</span> <span><b className="text-teal-600">전자담배</b>도 똑같이 나쁜 독성 물질을 뿜어내요.</span></li>
+                                </ul>
+                            </div>
+                            
+                            <button onClick={() => setView('dashboard')} className="bg-orange-500 hover:bg-orange-600 text-white text-xl font-bold py-4 px-8 rounded-full shadow-lg transform transition active:scale-95">
+                                대시보드로 돌아가기
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex flex-col min-h-screen p-6 max-w-lg mx-auto w-full bg-orange-50">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-2xl font-bold text-orange-600">도전! OX 퀴즈</h2>
+                        <button onClick={() => setView('dashboard')} className="text-gray-500 font-bold bg-white px-3 py-1 rounded-lg shadow">돌아가기</button>
+                    </div>
+                    
+                    <div className="bg-white rounded-3xl shadow-lg p-8 flex-1 flex flex-col justify-center text-center relative">
+                        <div className="absolute top-4 right-4 text-gray-400">{qIndex + 1} / {QUIZ_DATA.length}</div>
+                        
+                        {!showResult ? (
+                            <>
+                                <h3 className="text-2xl text-gray-800 mb-10 leading-relaxed">
+                                    Q. {QUIZ_DATA[qIndex].question}
+                                </h3>
+                                <div className="flex justify-center gap-6">
+                                    <button onClick={() => handleAnswer(true)} className="w-32 h-32 bg-blue-100 hover:bg-blue-200 border-4 border-blue-400 rounded-2xl text-6xl text-blue-500 font-bold transform transition active:scale-90 shadow-md">O</button>
+                                    <button onClick={() => handleAnswer(false)} className="w-32 h-32 bg-red-100 hover:bg-red-200 border-4 border-red-400 rounded-2xl text-6xl text-red-500 font-bold transform transition active:scale-90 shadow-md">X</button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="animate-[pulse_0.5s_ease-in-out]">
+                                <div className="text-6xl mb-4">{isCorrect ? '🎉' : '😅'}</div>
+                                <h3 className={`text-3xl font-bold mb-4 ${isCorrect ? 'text-blue-500' : 'text-red-500'}`}>
+                                    {isCorrect ? '정답입니다!' : '아쉬워요!'}
+                                </h3>
+                                {isCorrect && <p className="text-lg text-teal-600 font-bold mb-4">🫧 맑은 공기 +20 획득!</p>}
+                                <p className="text-xl text-gray-700 bg-gray-100 p-4 rounded-xl mb-8">
+                                    {QUIZ_DATA[qIndex].explanation}
+                                </p>
+                                <button onClick={nextQuestion} className="bg-orange-500 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg">
+                                    {qIndex < QUIZ_DATA.length - 1 ? '다음 문제' : '완료하기'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function Game({ setView, addPoints }) {
+            const [gameState, setGameState] = useState('ready'); // ready, playing, result
+            const [timeLeft, setTimeLeft] = useState(15);
+            const [score, setScore] = useState(0);
+            const canvasRef = useRef(null);
+            
+            const gameData = useRef({
+                playerX: 150,
+                items: [],
+                lastSpawn: 0
+            });
+
+            useEffect(() => {
+                let timer;
+                if (gameState === 'playing' && timeLeft > 0) {
+                    timer = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+                } else if (gameState === 'playing' && timeLeft === 0) {
+                    setGameState('result');
+                    const earned = Math.max(0, score) * 2;
+                    addPoints(earned);
+                }
+                return () => clearTimeout(timer);
+            }, [gameState, timeLeft, score, addPoints]);
+
+            useEffect(() => {
+                if (gameState !== 'playing') return;
+
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                
+                // 해상도를 부모 요소 크기에 맞춰 선명하게 렌더링
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                gameData.current.playerX = canvas.width / 2;
+
+                const ctx = canvas.getContext('2d');
+                let animationFrameId;
+
+                const render = (time) => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 아이템 생성 (담배 연기 35%, 맑은 공기 65%)
+                    if (time - gameData.current.lastSpawn > 400) {
+                        const isSmoke = Math.random() > 0.65; 
+                        gameData.current.items.push({
+                            x: Math.random() * (canvas.width - 40) + 20,
+                            y: -20,
+                            speed: Math.random() * 3 + 2.5, // 떨어지는 속도
+                            type: isSmoke ? 'smoke' : 'air'
+                        });
+                        gameData.current.lastSpawn = time;
+                    }
+
+                    // 플레이어(바구니) 그리기
+                    ctx.font = '45px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const playerY = canvas.height - 40;
+                    ctx.fillText('🧺', gameData.current.playerX, playerY);
+
+                    // 아이템 위치 업데이트 및 그리기
+                    for (let i = gameData.current.items.length - 1; i >= 0; i--) {
+                        const item = gameData.current.items[i];
+                        item.y += item.speed;
+
+                        ctx.font = '35px Arial';
+                        ctx.fillText(item.type === 'smoke' ? '💨' : '🫧', item.x, item.y);
+
+                        // 충돌 판정
+                        const dx = Math.abs(item.x - gameData.current.playerX);
+                        const dy = Math.abs(item.y - playerY);
+                        
+                        if (dx < 40 && dy < 40) {
+                            if (item.type === 'smoke') {
+                                setScore(s => Math.max(0, s - 2)); // 연기를 마시면 감점
+                            } else {
+                                setScore(s => s + 1); // 맑은 공기 획득
+                            }
+                            gameData.current.items.splice(i, 1);
+                        }
+                        // 화면 밖으로 나가면 삭제
+                        else if (item.y > canvas.height + 40) {
+                            gameData.current.items.splice(i, 1);
+                        }
+                    }
+
+                    animationFrameId = requestAnimationFrame(render);
+                };
+
+                animationFrameId = requestAnimationFrame(render);
+                return () => cancelAnimationFrame(animationFrameId);
+            }, [gameState]);
+
+            const startGame = () => {
+                setGameState('playing');
+                setTimeLeft(15); // 게임 시간 15초
+                setScore(0);
+                gameData.current.items = [];
+                gameData.current.lastSpawn = performance.now();
+            };
+
+            const handlePointerMove = (e) => {
+                if (gameState !== 'playing' || !canvasRef.current) return;
+                
+                const rect = canvasRef.current.getBoundingClientRect();
+                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let x = clientX - rect.left;
+                
+                // 화면 밖으로 바구니가 나가지 않도록 제한
+                x = Math.max(25, Math.min(x, canvasRef.current.width - 25));
+                gameData.current.playerX = x;
+            };
+
+            return (
+                <div className="flex flex-col min-h-screen p-6 max-w-lg mx-auto w-full bg-blue-50 overflow-hidden">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-blue-600">맑은 공기 캐치!</h2>
+                        <button onClick={() => setView('dashboard')} className="text-gray-500 font-bold bg-white px-3 py-1 rounded-lg shadow">돌아가기</button>
+                    </div>
+
+                    <div className="bg-white rounded-3xl shadow-lg p-4 flex-1 flex flex-col items-center justify-between w-full">
+                        {gameState === 'ready' && (
+                            <div className="text-center flex-1 flex flex-col justify-center">
+                                <div className="text-7xl mb-6 monster-bounce">🧺</div>
+                                <h3 className="text-2xl font-bold mb-4">공기 방울을 모아라!</h3>
+                                <p className="text-lg text-gray-600 mb-2">화면을 문질러 바구니를 움직여요!</p>
+                                <p className="text-md text-teal-600 font-bold mb-1">🫧 맑은 공기 : +1점</p>
+                                <p className="text-md text-red-500 font-bold mb-8">💨 담배 연기 : -2점 (조심!)</p>
+                                <button onClick={startGame} className="bg-blue-500 text-white text-2xl font-bold py-4 px-10 rounded-full shadow-lg pulse-fast">
+                                    게임 시작!
+                                </button>
+                            </div>
+                        )}
+
+                        {gameState === 'playing' && (
+                            <div className="flex-1 flex flex-col w-full h-full min-h-[350px]">
+                                <div className="flex justify-between w-full px-2 mb-2">
+                                    <div className="text-xl font-bold text-red-500">남은 시간: {timeLeft}초</div>
+                                    <div className="text-xl font-bold text-blue-600">점수: {score}</div>
+                                </div>
+                                
+                                <div className="flex-1 w-full bg-gradient-to-b from-blue-100 to-blue-50 rounded-2xl overflow-hidden relative touch-none border-4 border-blue-200">
+                                    <canvas 
+                                        ref={canvasRef}
+                                        className="w-full h-full block cursor-pointer touch-none"
+                                        onTouchMove={handlePointerMove}
+                                        onMouseMove={handlePointerMove}
+                                    />
+                                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10">
+                                        <div className="text-9xl filter blur-sm">🌬️</div>
+                                    </div>
+                                </div>
+                                <p className="text-center text-sm text-gray-500 mt-3 animate-pulse">좌우로 드래그해서 바구니를 움직이세요!</p>
+                            </div>
+                        )}
+
+                        {gameState === 'result' && (
+                            <div className="text-center flex-1 flex flex-col justify-center w-full animate-[bounce_0.5s_ease-out]">
+                                <div className="text-7xl mb-6">✨</div>
+                                <h3 className="text-3xl font-bold text-blue-600 mb-2">수집 완료!</h3>
+                                <p className="text-xl mb-4">내 기록: {score} 점</p>
+                                <div className="bg-teal-100 border-2 border-teal-300 rounded-2xl p-4 mb-8 text-teal-800 font-bold text-xl">
+                                    🫧 맑은 공기 +{Math.max(0, score) * 2} 획득!
+                                </div>
+                                <button onClick={() => setView('dashboard')} className="bg-blue-500 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg">
+                                    돌아가기
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function Scenario({ setView, addPoints }) {
+            const [sIndex, setSIndex] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [isCorrect, setIsCorrect] = useState(false);
+
+            const playCorrectSound = async () => {
+                await Tone.start();
+                const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            };
+
+            const playWrongSound = async () => {
+                await Tone.start();
+                const synth = new Tone.Synth().toDestination();
+                synth.triggerAttackRelease("C3", "8n");
+            };
+
+            const handleChoice = (correct) => {
+                setIsCorrect(correct);
+                setShowResult(true);
+                
+                if (correct) {
+                    addPoints(30); // 올바른 대처 시 30포인트
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        zIndex: 1000,
+                        colors: ['#a855f7', '#2dd4bf', '#fcd34d']
+                    });
+                    playCorrectSound();
+                } else {
+                    playWrongSound();
+                }
+            };
+
+            const nextScenario = () => {
+                if (sIndex < SCENARIO_DATA.length - 1) {
+                    setSIndex(sIndex + 1);
+                    setShowResult(false);
+                } else {
+                    setView('dashboard');
+                }
+            };
+
+            return (
+                <div className="flex flex-col min-h-screen p-6 max-w-lg mx-auto w-full bg-purple-50">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-purple-600">방어막 훈련</h2>
+                        <button onClick={() => setView('dashboard')} className="text-gray-500 font-bold bg-white px-3 py-1 rounded-lg shadow">돌아가기</button>
+                    </div>
+                    
+                    <div className="bg-white rounded-3xl shadow-lg p-6 flex-1 flex flex-col">
+                        {!showResult ? (
+                            <div className="flex-1 flex flex-col">
+                                <div className="bg-gray-100 p-6 rounded-2xl mb-6 relative">
+                                    <div className="absolute -top-4 -left-2 text-4xl">🚨</div>
+                                    <h3 className="text-xl text-gray-800 leading-relaxed font-bold mt-2">
+                                        {SCENARIO_DATA[sIndex].situation}
+                                    </h3>
+                                </div>
+                                
+                                <div className="flex-1 flex flex-col gap-4 justify-center">
+                                    {SCENARIO_DATA[sIndex].options.map((opt, i) => (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => handleChoice(opt.isCorrect)}
+                                            className="bg-purple-100 hover:bg-purple-200 border-2 border-purple-300 rounded-xl p-4 text-left text-lg font-medium text-purple-900 transition active:scale-95 shadow-sm"
+                                        >
+                                            {i + 1}. {opt.text}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col justify-center text-center animate-[pulse_0.3s_ease-in]">
+                                <div className="text-6xl mb-4">{isCorrect ? '🛡️' : '⚠️'}</div>
+                                <h3 className={`text-3xl font-bold mb-4 ${isCorrect ? 'text-teal-500' : 'text-red-500'}`}>
+                                    {isCorrect ? '훌륭한 대처예요!' : '앗, 위험해요!'}
+                                </h3>
+                                {isCorrect && <p className="text-lg text-teal-600 font-bold mb-4">🫧 맑은 공기 +30 획득!</p>}
+                                <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl mb-8 text-lg text-gray-700 leading-relaxed text-left">
+                                    <span className="font-bold block mb-2 text-purple-600">해설:</span>
+                                    {SCENARIO_DATA[sIndex].feedback}
+                                </div>
+                                <button onClick={nextScenario} className="bg-purple-500 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg">
+                                    {sIndex < SCENARIO_DATA.length - 1 ? '다음 상황 훈련' : '훈련 완료'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            // 화면 상태: 'home', 'dashboard', 'quiz', 'game', 'scenario'
+            const [view, setView] = useState('home');
+            const [airPoints, setAirPoints] = useState(0);
+            
+            // 몬스터 레벨 계산
+            const currentLevel = MONSTERS.slice().reverse().find(m => airPoints >= m.requiredAir) || MONSTERS[0];
+            const nextLevel = MONSTERS.find(m => m.requiredAir > airPoints);
+            const progress = nextLevel ? ((airPoints - currentLevel.requiredAir) / (nextLevel.requiredAir - currentLevel.requiredAir)) * 100 : 100;
+
+            // 맑은 공기 포인트 획득 효과
+            const addPoints = (points) => {
+                setAirPoints(prev => prev + points);
+            };
+
+            // 컴포넌트 렌더링 라우터 역할
+            switch(view) {
+                case 'home': return <Home setView={setView} />;
+                case 'dashboard': 
+                    return <Dashboard 
+                                setView={setView} 
+                                airPoints={airPoints} 
+                                currentLevel={currentLevel} 
+                                nextLevel={nextLevel} 
+                                progress={progress} 
+                           />;
+                case 'quiz': return <Quiz setView={setView} addPoints={addPoints} />;
+                case 'game': return <Game setView={setView} addPoints={addPoints} />;
+                case 'scenario': return <Scenario setView={setView} addPoints={addPoints} />;
+                default: return <Home setView={setView} />;
+            }
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
