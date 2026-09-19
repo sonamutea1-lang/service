@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>경계 수호대: 서로의 선을 지켜요! | 초등 5학년 보건교육</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Prettiest readable rounded font for Korean elementary students -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Jua&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-jua {
+      font-family: 'Jua', sans-serif;
+    }
+    .font-gaegu {
+      font-family: 'Gaegu', cursive;
+    }
+    /* Custom bounce & glow animations */
+    @keyframes pulse-subtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2.5s infinite ease-in-out;
+    }
+    .body-part-zone {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .body-part-zone:hover {
+      filter: brightness(0.92);
+      transform: scale(1.05);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-sky-50 to-indigo-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Fullscreen celebration confetti canvas (native & safe inside iframe) -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+  <!-- Top App Navigation -->
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-amber-200/70 shadow-sm px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-md text-2xl transform rotate-3">
+          🛡️
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded-full">초등 5학년 보건 4단원</span>
+            <span class="text-xs text-slate-500 hidden sm:inline">존중하고 배려하는 성</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-jua text-slate-800 tracking-wide flex items-center gap-1.5">
+            경계 수호대 <span class="text-indigo-600 text-sm sm:text-base font-bold font-sans">:: 서로의 선을 지켜요!</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Sound Toggle & Student Name Badge -->
+      <div class="flex items-center space-x-2">
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="효과음 켜기/끄기">
+          <span id="soundIcon">🔊</span>
+        </button>
+        <button onclick="openInfoModal()" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-bold transition flex items-center gap-1">
+          <span>📖 교과서 핵심</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs: Reconfigured to 3 Core Sections -->
+    <div class="max-w-5xl mx-auto mt-3 flex gap-2 overflow-x-auto pb-1 text-sm font-bold no-scrollbar">
+      <button onclick="switchTab('tab1')" id="nav-tab1" class="tab-btn flex-1 min-w-[140px] py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition bg-indigo-600 text-white shadow-md">
+        <span>🔍</span> 1. 경계 탐정 레이더
+      </button>
+      <button onclick="switchTab('tab2')" id="nav-tab2" class="tab-btn flex-1 min-w-[140px] py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition bg-white hover:bg-indigo-50 text-slate-600 border border-slate-200">
+        <span>💬</span> 2. 존·동·인 퀘스트
+      </button>
+      <button onclick="switchTab('tab3')" id="nav-tab3" class="tab-btn flex-1 min-w-[140px] py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition bg-white hover:bg-indigo-50 text-slate-600 border border-slate-200">
+        <span>📜</span> 3. 수호대 서약서
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Contents Area -->
+  <main class="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-1">
+
+    <!-- ========================================================
+         TAB 1: [탐정 퀴즈 & 분류] 교실 속 경계 침범 레이더
+         (교과서 86쪽 4대 경계 침범 유형: 신체, 물리, 언어·정서, 시각)
+         ======================================================== -->
+    <section id="content-tab1" class="tab-content block space-y-6">
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 rounded-3xl p-5 sm:p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl">
+          <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">활동 1 : 경계 침범 분별 탐정</span>
+          <h2 class="text-2xl sm:text-3xl font-jua mt-2">교실 속 경계 침범을 찾아라!</h2>
+          <p class="text-emerald-100 text-xs sm:text-sm mt-1 leading-relaxed">
+            일상 속 다양한 사례를 보고 이것이 어떤 경계 침범인지 4가지 카테고리로 분류해 보세요.
+            <br><span class="text-amber-200 font-semibold font-gaegu text-base sm:text-lg">"장난이라도 상대방이 불편하면 경계 침범입니다!"</span>
+          </p>
+        </div>
+        <div class="absolute right-3 bottom-0 opacity-20 sm:opacity-30 text-8xl select-none pointer-events-none">
+          🔍
+        </div>
+      </div>
+
+      <!-- Quiz Interactive Card Container -->
+      <div class="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+        
+        <!-- Progress bar & Score -->
+        <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500">
+          <span id="quizProgressText">문제 1 / 6</span>
+          <div class="flex items-center gap-2">
+            <span>획득 배지: </span>
+            <span id="badgeCounter" class="text-amber-500 font-extrabold text-base">0개 🏅</span>
+          </div>
+        </div>
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+          <div id="quizProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-300 w-1/6"></div>
+        </div>
+
+        <!-- Current Question Scenario Box -->
+        <div id="quizCard" class="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200 text-center space-y-4">
+          <div class="text-5xl sm:text-6xl animate-bounce-subtle" id="qEmoji">
+            🎒
+          </div>
+          <div class="max-w-xl mx-auto">
+            <span id="qTag" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">사례 탐색</span>
+            <h3 id="qSituation" class="text-lg sm:text-2xl font-jua text-slate-800 mt-2">
+              "야! 이 샤프 예쁜데? 내가 잠깐 쓸게~" 하고 친구 허락도 없이 필통을 뒤져 가져갔어요.
+            </h3>
+            <p id="qVictimReaction" class="text-xs sm:text-sm text-rose-500 font-medium mt-2">
+              🥺 짝꿍: "어... 나 지금 수학 문제 풀어야 하는데 왜 마음대로 가져가지...?"
+            </p>
+          </div>
+        </div>
+
+        <!-- 4 Boundary Types Option Buttons -->
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-slate-500 text-center mb-3">
+            👇 이 행동은 어떤 경계를 침범한 것일까요? (하나를 골라보세요)
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+            
+            <button onclick="handleAnswer('physical')" class="quiz-ans-btn p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                🤝
+              </div>
+              <div>
+                <strong class="text-sm sm:text-base text-slate-800 block">1. 신체적 경계 침범</strong>
+                <span class="text-xs text-slate-500">몸 치기, 억지로 잡기, 간지럽히기</span>
+              </div>
+            </button>
+
+            <button onclick="handleAnswer('material')" class="quiz-ans-btn p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                ✏️
+              </div>
+              <div>
+                <strong class="text-sm sm:text-base text-slate-800 block">2. 물리적 경계 침범</strong>
+                <span class="text-xs text-slate-500">허락 없이 물건 쓰기, 자리 침범</span>
+              </div>
+            </button>
+
+            <button onclick="handleAnswer('verbal')" class="quiz-ans-btn p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                💬
+              </div>
+              <div>
+                <strong class="text-sm sm:text-base text-slate-800 block">3. 언어·정서적 경계 침범</strong>
+                <span class="text-xs text-slate-500">사생활 캐묻기, 비꼬기, 뒷담화</span>
+              </div>
+            </button>
+
+            <button onclick="handleAnswer('visual')" class="quiz-ans-btn p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-left transition flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                👀
+              </div>
+              <div>
+                <strong class="text-sm sm:text-base text-slate-800 block">4. 시각적 경계 침범</strong>
+                <span class="text-xs text-slate-500">옷 갈아입는 것 엿보기, 불쾌한 영상 보여주기</span>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Dynamic Feedback Panel (Hidden until answered) -->
+        <div id="feedbackPanel" class="hidden rounded-2xl p-5 transition-all text-center space-y-3">
+          <div id="feedbackTitle" class="text-xl font-jua"></div>
+          <p id="feedbackDesc" class="text-sm leading-relaxed max-w-xl mx-auto"></p>
+          <button id="nextQuestionBtn" onclick="goToNextQuestion()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition">
+            다음 탐정 미션으로 ➡️
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         TAB 2: [상황별 실천 시뮬레이션] "존·동·인" 퀘스트
+         (교과서 87쪽 3가지 약속, 88~89쪽 실천 연습)
+         ======================================================== -->
+    <section id="content-tab2" class="tab-content hidden space-y-6">
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-purple-500 via-indigo-600 to-pink-500 rounded-3xl p-5 sm:p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl">
+          <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">활동 2 : 경계 존중 3대 원칙 실천</span>
+          <h2 class="text-2xl sm:text-3xl font-jua mt-2">존·동·인 실천 퀘스트!</h2>
+          <p class="text-purple-100 text-xs sm:text-sm mt-1 leading-relaxed">
+            <strong class="text-amber-200">존</strong>중(침범X) - <strong class="text-amber-200">동</strong>의(먼저 묻기) - <strong class="text-amber-200">인</strong>정(거절 수용하기)!
+            실제 대화 상황에서 어떻게 말하고 행동해야 할지 지혜로운 선택을 해보세요.
+          </p>
+        </div>
+        <div class="absolute right-3 bottom-0 opacity-20 sm:opacity-30 text-8xl select-none pointer-events-none">
+          🎭
+        </div>
+      </div>
+
+      <!-- 3 Promises Legend Card (Textbook p.87) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-white p-4 rounded-2xl border-l-4 border-emerald-500 shadow-sm">
+          <div class="text-xs font-bold text-emerald-600 uppercase">약속 1</div>
+          <div class="text-base font-jua text-slate-800 mt-0.5">존중 (함부로 침범X)</div>
+          <p class="text-xs text-slate-500 mt-1">다른 사람의 경계를 함부로 넘지 않아요.</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border-l-4 border-blue-500 shadow-sm">
+          <div class="text-xs font-bold text-blue-600 uppercase">약속 2</div>
+          <div class="text-base font-jua text-slate-800 mt-0.5">동의 (먼저 물어보기)</div>
+          <p class="text-xs text-slate-500 mt-1">행동하기 전 상대방의 생각을 꼭 물어봐요.</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border-l-4 border-pink-500 shadow-sm">
+          <div class="text-xs font-bold text-pink-600 uppercase">약속 3</div>
+          <div class="text-base font-jua text-slate-800 mt-0.5">인정 (거절 수용하기)</div>
+          <p class="text-xs text-slate-500 mt-1">상대가 거절해도 떼쓰지 않고 인정해요.</p>
+        </div>
+      </div>
+
+      <!-- Interactive Webtoon Dialogue Stage -->
+      <div class="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+        
+        <!-- Quest Stage Navigator -->
+        <div class="flex items-center justify-between border-b pb-3 text-xs sm:text-sm font-bold">
+          <div class="flex gap-2">
+            <button onclick="loadQuestStage(0)" id="quest-stage-btn-0" class="px-3 py-1.5 rounded-xl bg-purple-600 text-white">
+              퀘스트 1: 동의 구하기
+            </button>
+            <button onclick="loadQuestStage(1)" id="quest-stage-btn-1" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600">
+              퀘스트 2: 당당하게 거절하기
+            </button>
+            <button onclick="loadQuestStage(2)" id="quest-stage-btn-2" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600">
+              퀘스트 3: 쿨하게 인정하기
+            </button>
+          </div>
+          <span id="questStatusBadge" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full text-xs">진행 중 🎮</span>
+        </div>
+
+        <!-- Dialogue Webtoon Visual Box -->
+        <div class="bg-slate-50 rounded-2xl p-4 sm:p-6 border border-slate-200 space-y-4">
+          <div class="text-xs font-bold text-purple-700 bg-purple-100 inline-block px-2.5 py-0.5 rounded-md" id="questContextTag">
+            상황 1 (교과서 89쪽 연계): 친구의 손을 잡거나 이끌고 싶을 때
+          </div>
+
+          <!-- Characters dialogue bubble view -->
+          <div class="space-y-4 py-2" id="dialogueChatBox">
+            <!-- Dynamic character chat elements inserted by JS -->
+          </div>
+        </div>
+
+        <!-- Choices Section -->
+        <div class="space-y-3">
+          <h4 class="text-xs sm:text-sm font-bold text-slate-600 flex items-center gap-1.5">
+            <span>✨</span> 당신이라면 어떻게 말하고 행동할까요?
+          </h4>
+          <div id="questChoicesBox" class="grid grid-cols-1 gap-2.5">
+            <!-- Dynamic choices inserted by JS -->
+          </div>
+        </div>
+
+        <!-- Practice Saying Aloud (교과서 88쪽 말하기 연습) -->
+        <div id="sayAloudCard" class="hidden bg-indigo-50 border border-indigo-200 rounded-2xl p-4 sm:p-5 text-center space-y-2">
+          <div class="text-xs font-bold text-indigo-600 uppercase">🗣️ 직접 입으로 소리 내어 말해보기!</div>
+          <div id="sayAloudSentence" class="text-lg sm:text-xl font-jua text-indigo-900">
+            "저쪽에 가서 같이 축구할래?"
+          </div>
+          <p class="text-xs text-slate-500">머리로 아는 것보다 직접 소리 내어 말할 때 실천하는 용기가 자라나요.</p>
+          <button onclick="simulateVoiceRecord()" id="voiceRecordBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center gap-2 mx-auto">
+            <span>🎤</span> 큰 소리로 읽었어요! (도장 쾅!)
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         TAB 3: [나의 수호대 서약서] 스스로 다짐 카드 & 임명장
+         (교과서 89쪽 '스스로 다짐하기' 연계)
+         ======================================================== -->
+    <section id="content-tab3" class="tab-content hidden space-y-6">
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-3xl p-5 sm:p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl">
+          <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">활동 3 : 스스로 다짐하기</span>
+          <h2 class="text-2xl sm:text-3xl font-jua mt-2">나만의 경계 지킴이 서약서</h2>
+          <p class="text-amber-100 text-xs sm:text-sm mt-1 leading-relaxed">
+            나와 다른 사람의 경계를 존중하기 위한 실천 다짐을 적고, 멋진 [경계 수호대 임명장]을 완성해 보세요.
+          </p>
+        </div>
+        <div class="absolute right-3 bottom-0 opacity-20 sm:opacity-30 text-8xl select-none pointer-events-none">
+          📜
+        </div>
+      </div>
+
+      <!-- Pledge Generator & Certificate Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Input Form -->
+        <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+          <h3 class="text-base font-jua text-slate-800 flex items-center gap-1.5">
+            <span>✍️</span> 내 정보와 다짐 한마디 적기
+          </h3>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">임명장 제목</label>
+            <input type="text" id="inputCertTitle" value="경계 수호대 임명장" oninput="updateCertificate(false)" class="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-slate-800" placeholder="예: 경계 수호대 임명장">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">수여 일자 (교육 실행 날짜)</label>
+            <div class="flex gap-2">
+              <input type="date" id="inputCertDate" onchange="updateCertificate(false)" class="flex-1 text-xs sm:text-sm p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium text-slate-800">
+              <button onclick="setTodayDate()" type="button" class="px-3 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold rounded-xl transition shrink-0">
+                📅 오늘 날짜
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">원하는 수업 날짜를 지정하거나 오늘 날짜로 쉽게 맞출 수 있습니다.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">우리 학교 & 반</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="inputSchool" value="튼튼초등학교" class="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400">
+              <input type="text" id="inputGradeClass" value="5학년 1반" class="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">수호대원 이름</label>
+            <input type="text" id="inputName" placeholder="예: 김민준" value="홍길동" class="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">추천 실천 다짐 예시 (클릭하면 쏙!)</label>
+            <div class="space-y-1.5">
+              <button onclick="setPledgePreset(1)" class="w-full text-left text-xs p-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 transition">
+                🌟 "친구의 물건을 만질 때는 반드시 먼저 물어보겠습니다."
+              </button>
+              <button onclick="setPledgePreset(2)" class="w-full text-left text-xs p-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 transition">
+                🌟 "친구가 거절할 때 떼쓰지 않고 '알겠어'하고 웃으며 인정하겠습니다."
+              </button>
+              <button onclick="setPledgePreset(3)" class="w-full text-left text-xs p-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-900 transition">
+                🌟 "내 몸과 마음이 불편할 때는 '싫어, 하지 말아 줘'라고 당당히 말하겠습니다."
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">나의 실천 다짐 (직접 쓰기)</label>
+            <textarea id="inputPledge" rows="3" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="교과서 89쪽 예시처럼 나만의 다짐을 작성해 보세요.">나와 친구의 경계를 소중하게 생각하며, 친구의 물건을 함부로 만지지 않고 먼저 동의를 구하겠습니다.</textarea>
+          </div>
+
+          <button onclick="updateCertificate(true)" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+            <span>🎉</span> 서약서 업데이트 & 도장 찍기
+          </button>
+        </div>
+
+        <!-- Certificate Preview Card (Printable) -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div id="certificateCard" class="w-full bg-white rounded-3xl p-6 sm:p-8 border-4 border-amber-300 shadow-xl relative overflow-hidden bg-gradient-to-br from-amber-50/40 via-white to-orange-50/40">
+            <!-- Decorative Gold border in corners -->
+            <div class="absolute top-2 left-2 text-2xl text-amber-300 pointer-events-none">⚜️</div>
+            <div class="absolute top-2 right-2 text-2xl text-amber-300 pointer-events-none">⚜️</div>
+            <div class="absolute bottom-2 left-2 text-2xl text-amber-300 pointer-events-none">⚜️</div>
+            <div class="absolute bottom-2 right-2 text-2xl text-amber-300 pointer-events-none">⚜️</div>
+
+            <!-- Certificate Header -->
+            <div class="text-center space-y-1">
+              <div class="text-xs font-extrabold tracking-widest text-amber-600 uppercase">보건교육 공식 수료증</div>
+              <h3 id="certTitleDisplay" class="text-2xl sm:text-3xl font-jua text-slate-800 tracking-wide">
+                경계 수호대 임명장
+              </h3>
+              <p class="text-xs text-slate-400">제 2026-09호</p>
+            </div>
+
+            <!-- Student Info -->
+            <div class="mt-6 flex justify-between items-center border-b pb-3 text-xs sm:text-sm">
+              <span class="text-slate-600">
+                소속 : <strong id="certSchool" class="text-slate-900">튼튼초등학교</strong> <strong id="certGradeClass" class="text-slate-900">5학년 1반</strong>
+              </span>
+              <span class="text-slate-600">
+                이름 : <strong id="certName" class="text-slate-900 text-base font-jua">홍길동</strong>
+              </span>
+            </div>
+
+            <!-- Content Body -->
+            <div class="mt-5 text-xs sm:text-sm leading-relaxed text-slate-700 space-y-3">
+              <p>
+                위 학생은 서로의 안전과 행복을 지키는 <strong>[경계 존중 보건교육]</strong> 과정을 성실히 이수하였으며, 신체적·물리적·언어적·시각적 경계를 소중히 지키는 <strong>자랑스러운 경계 수호대원</strong>으로 임명합니다.
+              </p>
+
+              <!-- Pledge Box -->
+              <div class="bg-amber-100/60 p-4 rounded-2xl border border-amber-200">
+                <div class="font-bold text-amber-900 text-xs flex items-center gap-1 mb-1">
+                  <span>📌</span> 대원의 실천 다짐:
+                </div>
+                <p id="certPledgeText" class="text-slate-800 font-semibold italic text-xs sm:text-sm">
+                  "나와 친구의 경계를 소중하게 생각하며, 친구의 물건을 함부로 만지지 않고 먼저 동의를 구하겠습니다."
+                </p>
+              </div>
+
+              <!-- 3 Promises badges -->
+              <div class="flex justify-around pt-2 text-[11px] text-slate-600 font-bold">
+                <span class="flex items-center gap-1">✅ 1. 침범 존중</span>
+                <span class="flex items-center gap-1">✅ 2. 먼저 동의</span>
+                <span class="flex items-center gap-1">✅ 3. 거절 인정</span>
+              </div>
+            </div>
+
+            <!-- Footer Seal -->
+            <div class="mt-8 flex items-end justify-between">
+              <div class="text-xs text-slate-400">
+                수여일자: <span id="certDate">2026년 9월 13일</span>
+              </div>
+              
+              <!-- Official Stamp SVG -->
+              <div class="w-16 h-16 rounded-full border-2 border-rose-500 flex flex-col items-center justify-center text-rose-600 transform -rotate-12 bg-rose-50/70 shadow-sm">
+                <span class="text-[9px] font-bold">보건교육</span>
+                <span class="font-jua text-sm">참 잘했어요</span>
+                <span class="text-[8px]">인증</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Actions: Print / Copy / Share -->
+          <div class="w-full mt-4 flex gap-2">
+            <button onclick="window.print()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 shadow">
+              <span>🖨️</span> 임명장 인쇄하기
+            </button>
+            <button onclick="copyPledgeToClipboard()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 shadow">
+              <span>📋</span> 다짐 글 복사하기
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Textbook Info Modal -->
+  <div id="infoModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-pulse-subtle">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-jua text-slate-800 flex items-center gap-2">
+          <span>📖</span> 교과서 85~89쪽 핵심 정리
+        </h3>
+        <button onclick="closeInfoModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs sm:text-sm text-slate-600 max-h-[65vh] overflow-y-auto pr-1">
+        <div class="p-3 bg-blue-50 rounded-xl">
+          <strong class="text-blue-900 font-bold block mb-1">1. 경계란 무엇인가요?</strong>
+          나와 다른 사람의 안전을 위해 지켜야 하는 범위를 의미합니다. 신체적·물리적 경계뿐만 아니라 감정, 언어, 사생활에도 지켜야 할 일정한 거리가 있습니다.
+        </div>
+        <div class="p-3 bg-amber-50 rounded-xl">
+          <strong class="text-amber-900 font-bold block mb-1">2. 경계는 변할 수 있어요!</strong>
+          경계는 고정되어 있지 않고 사람, 장소, 시간, 상황, 내 기분에 따라 달라질 수 있습니다. 어디까지 허락할지는 오직 <strong>'나' 자신</strong>이 결정합니다.
+        </div>
+        <div class="p-3 bg-emerald-50 rounded-xl">
+          <strong class="text-emerald-900 font-bold block mb-1">3. 경계 존중을 위한 3가지 약속</strong>
+          <ul class="list-disc list-inside space-y-0.5 mt-1 text-slate-700">
+            <li><strong>존중</strong>: 다른 사람의 경계를 함부로 침범하지 않아요.</li>
+            <li><strong>동의</strong>: 먼저 상대방의 생각을 물어보고 행동해요.</li>
+            <li><strong>인정</strong>: 상대방이 거절할 경우 떼쓰거나 화내지 않고 인정해요.</li>
+          </ul>
+        </div>
+      </div>
+      <button onclick="closeInfoModal()" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm">
+        확인했어요!
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Alert/Toast Container -->
+  <div id="toastMessage" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/90 text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+    <span id="toastIcon">✨</span>
+    <span id="toastText">메시지가 표시됩니다.</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200/80 py-4 px-4 text-center text-xs text-slate-400">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>초등 보건 5학년 4단원「서로의 경계를 존중해요」(85~89쪽) 디지털 수업 도구</span>
+      <span class="font-semibold text-slate-500">경계 수호대 프로젝트 &copy; 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================
+       BUILT-IN CONFETTI ANIMATION (Zero external dependency & iFrame-safe)
+       ========================================================== */
+    let confettiParticles = [];
+    let confettiAnimationId = null;
+
+    function fireConfetti(count = 50) {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
+      for (let i = 0; i < count; i++) {
+        confettiParticles.push({
+          x: canvas.width * (0.3 + Math.random() * 0.4),
+          y: canvas.height * 0.5,
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 0.8) * 14 - 3,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          opacity: 1
+        });
+      }
+
+      if (!confettiAnimationId) {
+        animateConfetti();
+      }
+    }
+
+    function animateConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = confettiParticles.length - 1; i >= 0; i--) {
+        const p = confettiParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35; // gravity
+        p.rotation += p.rotationSpeed;
+        p.opacity -= 0.012;
+
+        if (p.opacity <= 0 || p.y > canvas.height + 20) {
+          confettiParticles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      }
+
+      if (confettiParticles.length > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+      } else {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confettiCanvas');
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+
+    /* ==========================================================
+       AUDIO SYNTHESIZER (Web Audio API - No external sound files)
+       ========================================================== */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio not supported or blocked");
+      }
+    }
+
+    function playChime(isSuccess = true) {
+      if (!soundEnabled) return;
+      if (isSuccess) {
+        playTone(523.25, 'triangle', 0.1);
+        setTimeout(() => playTone(659.25, 'triangle', 0.1), 100);
+        setTimeout(() => playTone(783.99, 'triangle', 0.25), 200);
+      } else {
+        playTone(350, 'sawtooth', 0.15);
+        setTimeout(() => playTone(280, 'sawtooth', 0.25), 150);
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('soundIcon');
+      icon.innerText = soundEnabled ? '🔊' : '🔇';
+      showToast(soundEnabled ? '효과음이 켜졌습니다.' : '효과음이 꺼졌습니다.', soundEnabled ? '🔊' : '🔇');
+    }
+
+    /* ==========================================================
+       GLOBAL TAB SWITCHING LOGIC (3 Tabs)
+       ========================================================== */
+    function switchTab(tabId) {
+      playTone(600, 'sine', 0.08);
+      // Update Tab Buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+      });
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+        activeBtn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+      }
+
+      // Hide all contents & show target
+      document.querySelectorAll('.tab-content').forEach(section => {
+        section.classList.add('hidden');
+      });
+      const targetContent = document.getElementById('content-' + tabId);
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ==========================================================
+       TOAST HELPER
+       ========================================================== */
+    let toastTimeout;
+    function showToast(text, icon = '💡') {
+      const toast = document.getElementById('toastMessage');
+      document.getElementById('toastText').innerText = text;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2400);
+    }
+
+    /* ==========================================================
+       TAB 1: RADAR QUIZ LOGIC (교과서 86쪽 4대 경계 침범)
+       ========================================================== */
+    const quizQuestions = [
+      {
+        emoji: '🎒',
+        tag: '사례 1 (교과서 86쪽)',
+        situation: '"야! 이 샤프 예쁜데? 내가 잠깐 쓸게~" 하고 친구 허락도 없이 필통을 뒤져 가져갔어요.',
+        reaction: '🥺 짝꿍: "어... 나 지금 수학 문제 풀어야 하는데 왜 마음대로 가져가지...?"',
+        correctType: 'material',
+        explanation: '정답입니다! 친구의 동의 없이 물건을 사용하거나 상대방의 사적 공간을 침범하는 것은 [물리적 경계 침범]입니다.'
+      },
+      {
+        emoji: '🤝',
+        tag: '사례 2 (교과서 86쪽)',
+        situation: '친구가 싫다고 손을 빼는데도 "우리 친하잖아!" 하면서 억지로 팔짱을 끼고 당겼어요.',
+        reaction: '😖 친구: "아... 불편한데 계속 억지로 붙잡네..."',
+        correctType: 'physical',
+        explanation: '정답입니다! 장난이라며 상대방의 몸을 툭 치거나 원치 않는 신체 접촉을 억지로 하는 것은 [신체적 경계 침범]입니다.'
+      },
+      {
+        emoji: '📱',
+        tag: '사례 3 (교과서 86쪽)',
+        situation: '친구가 찡그리며 거부하는데도 인터넷에서 유행하는 이상하고 징그러운 영상을 억지로 보여줬어요.',
+        reaction: '🙈 친구: "나 이런 거 보기 싫다고 몇 번을 말해!"',
+        correctType: 'visual',
+        explanation: '정답입니다! 불편한 동영상이나 사진을 강제로 보여주거나, 남의 옷 갈아입는 모습을 엿보는 행위는 [시각적 경계 침범]입니다.'
+      },
+      {
+        emoji: '🗣️',
+        tag: '사례 4 (교과서 86쪽)',
+        situation: '"너 어제 방과 후에 학원 왜 빠졌어? 부모님이랑 싸웠지?" 라며 꼬치꼬치 사생활을 캐물었어요.',
+        reaction: '😠 친구: "말하기 싫은 개인적인 일인데 왜 자꾸 캐묻는 거야..."',
+        correctType: 'verbal',
+        explanation: '정답입니다! 사생활을 캐묻거나, 소리치기, 욕하기, 비꼬며 의사를 무시하는 행위는 [언어·정서적 경계 침범]입니다.'
+      },
+      {
+        emoji: '📏',
+        tag: '사례 5 (교실 실전)',
+        situation: '쉬는 시간에 짝꿍 책상 위에 내 가방과 겉옷을 가득 올려놓아 짝꿍이 책을 펼치지 못했어요.',
+        reaction: '😓 짝꿍: "내 책상 자리인데 자기 짐만 한가득 올려두면 난 어떡해..."',
+        correctType: 'material',
+        explanation: '정답입니다! 상대방의 책상, 사물함 등 정해진 개인 영역을 허락 없이 침범하는 것은 [물리적 경계 침범]입니다.'
+      },
+      {
+        emoji: '👀',
+        tag: '사례 6 (체육시간)',
+        situation: '체육복을 갈아입는 탈의실 문틈으로 친구가 옷 갈아입는 모습을 몰래 쳐다보았어요.',
+        reaction: '😨 친구: "누가 보고 있는 것 같아서 너무 무섭고 수치스러워..."',
+        correctType: 'visual',
+        explanation: '정답입니다! 다른 사람의 옷 갈아입는 모습이나 신체 일부를 훔쳐보는 행위는 명백한 [시각적 경계 침범]이자 성폭력에 해당할 수 있습니다.'
+      }
+    ];
+
+    let currentQIdx = 0;
+    let earnedBadges = 0;
+
+    function renderCurrentQuestion() {
+      const q = quizQuestions[currentQIdx];
+      document.getElementById('qEmoji').innerText = q.emoji;
+      document.getElementById('qTag').innerText = q.tag;
+      document.getElementById('qSituation').innerText = q.situation;
+      document.getElementById('qVictimReaction').innerText = q.reaction;
+
+      document.getElementById('quizProgressText').innerText = `문제 ${currentQIdx + 1} / ${quizQuestions.length}`;
+      const pct = ((currentQIdx + 1) / quizQuestions.length) * 100;
+      document.getElementById('quizProgressBar').style.width = pct + '%';
+
+      // Reset feedback panel
+      const fb = document.getElementById('feedbackPanel');
+      fb.classList.add('hidden');
+      fb.className = 'hidden rounded-2xl p-5 transition-all text-center space-y-3';
+      
+      // Enable answer buttons
+      document.querySelectorAll('.quiz-ans-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'pointer-events-none');
+      });
+    }
+
+    function handleAnswer(selectedType) {
+      const q = quizQuestions[currentQIdx];
+      const fb = document.getElementById('feedbackPanel');
+      const fbTitle = document.getElementById('feedbackTitle');
+      const fbDesc = document.getElementById('feedbackDesc');
+
+      // Disable buttons
+      document.querySelectorAll('.quiz-ans-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'pointer-events-none');
+      });
+
+      fb.classList.remove('hidden');
+
+      if (selectedType === q.correctType) {
+        playChime(true);
+        earnedBadges++;
+        document.getElementById('badgeCounter').innerText = `${earnedBadges}개 🏅`;
+        fireConfetti(45);
+
+        fb.classList.add('bg-emerald-50', 'border', 'border-emerald-200', 'text-emerald-900');
+        fbTitle.innerHTML = '🎉 훌륭한 탐정의 눈썰미! 정확한 분류입니다!';
+        fbDesc.innerText = q.explanation;
+      } else {
+        playChime(false);
+        fb.classList.add('bg-rose-50', 'border', 'border-rose-200', 'text-rose-900');
+        fbTitle.innerHTML = '🧐 아쉬워요! 다시 한번 생각해 볼까요?';
+        fbDesc.innerText = `이 행동은 상대방의 공간이나 물건, 신체 혹은 마음 중 어떤 영역을 건드렸을까요? ${q.explanation}`;
+      }
+    }
+
+    function goToNextQuestion() {
+      playTone(550, 'sine', 0.08);
+      if (currentQIdx < quizQuestions.length - 1) {
+        currentQIdx++;
+        renderCurrentQuestion();
+      } else {
+        // Quiz completed
+        playChime(true);
+        fireConfetti(80);
+        const fb = document.getElementById('feedbackPanel');
+        fb.innerHTML = `
+          <div class="text-2xl font-jua text-indigo-700">🏆 경계 탐정 레이더 마스터!</div>
+          <p class="text-sm text-slate-600 mt-2">
+            총 ${earnedBadges}개의 탐정 배지를 획득하셨습니다!<br>이제 일상 속에서도 4대 경계를 지키는 멋진 어린이가 될 수 있어요.
+          </p>
+          <button onclick="switchTab('tab2')" class="mt-4 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition">
+            다음: 존·동·인 퀘스트 도전하기 ➡️
+          </button>
+        `;
+      }
+    }
+
+    /* ==========================================================
+       TAB 2: "존·동·인" QUEST LOGIC (교과서 87~89쪽)
+       ========================================================== */
+    const questStages = [
+      {
+        stageTitle: '퀘스트 1 : 동의 구하기 (먼저 물어보기)',
+        tag: '상황 1 (교과서 89쪽 연계): 친구의 손을 잡고 축구하러 가고 싶을 때',
+        dialogue: [
+          { speaker: '나 (친근함 표현)', text: '저기 운동장에 축구하러 가고 싶은데, 친구 손을 잡고 이끌고 싶어!' },
+          { speaker: '속마음 요정', text: '잠깐! 아무리 친근함의 표현이라도 동의 없이 신체를 억지로 접촉하거나 당기면 경계 침범이야!' }
+        ],
+        choices: [
+          {
+            text: '1. "야 축구하자!" 하면서 손목을 홱 잡아끌고 달린다.',
+            isCorrect: false,
+            reaction: '❌ 친구: "아야! 갑자기 왜 이래? 나 지금 숙제해야 하는데..." (신체적 침범!)'
+          },
+          {
+            text: '2. "저쪽에 가서 같이 축구할래? 손잡고 가도 돼?" 먼저 물어본다.',
+            isCorrect: true,
+            reaction: '⭕ 친구: "그래 좋아! 같이 손잡고 가자!" (미리 동의를 구해 서로 기분 좋은 순간!)'
+          }
+        ],
+        saySentence: '"저쪽에 가서 같이 축구할래? 괜찮아?"'
+      },
+      {
+        stageTitle: '퀘스트 2 : 싫다고 말하기 (똑똑한 거절)',
+        tag: '상황 2 (교과서 88쪽 연계): 친구가 내가 싫어하는 별명을 부르거나 신체를 툭툭 칠 때',
+        dialogue: [
+          { speaker: '친구', text: '야~ 뚱뚱이! 멍청이! (내 어깨를 툭툭 치며 장난친다)' },
+          { speaker: '속마음 요정', text: '웃으며 참거나 욕을 하며 때리는 건 올바른 방법이 아니야. 나를 지키는 명확한 거절이 필요해!' }
+        ],
+        choices: [
+          {
+            text: '1. 기분 나쁘지만 분위기 망칠까 봐 어색하게 하하하 웃으며 참는다.',
+            isCorrect: false,
+            reaction: '❌ 친구는 내가 괜찮은 줄 알고 계속해서 놀리고 괴롭히게 됩니다.'
+          },
+          {
+            text: '2. "그 별명과 신체 터치는 불쾌해. 그건 싫어, 하지 말아 줘." 단호하게 말한다.',
+            isCorrect: true,
+            reaction: '⭕ 친구: "어? 너가 그렇게 싫어하는 줄 몰랐어. 미안해, 다음부턴 안 부를게!"'
+          }
+        ],
+        saySentence: '"그건 싫어. 하지 말아 줘."'
+      },
+      {
+        stageTitle: '퀘스트 3 : 거절을 인정하기 (쿨하게 수용)',
+        tag: '상황 3 (교과서 87, 88쪽 연계): 같이 게임하자고 했는데 친구가 거절했을 때',
+        dialogue: [
+          { speaker: '나', text: '민지야! 오늘 쉬는 시간에 나랑 공기놀이 하자!' },
+          { speaker: '민지', text: '미안해, 나 지금 머리가 좀 아파서 조용히 책 읽고 쉬고 싶어...' }
+        ],
+        choices: [
+          {
+            text: '1. "치, 재미없게 왜 그래? 너 나랑 절교할 거야?" 하며 삐치고 화낸다.',
+            isCorrect: false,
+            reaction: '❌ 상대방의 기분과 사정을 무시하고 압박하는 언어·정서적 침범입니다.'
+          },
+          {
+            text: '2. "그렇구나! 푹 쉬어. 다음 쉬는 시간에 컨디션 괜찮으면 같이 놀자!" 인정한다.',
+            isCorrect: true,
+            reaction: '⭕ 민지: "이해해 줘서 정말 고마워! 다음 시간에 꼭 같이 놀자!" (서로의 신뢰 형성)'
+          }
+        ],
+        saySentence: '"알겠어! 몸 편히 쉬어, 다음에 놀자!"'
+      }
+    ];
+
+    let activeStageIdx = 0;
+
+    function loadQuestStage(idx) {
+      activeStageIdx = idx;
+      playTone(580, 'sine', 0.08);
+
+      // Buttons styling
+      [0, 1, 2].forEach(i => {
+        const btn = document.getElementById('quest-stage-btn-' + i);
+        if (i === idx) {
+          btn.className = 'px-3 py-1.5 rounded-xl bg-purple-600 text-white font-bold shadow';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200';
+        }
+      });
+
+      const stage = questStages[idx];
+      document.getElementById('questContextTag').innerText = stage.tag;
+
+      // Render Dialogue
+      const chatBox = document.getElementById('dialogueChatBox');
+      chatBox.innerHTML = '';
+      stage.dialogue.forEach(d => {
+        const item = document.createElement('div');
+        item.className = 'flex items-start gap-2.5';
+        item.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-purple-200 text-purple-800 flex items-center justify-center font-bold text-xs shrink-0">
+            ${d.speaker.includes('요정') ? '🧚' : '👤'}
+          </div>
+          <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-xs sm:text-sm max-w-lg">
+            <strong class="text-purple-900 block text-xs mb-0.5">${d.speaker}</strong>
+            <span class="text-slate-700">${d.text}</span>
+          </div>
+        `;
+        chatBox.appendChild(item);
+      });
+
+      // Render Choices
+      const choicesBox = document.getElementById('questChoicesBox');
+      choicesBox.innerHTML = '';
+      stage.choices.forEach((c, cIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50 text-xs sm:text-sm font-semibold transition';
+        btn.innerText = c.text;
+        btn.onclick = () => handleQuestChoice(c, btn);
+        choicesBox.appendChild(btn);
+      });
+
+      // Reset Say aloud card
+      document.getElementById('sayAloudCard').classList.add('hidden');
+      document.getElementById('sayAloudSentence').innerText = stage.saySentence;
+      document.getElementById('questStatusBadge').innerText = '선택 대기 중 🤔';
+    }
+
+    function handleQuestChoice(choice, btnElement) {
+      if (choice.isCorrect) {
+        playChime(true);
+        fireConfetti(50);
+        btnElement.classList.remove('border-slate-200', 'hover:border-purple-500');
+        btnElement.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+
+        showToast(choice.reaction, '✅');
+        document.getElementById('sayAloudCard').classList.remove('hidden');
+        document.getElementById('questStatusBadge').innerText = '미션 성공! 말하기 단계 🗣️';
+      } else {
+        playChime(false);
+        btnElement.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-900');
+        showToast(choice.reaction, '❌');
+      }
+    }
+
+    function simulateVoiceRecord() {
+      playTone(880, 'triangle', 0.2);
+      fireConfetti(65);
+      showToast('참 잘했어요! 소리 내어 말하는 멋진 실천 도장을 찍었습니다! 💮', '🌟');
+
+      const btn = document.getElementById('voiceRecordBtn');
+      btn.innerHTML = '<span>💮</span> 실천 완료! (도장 쾅)';
+      btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      btn.classList.add('bg-emerald-600', 'text-white', 'pointer-events-none');
+
+      setTimeout(() => {
+        if (activeStageIdx < 2) {
+          loadQuestStage(activeStageIdx + 1);
+        } else {
+          showToast('모든 롤플레잉 퀘스트를 달성했습니다! 서약서를 발급받으세요.', '📜');
+          switchTab('tab3');
+        }
+      }, 1500);
+    }
+
+    /* ==========================================================
+       TAB 3: PLEDGE & CERTIFICATE LOGIC
+       ========================================================== */
+    function setTodayDate() {
+      playTone(600, 'sine', 0.05);
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('inputCertDate').value = `${yyyy}-${mm}-${dd}`;
+      updateCertificate(false);
+      showToast('수여 일자가 오늘 날짜로 설정되었습니다.', '📅');
+    }
+
+    function setPledgePreset(presetNum) {
+      playTone(600, 'sine', 0.05);
+      const textarea = document.getElementById('inputPledge');
+      if (presetNum === 1) {
+        textarea.value = '친구의 물건이나 사물함에 손대기 전에는 반드시 먼저 물어보고 동의를 구하겠습니다.';
+      } else if (presetNum === 2) {
+        textarea.value = '친구가 "싫어"라고 거절할 때 서운해하지 않고 "알겠어"하며 친구의 의사를 존중하겠습니다.';
+      } else if (presetNum === 3) {
+        textarea.value = '내 몸과 마음에 불편한 일이 생기면 참지 않고 당당하게 "그건 싫어, 하지 말아 줘"라고 표현하겠습니다.';
+      }
+      updateCertificate(false);
+    }
+
+    function updateCertificate(triggerCelebration = false) {
+      const certTitle = document.getElementById('inputCertTitle')?.value || '경계 수호대 임명장';
+      const school = document.getElementById('inputSchool').value || '튼튼초등학교';
+      const gradeClass = document.getElementById('inputGradeClass').value || '5학년';
+      const name = document.getElementById('inputName').value || '경계수호대원';
+      const pledge = document.getElementById('inputPledge').value || '나와 타인의 경계를 소중히 지키겠습니다.';
+
+      // Title & Content Update
+      const titleElem = document.getElementById('certTitleDisplay');
+      if (titleElem) titleElem.innerText = certTitle;
+
+      document.getElementById('certSchool').innerText = school;
+      document.getElementById('certGradeClass').innerText = gradeClass;
+      document.getElementById('certName').innerText = name;
+      document.getElementById('certPledgeText').innerText = `"${pledge}"`;
+
+      // Custom or Dynamic Date calculation
+      const dateInput = document.getElementById('inputCertDate');
+      let dateStr = '';
+      if (dateInput && dateInput.value) {
+        const [y, m, d] = dateInput.value.split('-');
+        dateStr = `${parseInt(y, 10)}년 ${parseInt(m, 10)}월 ${parseInt(d, 10)}일`;
+      } else {
+        const today = new Date();
+        dateStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+      }
+      document.getElementById('certDate').innerText = dateStr;
+
+      if (triggerCelebration) {
+        playChime(true);
+        fireConfetti(60);
+        showToast('임명장이 새롭게 업데이트되었습니다!', '📜');
+      }
+    }
+
+    function copyPledgeToClipboard() {
+      const name = document.getElementById('inputName').value;
+      const pledge = document.getElementById('inputPledge').value;
+      const textToCopy = `[경계 수호대 실천 다짐]\n이름: ${name}\n나의 다짐: ${pledge}\n#경계존중 #초등보건 #존동인`;
+
+      try {
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = textToCopy;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+        showToast('패들렛이나 과제방에 제출할 수 있도록 클립보드에 복사되었습니다!', '📋');
+      } catch (err) {
+        showToast('복사에 실패했습니다. 직접 텍스트를 선택해 복사해 주세요.', '⚠️');
+      }
+    }
+
+    /* ==========================================================
+       MODAL CONTROLLERS & INITIALIZATION
+       ========================================================== */
+    function openInfoModal() {
+      playTone(600, 'sine', 0.05);
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+    function closeInfoModal() {
+      document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    // Window Initializer
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentQuestion();
+      loadQuestStage(0);
+      
+      // Initialize default date in input (today)
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const dateInput = document.getElementById('inputCertDate');
+      if (dateInput) {
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      updateCertificate(false);
+    });
+  </script>
+</body>
+</html>
