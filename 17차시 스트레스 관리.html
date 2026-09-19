@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스트레스 팡팡! 마음 튼튼 자판기 - 초등 5학년 보건</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 폰트 로드: Pretendard & Gamja Flower (초등학생 친화 폰트) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'sans-serif'],
+            jua: ['Jua', 'sans-serif'],
+            gaegu: ['Gaegu', 'cursive'],
+          },
+          colors: {
+            candyPink: '#FF6B8B',
+            softYellow: '#FFF176',
+            mintGreen: '#4DD0E1',
+            gentlePurple: '#9575CD',
+            cloudBlue: '#E1F5FE',
+          },
+          keyframes: {
+            bounceGentle: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            wobble: {
+              '0%, 100%': { transform: 'rotate(0deg)' },
+              '25%': { transform: 'rotate(-4deg)' },
+              '75%': { transform: 'rotate(4deg)' },
+            },
+            dropCan: {
+              '0%': { transform: 'translateY(-120px) rotate(15deg)', opacity: '0' },
+              '70%': { transform: 'translateY(10px) rotate(-5deg)', opacity: '1' },
+              '100%': { transform: 'translateY(0) rotate(0)', opacity: '1' },
+            }
+          },
+          animation: {
+            bounceGentle: 'bounceGentle 2s ease-in-out infinite',
+            wobble: 'wobble 1s ease-in-out infinite',
+            dropCan: 'dropCan 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F8FAFC;
+      user-select: none;
+    }
+    .custom-shadow {
+      box-shadow: 0 8px 0px rgba(0, 0, 0, 0.12), 0 15px 25px rgba(0,0,0,0.06);
+    }
+    .active-tab {
+      background-color: #FF6B8B !important;
+      color: white !important;
+      border-color: #E64A70 !important;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col font-sans bg-gradient-to-b from-sky-100 via-pink-50 to-amber-50">
+
+  <!-- 헤더 영역 -->
+  <header class="w-full bg-white/90 backdrop-blur-md border-b border-pink-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 bg-pink-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-md transform -rotate-3 hover:rotate-0 transition">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-pink-100 text-pink-700 text-xs font-bold px-2.5 py-0.5 rounded-full">초등 5학년 보건</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-jua text-slate-800 tracking-wide">스트레스 팡팡! 마음 튼튼 자판기 🌈</h1>
+        </div>
+      </div>
+
+      <!-- 상단 배지 & 사운드 토글 -->
+      <div class="flex items-center gap-2">
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-volume-high text-pink-500" id="soundIcon"></i>
+          <span id="soundText">효과음 ON</span>
+        </button>
+        <button onclick="openHelpModal()" class="px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+          <i class="fa-solid fa-hands-holding-child"></i>
+          <span>1388 도움받기</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3가지 대주제 탭 버튼 바 -->
+    <div class="max-w-5xl mx-auto px-4 pt-1">
+      <nav class="flex space-x-2 border-b border-slate-200">
+        <button onclick="switchTab('tab1')" id="nav-tab1" class="tab-btn active-tab flex-1 py-3 text-center font-jua text-base sm:text-lg border-b-4 border-transparent rounded-t-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <span>🔍</span> 1. 마음 돋보기 & 생각 전환
+        </button>
+        <button onclick="switchTab('tab2')" id="nav-tab2" class="tab-btn flex-1 py-3 text-center font-jua text-base sm:text-lg text-slate-500 border-b-4 border-transparent rounded-t-xl hover:text-pink-600 hover:bg-pink-50/50 transition-all duration-200 flex items-center justify-center gap-2">
+          <span>🎈</span> 2. 퐁퐁 풍선 복식호흡
+        </button>
+        <button onclick="switchTab('tab3')" id="nav-tab3" class="tab-btn flex-1 py-3 text-center font-jua text-base sm:text-lg text-slate-500 border-b-4 border-transparent rounded-t-xl hover:text-pink-600 hover:bg-pink-50/50 transition-all duration-200 flex items-center justify-center gap-2">
+          <span>🥤</span> 3. 마음 처방 자판기
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- ============================================== -->
+    <!-- 1단계: 마음 돋보기 & 생각 전환 (교과서 106~108p) -->
+    <!-- ============================================== -->
+    <section id="tab1-content" class="tab-panel space-y-6">
+      <!-- 학습 인트로 카드 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm flex flex-col md:flex-row items-center gap-6">
+        <div class="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center text-4xl shadow-inner shrink-0 animate-bounceGentle">
+          🧠
+        </div>
+        <div class="space-y-1">
+          <div class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg mb-1">
+            교과서 106~107쪽 쏙쏙 이해하기
+          </div>
+          <h2 class="text-2xl font-jua text-slate-800">스트레스는 무조건 나쁜 걸까요?</h2>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            스트레스는 우리 몸과 마음이 외부 자극에 반응할 때 생기는 <strong>자연스러운 긴장 상태</strong>예요. <br class="hidden sm:inline">
+            적당한 스트레스는 집중력과 도전 정신을 높여주지만, 부정적인 마음이 오래가면 몸과 마음이 지쳐요!
+          </p>
+        </div>
+      </div>
+
+      <!-- 교과서 4대 공감 상황 카드 -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-jua text-xl text-slate-700 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-pink-500"></span>
+            우리 친구들이 자주 겪는 스트레스 상황 4가지
+          </h3>
+          <span class="text-xs text-slate-500">카드를 눌러 마음 소리를 확인해 봐요!</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 상황 1: 시험 망침 -->
+          <div onclick="selectSituation(0)" id="sit-card-0" class="sit-card cursor-pointer bg-white p-5 rounded-2xl border-2 border-slate-200 hover:border-pink-400 transition transform hover:-translate-y-1 shadow-sm text-center">
+            <div class="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center text-3xl mb-3">📝</div>
+            <span class="text-xs font-bold px-2 py-0.5 bg-red-50 text-red-600 rounded-md">상황 1</span>
+            <h4 class="font-jua text-lg mt-1 text-slate-800">"시험을 망친 것 같아"</h4>
+            <p class="text-xs text-slate-500 mt-2">가슴이 쿵쾅거리고 머리가 하얘져요.</p>
+          </div>
+
+          <!-- 상황 2: 친구 다툼 -->
+          <div onclick="selectSituation(1)" id="sit-card-1" class="sit-card cursor-pointer bg-white p-5 rounded-2xl border-2 border-slate-200 hover:border-pink-400 transition transform hover:-translate-y-1 shadow-sm text-center">
+            <div class="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-3xl mb-3">👫</div>
+            <span class="text-xs font-bold px-2 py-0.5 bg-orange-50 text-orange-600 rounded-md">상황 2</span>
+            <h4 class="font-jua text-lg mt-1 text-slate-800">"친구와 말다툼을 했어"</h4>
+            <p class="text-xs text-slate-500 mt-2">오해가 쌓여 하루 종일 기분이 울적해요.</p>
+          </div>
+
+          <!-- 상황 3: 과제 폭탄 -->
+          <div onclick="selectSituation(2)" id="sit-card-2" class="sit-card cursor-pointer bg-white p-5 rounded-2xl border-2 border-slate-200 hover:border-pink-400 transition transform hover:-translate-y-1 shadow-sm text-center">
+            <div class="w-16 h-16 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-3xl mb-3">⏰</div>
+            <span class="text-xs font-bold px-2 py-0.5 bg-amber-50 text-amber-600 rounded-md">상황 3</span>
+            <h4 class="font-jua text-lg mt-1 text-slate-800">"과제가 너무 많아"</h4>
+            <p class="text-xs text-slate-500 mt-2">시계만 째깍째깍, 어디서부터 시작할까?</p>
+          </div>
+
+          <!-- 상황 4: 부모님 꾸중 -->
+          <div onclick="selectSituation(3)" id="sit-card-3" class="sit-card cursor-pointer bg-white p-5 rounded-2xl border-2 border-slate-200 hover:border-pink-400 transition transform hover:-translate-y-1 shadow-sm text-center">
+            <div class="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-3xl mb-3">📢</div>
+            <span class="text-xs font-bold px-2 py-0.5 bg-purple-50 text-purple-600 rounded-md">상황 4</span>
+            <h4 class="font-jua text-lg mt-1 text-slate-800">"엄마에게 꾸중을 들었어"</h4>
+            <p class="text-xs text-slate-500 mt-2">서운하고 억울해서 눈물이 핑 돌아요.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 선택된 상황 인터랙티브 솔루션 뷰 -->
+      <div id="situationDetailBox" class="bg-gradient-to-r from-sky-50 to-indigo-50 border-2 border-sky-200 rounded-3xl p-5 sm:p-6 transition-all">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+
+      <!-- 교과서 108쪽: 가온이의 일기 '생각 체인지(전환)' 체험관 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-3xl">📖</span>
+          <div>
+            <h3 class="text-xl font-jua text-slate-800">교과서 108쪽 실천! [가온이의 일기] 생각 뒤집기</h3>
+            <p class="text-xs text-slate-500">같은 상황이라도 내가 어떻게 생각하느냐에 따라 스트레스는 180도 달라져요!</p>
+          </div>
+        </div>
+
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 font-gaegu text-lg text-slate-700 leading-relaxed mb-5 shadow-inner">
+          <p class="font-bold text-amber-800 mb-1">📅 가온이의 일기 중 일부:</p>
+          <p>"다음 주에 운동회가 열린다. 친구들은 신나 보이는데 나는 잘 모르겠다. 왜냐하면 나는 달리기를 못하기 때문이다. 혹시 또 넘어지거나 꼴찌를 하면 어떡하지? 하는 걱정이 든다... 휴..."</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 부정적 반응 -->
+          <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold bg-red-200 text-red-800 px-2.5 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-solid fa-cloud-rain"></i> 부정적 생각으로 이어진다면?
+              </span>
+            </div>
+            <p class="text-sm text-slate-700 italic">"차라리 운동회 날에 비가 쏟아져서 다 취소되었으면 좋겠어. 난 아무것도 하기 싫어."</p>
+            <div class="mt-3 text-xs text-red-600 bg-white/80 p-2.5 rounded-xl">
+              ⚠️ <strong>결과:</strong> 불안감이 커지고, 배가 아프거나 친구들과의 소중한 축제를 놓치게 돼요.
+            </div>
+          </div>
+
+          <!-- 긍정적 전환 -->
+          <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold bg-emerald-200 text-emerald-800 px-2.5 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-solid fa-sun text-amber-500"></i> 긍정적 스트레스로 바꾼다면!
+              </span>
+            </div>
+            <p class="text-sm text-slate-700 font-semibold">"그래도 최선을 다해보자! 1등이 아니어도 친구들과 응원하며 좋은 추억을 만들 수 있어!"</p>
+            <div class="mt-3 text-xs text-emerald-700 bg-white/80 p-2.5 rounded-xl">
+              ✨ <strong>결과:</strong> 가슴이 두근거리지만 도전하고 싶은 용기와 활력이 생겨요!
+            </div>
+          </div>
+        </div>
+
+        <!-- 생각 전환 인터랙션 버튼 -->
+        <div class="mt-5 p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-sm font-semibold text-slate-700">
+            💡 "어려운 상황이 닥치면 먼저 <strong class="text-pink-600">'그래도 이 경험을 통해 배울 수 있어!'</strong>라고 외쳐보세요."
+          </div>
+          <button onclick="cheerGaon()" class="px-5 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-jua rounded-xl shadow-md transform active:scale-95 transition flex items-center gap-2 shrink-0">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            가온이에게 생각 전환 마법 걸기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 2단계: 퐁퐁 풍선 복식호흡 트레이너 (교과서 109p 이완요법) -->
+    <!-- ============================================== -->
+    <section id="tab2-content" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-2 border-sky-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-block px-3 py-1 bg-sky-100 text-sky-800 text-xs font-bold rounded-lg">
+            교과서 109쪽 이완요법 배우기
+          </div>
+          <h2 class="text-2xl font-jua text-slate-800">긴장된 몸과 마음을 녹여주는 복식 호흡 🎈</h2>
+          <p class="text-slate-600 text-sm">
+            스트레스를 받으면 호흡이 가빠지고 심장이 쿵쾅거려요. <br class="hidden sm:inline">
+            아랫배에 풍선이 들어있다고 생각하고, 풍선을 천천히 부풀렸다가 바람을 빼보세요!
+          </p>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <div class="bg-sky-50 border border-sky-200 rounded-xl px-4 py-2 text-center">
+            <span class="text-xs text-slate-500 block">오늘 완료 횟수</span>
+            <span id="breathCountDisplay" class="text-2xl font-jua text-sky-600">0회</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 호흡 시각화 및 인터랙티브 캔버스 구역 -->
+      <div class="bg-gradient-to-b from-sky-50 to-pink-50 border-2 border-sky-100 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-inner min-h-[420px]">
+        
+        <!-- 상태 안내 문구 -->
+        <div class="mb-4 z-10">
+          <span id="breathStageBadge" class="inline-block px-4 py-1.5 bg-sky-500 text-white font-jua rounded-full text-base tracking-wide shadow-sm">
+            준비하기
+          </span>
+          <h3 id="breathInstruction" class="text-2xl sm:text-3xl font-jua text-slate-800 mt-2 transition-all">
+            아래 [호흡 시작하기] 버튼을 누르면 시작됩니다
+          </h3>
+          <p id="breathSubInstruction" class="text-sm text-slate-500 mt-1 font-sans">
+            코로 숨을 깊게 들이마시고 입으로 "후~" 길게 내쉬어 보세요.
+          </p>
+        </div>
+
+        <!-- 풍선 시각화 인터랙션 원 -->
+        <div class="relative w-64 h-64 flex items-center justify-center my-4">
+          <!-- 외곽 펄스 링 -->
+          <div id="balloonRing" class="absolute inset-0 rounded-full border-4 border-dashed border-sky-300/60 transition-all duration-1000 scale-75 opacity-50"></div>
+          <!-- 중앙 복식 호흡 풍선 캐릭터 -->
+          <div id="balloonCore" class="w-40 h-40 bg-gradient-to-tr from-pink-400 via-rose-300 to-amber-200 rounded-full shadow-2xl flex flex-col items-center justify-center transition-all duration-1000 transform scale-75 border-4 border-white">
+            <span id="balloonFace" class="text-4xl filter drop-shadow">😌</span>
+            <span id="breathTimerDisplay" class="font-jua text-3xl text-white mt-1 drop-shadow-md">--</span>
+          </div>
+          <!-- 배 표시 아이콘 (교과서 안내 연결) -->
+          <div class="absolute -bottom-2 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-600 shadow-sm border border-slate-200 flex items-center gap-1">
+            <span>풍선처럼 배를 부풀려요!</span>
+          </div>
+        </div>
+
+        <!-- 조작 버튼 그룹 -->
+        <div class="z-10 flex flex-wrap gap-3 mt-4 justify-center">
+          <button id="startBreathBtn" onclick="toggleBreathing()" class="px-8 py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-jua text-lg rounded-2xl shadow-lg hover:shadow-sky-300/50 transform active:scale-95 transition flex items-center gap-2">
+            <i class="fa-solid fa-play"></i>
+            <span>호흡 운동 시작하기</span>
+          </button>
+          <button onclick="resetBreathing()" class="px-5 py-3.5 bg-white hover:bg-slate-100 text-slate-700 font-jua text-base rounded-2xl border border-slate-300 shadow-sm transition">
+            <i class="fa-solid fa-rotate-left"></i> 다시하기
+          </button>
+        </div>
+
+        <!-- 교과서 복식호흡 원리 팁 박스 -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left z-10">
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-sky-100 text-xs text-slate-700 flex items-start gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-sky-200 text-sky-700 flex items-center justify-center font-bold shrink-0">1</span>
+            <div>
+              <strong class="text-slate-800">숨 들이마시기 (4초)</strong><br>
+              코로 천천히 들이마시며 아랫배를 볼록하게 풍선처럼 만듭니다.
+            </div>
+          </div>
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-pink-100 text-xs text-slate-700 flex items-start gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-pink-200 text-pink-700 flex items-center justify-center font-bold shrink-0">2</span>
+            <div>
+              <strong class="text-slate-800">숨 길게 내쉬기 (6초)</strong><br>
+              입으로 "후~" 촛불을 끄듯 천천히 내쉬며 아랫배를 쏙 집어넣습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 3단계: 나만의 스트레스 관리 자판기 (교과서 110p) -->
+    <!-- ============================================== -->
+    <section id="tab3-content" class="tab-panel hidden space-y-6">
+      <!-- 안내 카드 -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-pink-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-block px-3 py-1 bg-pink-100 text-pink-800 text-xs font-bold rounded-lg">
+            교과서 110쪽 만들기 활동
+          </div>
+          <h2 class="text-2xl font-jua text-slate-800">찰칵! 나만의 스트레스 관리 자판기 🥤</h2>
+          <p class="text-slate-600 text-sm">
+            내가 좋아하는 스트레스 해소법 4가지를 등록하고, 고민이 생겼을 때 번호를 눌러 맞춤 처방 캔을 뽑아보세요!
+          </p>
+        </div>
+        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200">
+          <span class="text-2xl animate-spin" style="animation-duration: 4s;">🪙</span>
+          <div>
+            <span class="text-xs text-slate-500 block">내 마음 코인</span>
+            <span id="coinDisplay" class="font-jua text-xl text-pink-600">무제한 코인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 자판기 인터랙티브 레이아웃 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- 왼쪽: 자판기 본체 UI (LG: 7열) -->
+        <div class="lg:col-span-7 bg-pink-400 rounded-3xl p-5 sm:p-7 border-4 border-pink-500 shadow-2xl relative">
+          <!-- 자판기 상단 간판 -->
+          <div class="bg-white/95 rounded-2xl p-3 text-center mb-5 shadow-md border-2 border-pink-200 flex items-center justify-between">
+            <span class="text-xl">✨</span>
+            <h3 class="font-jua text-xl sm:text-2xl text-pink-600 tracking-wider">나만의 마음 치유 자판기</h3>
+            <span class="text-xl">✨</span>
+          </div>
+
+          <!-- 4개 슬롯 쇼케이스 (교과서 자판기 구조) -->
+          <div class="grid grid-cols-2 gap-3 bg-pink-500/40 p-4 rounded-2xl border-2 border-pink-300">
+            <!-- 슬롯 1 -->
+            <div class="bg-white/95 rounded-2xl p-3 border-2 border-pink-200 shadow flex flex-col items-center text-center relative group">
+              <span class="absolute top-2 left-2 w-6 h-6 bg-pink-500 text-white rounded-full font-jua text-xs flex items-center justify-center">1</span>
+              <div id="slotIcon1" class="text-4xl my-2 group-hover:scale-110 transition">🎵</div>
+              <span id="slotName1" class="font-jua text-sm text-slate-800">신나는 음악 듣기</span>
+              <span class="text-[10px] text-pink-500 font-bold mt-1 bg-pink-50 px-2 py-0.5 rounded-full">음악 힐링</span>
+            </div>
+
+            <!-- 슬롯 2 -->
+            <div class="bg-white/95 rounded-2xl p-3 border-2 border-pink-200 shadow flex flex-col items-center text-center relative group">
+              <span class="absolute top-2 left-2 w-6 h-6 bg-sky-500 text-white rounded-full font-jua text-xs flex items-center justify-center">2</span>
+              <div id="slotIcon2" class="text-4xl my-2 group-hover:scale-110 transition">🏃‍♂️</div>
+              <span id="slotName2" class="font-jua text-sm text-slate-800">운동장 달리기 & 줄넘기</span>
+              <span class="text-[10px] text-sky-500 font-bold mt-1 bg-sky-50 px-2 py-0.5 rounded-full">몸 움직이기</span>
+            </div>
+
+            <!-- 슬롯 3 -->
+            <div class="bg-white/95 rounded-2xl p-3 border-2 border-pink-200 shadow flex flex-col items-center text-center relative group">
+              <span class="absolute top-2 left-2 w-6 h-6 bg-amber-500 text-white rounded-full font-jua text-xs flex items-center justify-center">3</span>
+              <div id="slotIcon3" class="text-4xl my-2 group-hover:scale-110 transition">🗣️</div>
+              <span id="slotName3" class="font-jua text-sm text-slate-800">친구/부모님과 속마음 털어놓기</span>
+              <span class="text-[10px] text-amber-500 font-bold mt-1 bg-amber-50 px-2 py-0.5 rounded-full">이야기 나누기</span>
+            </div>
+
+            <!-- 슬롯 4 -->
+            <div class="bg-white/95 rounded-2xl p-3 border-2 border-pink-200 shadow flex flex-col items-center text-center relative group">
+              <span class="absolute top-2 left-2 w-6 h-6 bg-purple-500 text-white rounded-full font-jua text-xs flex items-center justify-center">4</span>
+              <div id="slotIcon4" class="text-4xl my-2 group-hover:scale-110 transition">🎨</div>
+              <span id="slotName4" class="font-jua text-sm text-slate-800">좋아하는 그림 & 낙서하기</span>
+              <span class="text-[10px] text-purple-500 font-bold mt-1 bg-purple-50 px-2 py-0.5 rounded-full">취미 활동</span>
+            </div>
+          </div>
+
+          <!-- 자판기 조작부 (버튼패드 + 동전 투입구 + 배출구) -->
+          <div class="mt-4 bg-pink-600/60 p-4 rounded-2xl border-2 border-pink-300/80 flex flex-col sm:flex-row items-center gap-4">
+            
+            <!-- 번호 누르기 버튼들 -->
+            <div class="flex-1 w-full">
+              <div class="text-xs font-jua text-white mb-2 text-center sm:text-left flex items-center gap-1">
+                <i class="fa-solid fa-hand-pointer"></i> 원하는 번호를 꾹 누르세요!
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="pressVendingButton(1)" class="vending-btn py-3 bg-amber-300 hover:bg-amber-400 active:bg-amber-500 text-amber-950 font-jua text-xl rounded-xl shadow-md border-b-4 border-amber-500 transform active:translate-y-1 transition">1번</button>
+                <button onclick="pressVendingButton(2)" class="vending-btn py-3 bg-amber-300 hover:bg-amber-400 active:bg-amber-500 text-amber-950 font-jua text-xl rounded-xl shadow-md border-b-4 border-amber-500 transform active:translate-y-1 transition">2번</button>
+                <button onclick="pressVendingButton(3)" class="vending-btn py-3 bg-amber-300 hover:bg-amber-400 active:bg-amber-500 text-amber-950 font-jua text-xl rounded-xl shadow-md border-b-4 border-amber-500 transform active:translate-y-1 transition">3번</button>
+                <button onclick="pressVendingButton(4)" class="vending-btn py-3 bg-amber-300 hover:bg-amber-400 active:bg-amber-500 text-amber-950 font-jua text-xl rounded-xl shadow-md border-b-4 border-amber-500 transform active:translate-y-1 transition">4번</button>
+              </div>
+            </div>
+
+            <!-- 동전 투입구 비주얼 -->
+            <div class="bg-pink-800/60 px-3 py-2 rounded-xl text-center border border-pink-400 shrink-0">
+              <span class="text-[10px] text-pink-200 block font-bold">동전 투입구</span>
+              <div class="w-10 h-1.5 bg-black rounded-full mx-auto my-1.5 border border-pink-300"></div>
+              <span class="text-xs text-yellow-300 font-bold">딸깍 자동 투입!</span>
+            </div>
+          </div>
+
+          <!-- 음료수 배출구 (출력 애니메이션 구역) -->
+          <div class="mt-4 bg-slate-900 rounded-2xl p-4 border-4 border-pink-700 min-h-[90px] flex items-center justify-center relative overflow-hidden">
+            <div id="vendingDropZone" class="w-full text-center">
+              <span class="text-slate-500 text-xs font-jua">번호를 누르면 여기에 힐링 캔이 톡! 떨어집니다 🥤</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 슬롯 편집기 & 친구 응원 한마디 (LG: 5열) -->
+        <div class="lg:col-span-5 space-y-4">
+          <!-- 슬롯 커스텀 설정 카드 -->
+          <div class="bg-white rounded-3xl p-5 border-2 border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="font-jua text-lg text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-pink-500"></i> 자판기 메뉴 바꿔보기
+              </h4>
+              <button onclick="loadDefaultSlots()" class="text-xs text-slate-400 hover:text-slate-600 underline">기본값 복원</button>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">내가 평소에 좋아하는 해소법으로 번호별 내용을 바꿀 수 있어요.</p>
+
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-700 text-xs font-bold flex items-center justify-center shrink-0">1</span>
+                <input id="editSlot1" type="text" value="신나는 음악 듣기" class="flex-1 text-xs border rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-300 outline-none">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs font-bold flex items-center justify-center shrink-0">2</span>
+                <input id="editSlot2" type="text" value="운동장 달리기 & 줄넘기" class="flex-1 text-xs border rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-300 outline-none">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">3</span>
+                <input id="editSlot3" type="text" value="친구/부모님과 속마음 털어놓기" class="flex-1 text-xs border rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-300 outline-none">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center shrink-0">4</span>
+                <input id="editSlot4" type="text" value="좋아하는 그림 & 낙서하기" class="flex-1 text-xs border rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-300 outline-none">
+              </div>
+            </div>
+
+            <button onclick="applySlotEdits()" class="mt-3 w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-jua text-sm rounded-xl transition">
+              수정한 내용 자판기에 넣기 ✨
+            </button>
+          </div>
+
+          <!-- 교과서 110쪽 하단: 친구에게 응원 한마디 쓰기 -->
+          <div class="bg-gradient-to-br from-amber-50 to-pink-50 rounded-3xl p-5 border-2 border-amber-200 shadow-sm">
+            <h4 class="font-jua text-lg text-slate-800 flex items-center gap-2 mb-1">
+              <i class="fa-solid fa-comment-heart text-rose-500"></i> 힘들어하는 친구에게 응원 쓰기
+            </h4>
+            <p class="text-xs text-slate-500 mb-3">스트레스로 속상해하는 가온이나 짝꿍에게 따뜻한 한마디를 남겨보세요.</p>
+            
+            <textarea id="cheerMessageInput" rows="3" placeholder="예: 가온아! 시험이나 달리기가 전부는 아니야. 넌 항상 밝고 착하잖아! 힘내자!" class="w-full text-xs p-3 rounded-xl border border-amber-200 focus:ring-2 focus:ring-amber-400 outline-none resize-none"></textarea>
+            
+            <button onclick="saveCheerMessage()" class="mt-2 w-full py-2 bg-rose-500 hover:bg-rose-600 text-white font-jua text-sm rounded-xl transition shadow">
+              응원 쪽지 교실 게시판에 붙이기 💌
+            </button>
+
+            <!-- 저장된 쪽지 리스트 미리보기 -->
+            <div id="savedCheerList" class="mt-3 space-y-1.5 max-h-36 overflow-y-auto">
+              <!-- JS로 동적 추가 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 1388 및 도움받을 수 있는 곳 모달 -->
+  <div id="helpModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border-4 border-purple-200 relative animate-bounceGentle" style="animation-iteration-count: 1;">
+      <button onclick="closeHelpModal()" class="absolute top-4 right-4 w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600 font-bold flex items-center justify-center">
+        ✕
+      </button>
+
+      <div class="text-center mb-5">
+        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-2 text-purple-600">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <h3 class="font-jua text-2xl text-slate-800">혼자 힘들어하지 말고 이야기해요!</h3>
+        <p class="text-xs text-slate-500">교과서 109쪽: 언제나 내 이야기를 들어주는 든든한 친구들이 있어요.</p>
+      </div>
+
+      <div class="space-y-3 text-sm">
+        <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200">
+          <div class="flex items-center justify-between mb-1">
+            <strong class="text-purple-900 font-jua text-base">청소년 상담 전화 1388</strong>
+            <span class="bg-purple-200 text-purple-800 text-xs px-2 py-0.5 rounded-full font-bold">24시간 무료</span>
+          </div>
+          <p class="text-xs text-slate-600">전화: (지역번호) + 1388 | 문자: 1388 전송</p>
+          <p class="text-xs text-slate-600">카카오톡: '#1388' 채널 검색 후 채팅 상담</p>
+        </div>
+
+        <div class="bg-sky-50 p-4 rounded-2xl border border-sky-200">
+          <div class="flex items-center justify-between mb-1">
+            <strong class="text-sky-900 font-jua text-base">모바일 상담 '다 들어줄 개'</strong>
+            <span class="bg-sky-200 text-sky-800 text-xs px-2 py-0.5 rounded-full font-bold">청소년 모바일</span>
+          </div>
+          <p class="text-xs text-slate-600">문자 상담: 1661-5004 | 전용 모바일 앱 제공</p>
+          <p class="text-xs text-slate-600">카카오톡: '다 들어줄 개' 친구 추가 후 상담</p>
+        </div>
+
+        <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 text-xs text-amber-900">
+          🏫 <strong>학교 안에서도 도움을 받을 수 있어요!</strong><br>
+          우리 학교 <strong>보건실 선생님</strong>, <strong>담임 선생님</strong>, <strong>Wee 클래스 상담 선생님</strong>께 언제든 찾아가 편하게 이야기해 보세요.
+        </div>
+      </div>
+
+      <button onclick="closeHelpModal()" class="mt-5 w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-jua rounded-2xl transition">
+        확인했어요, 마음이 든든해요! 👍
+      </button>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="bg-white/80 border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-5xl mx-auto px-4">
+      배우고 실천하는 초등 5학년 보건 | 2. 정신 건강 - 스트레스 관리 (17차시 수업용)
+    </div>
+  </footer>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. 오디오 합성기 (Web Audio API - 외부 음원 없이 띵동/차임 생성)
+    // -------------------------------------------------------------
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.2, gainValue = 0.15) {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainValue, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio not supported or waiting user interaction");
+      }
+    }
+
+    function playVendingDropSound() {
+      playTone(587.33, 'triangle', 0.15, 0.2); // D5
+      setTimeout(() => playTone(880, 'sine', 0.35, 0.25), 150); // A5
+    }
+
+    function playChime() {
+      playTone(523.25, 'sine', 0.2, 0.15); // C5
+      setTimeout(() => playTone(659.25, 'sine', 0.2, 0.15), 100); // E5
+      setTimeout(() => playTone(783.99, 'sine', 0.4, 0.2), 200); // G5
+    }
+
+    function toggleAudio() {
+      isSoundOn = !isSoundOn;
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundText');
+      if (isSoundOn) {
+        icon.className = 'fa-solid fa-volume-high text-pink-500';
+        text.innerText = '효과음 ON';
+        playTone(600, 'sine', 0.1);
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = '효과음 OFF';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 2. 탭 전환 제어
+    // -------------------------------------------------------------
+    function switchTab(tabId) {
+      playTone(440, 'triangle', 0.1);
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active-tab');
+        btn.classList.add('text-slate-500');
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      activeBtn.classList.add('active-tab');
+      activeBtn.classList.remove('text-slate-500');
+
+      document.getElementById(`${tabId}-content`).classList.remove('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // 3. 1단계: 상황 선택 및 생각 전환 데이터
+    // -------------------------------------------------------------
+    const situationsData = [
+      {
+        title: "시험을 망친 것 같아",
+        emoji: "📝",
+        feeling: "가슴이 철렁 내려앉고, 부모님과 친구들에게 부끄러운 마음이 들어요.",
+        negativeThought: "난 정말 바보인가 봐. 다음 시험도 무조건 망칠 게 뻔해.",
+        positiveChange: "내가 어떤 부분을 잘 몰랐는지 알게 된 좋은 기회야! 오답 노트를 만들어서 다시 풀어보면 다음엔 훨씬 잘할 수 있어!",
+        bodyReaction: "심장이 빠르게 뛰고 식은땀이 나며 두통이 생길 수 있어요."
+      },
+      {
+        title: "친구와 말다툼을 했어",
+        emoji: "👫",
+        feeling: "답답하고 억울해서 자꾸만 화가 나고, 친구가 나를 싫어할까 봐 불안해요.",
+        negativeThought: "이제 걔랑은 영원히 절교야. 다른 애들도 내 편 안 들어주면 어쩌지?",
+        positiveChange: "친구도 속상해서 그랬을 거야. 마음을 가라앉히고 먼저 내 마음을 솔직하게 말하고 화해를 신청해 보자!",
+        bodyReaction: "가슴이 답답하고 목이 메이며 얼굴이 붉어집니다."
+      },
+      {
+        title: "과제가 너무 많아",
+        emoji: "⏰",
+        feeling: "쉬지도 못하고 시간에 쫓겨 막막하고 한숨만 푹푹 나와요.",
+        negativeThought: "언제 다 해? 그냥 다 포기하고 아무것도 안 내고 혼날래.",
+        positiveChange: "가장 쉬운 과제부터 하나씩 순서를 정해 끝내보자. 다 끝내고 먹는 간식은 정말 꿀맛일 거야!",
+        bodyReaction: "눈이 피로하고 어깨와 목이 뻐근하게 굳어옵니다."
+      },
+      {
+        title: "엄마에게 꾸중을 들었어",
+        emoji: "📢",
+        feeling: "서운하고 눈물이 나며 '엄마는 나만 미워해'라는 반항심이 들어요.",
+        negativeThought: "엄마는 내 기분은 하나도 몰라주면서 소리만 질러. 방문 닫고 말 안 할 거야.",
+        positiveChange: "엄마가 나를 사랑하고 걱정하셔서 하신 말씀일 거야. 다음엔 약속을 잘 지키는 멋진 모습을 보여드려야지.",
+        bodyReaction: "눈물이 핑 돌고 턱이 떨리며 소화가 잘 안 될 수 있어요."
+      }
+    ];
+
+    let currentSitIndex = 0;
+
+    function selectSituation(index) {
+      currentSitIndex = index;
+      playTone(500, 'sine', 0.1);
+
+      document.querySelectorAll('.sit-card').forEach((card, idx) => {
+        if (idx === index) {
+          card.classList.add('border-pink-500', 'bg-pink-50/40', 'ring-2', 'ring-pink-200');
+          card.classList.remove('border-slate-200');
+        } else {
+          card.classList.remove('border-pink-500', 'bg-pink-50/40', 'ring-2', 'ring-pink-200');
+          card.classList.add('border-slate-200');
+        }
+      });
+
+      renderSituationDetail();
+    }
+
+    function renderSituationDetail() {
+      const data = situationsData[currentSitIndex];
+      const box = document.getElementById('situationDetailBox');
+      box.innerHTML = `
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-sky-200/60 pb-3 mb-4">
+          <div class="flex items-center gap-3">
+            <span class="text-4xl p-2 bg-white rounded-2xl shadow-sm">${data.emoji}</span>
+            <div>
+              <span class="text-xs font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-md">상황 분석 돋보기</span>
+              <h4 class="font-jua text-xl text-slate-800">${data.title}</h4>
+            </div>
+          </div>
+          <div class="text-xs text-slate-500 bg-white/70 px-3 py-1.5 rounded-xl border border-sky-100">
+            <strong>몸의 반응:</strong> ${data.bodyReaction}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="bg-white/80 p-4 rounded-2xl border border-red-100">
+            <span class="font-jua text-red-500 flex items-center gap-1.5 mb-1.5 text-base">
+              <i class="fa-solid fa-face-frown"></i> 부정적인 스트레스로 머물 때
+            </span>
+            <p class="text-slate-600 text-xs sm:text-sm">"${data.negativeThought}"</p>
+          </div>
+
+          <div class="bg-white/90 p-4 rounded-2xl border-2 border-emerald-300 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-3 -bottom-3 text-4xl opacity-10 text-emerald-600">🌟</div>
+            <span class="font-jua text-emerald-600 flex items-center gap-1.5 mb-1.5 text-base">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> 긍정적 생각으로 뒤집기!
+            </span>
+            <p class="text-slate-800 font-semibold text-xs sm:text-sm">"${data.positiveChange}"</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function cheerGaon() {
+      playChime();
+      const randomCheers = [
+        "🌟 가온아! 넘어지면 다시 툭툭 털고 일어나면 돼!",
+        "🌈 달리기를 못해도 응원 대장이 되면 최고의 인기쟁이가 될 수 있어!",
+        "💖 결과보다 즐겁게 웃으며 뛰는 가온이 모습이 제일 멋져!"
+      ];
+      const pick = randomCheers[Math.floor(Math.random() * randomCheers.length)];
+      
+      const bubble = document.createElement('div');
+      bubble.className = "fixed top-24 left-1/2 transform -translate-x-1/2 bg-pink-600 text-white px-6 py-3 rounded-full font-jua text-base shadow-2xl z-50 animate-bounce";
+      bubble.innerText = pick;
+      document.body.appendChild(bubble);
+
+      setTimeout(() => {
+        bubble.remove();
+      }, 3000);
+    }
+
+    // -------------------------------------------------------------
+    // 4. 2단계: 퐁퐁 풍선 복식호흡 로직
+    // -------------------------------------------------------------
+    let breathInterval = null;
+    let breathRunning = false;
+    let breathStep = 0; // 0: inhale (4s), 1: hold (2s), 2: exhale (6s)
+    let stepTimer = 0;
+    let completedCycles = 0;
+
+    const stages = [
+      { name: "코로 들이마시기", duration: 4, badgeBg: "bg-sky-500", face: "😮", desc: "코로 숨을 천천히 들이마시며 아랫배를 풍선처럼 부풀려요!", scale: "scale-110" },
+      { name: "잠깐 멈추기", duration: 2, badgeBg: "bg-amber-500", face: "🤫", desc: "몸의 긴장을 풀고 편안하게 멈춰보세요.", scale: "scale-110" },
+      { name: "입으로 후~ 내쉬기", duration: 6, badgeBg: "bg-pink-500", face: "😙", desc: "촛불을 끄듯 입으로 가늘고 길게 숨을 끝까지 내쉬어요.", scale: "scale-75" }
+    ];
+
+    function toggleBreathing() {
+      if (breathRunning) {
+        stopBreathing();
+      } else {
+        startBreathing();
+      }
+    }
+
+    function startBreathing() {
+      breathRunning = true;
+      document.getElementById('startBreathBtn').innerHTML = '<i class="fa-solid fa-pause"></i> <span>잠깐 멈춤</span>';
+      document.getElementById('startBreathBtn').classList.replace('bg-sky-500', 'bg-slate-700');
+      
+      breathStep = 0;
+      stepTimer = stages[breathStep].duration;
+      updateBreathingUI();
+
+      breathInterval = setInterval(() => {
+        stepTimer--;
+        if (stepTimer < 0) {
+          breathStep = (breathStep + 1) % stages.length;
+          if (breathStep === 0) {
+            completedCycles++;
+            document.getElementById('breathCountDisplay').innerText = `${completedCycles}회`;
+            playChime();
+          }
+          stepTimer = stages[breathStep].duration;
+        }
+        updateBreathingUI();
+      }, 1000);
+    }
+
+    function stopBreathing() {
+      breathRunning = false;
+      clearInterval(breathInterval);
+      document.getElementById('startBreathBtn').innerHTML = '<i class="fa-solid fa-play"></i> <span>호흡 계속하기</span>';
+      document.getElementById('startBreathBtn').classList.replace('bg-slate-700', 'bg-sky-500');
+    }
+
+    function resetBreathing() {
+      stopBreathing();
+      breathStep = 0;
+      stepTimer = 0;
+      document.getElementById('breathStageBadge').innerText = "준비하기";
+      document.getElementById('breathStageBadge').className = "inline-block px-4 py-1.5 bg-sky-500 text-white font-jua rounded-full text-base tracking-wide shadow-sm";
+      document.getElementById('breathInstruction').innerText = "호흡 운동을 시작해 보세요";
+      document.getElementById('breathTimerDisplay').innerText = "--";
+      document.getElementById('balloonFace').innerText = "😌";
+      const core = document.getElementById('balloonCore');
+      core.className = "w-40 h-40 bg-gradient-to-tr from-pink-400 via-rose-300 to-amber-200 rounded-full shadow-2xl flex flex-col items-center justify-center transition-all duration-1000 transform scale-75 border-4 border-white";
+    }
+
+    function updateBreathingUI() {
+      const current = stages[breathStep];
+      document.getElementById('breathStageBadge').innerText = current.name;
+      document.getElementById('breathStageBadge').className = `inline-block px-4 py-1.5 ${current.badgeBg} text-white font-jua rounded-full text-base tracking-wide shadow-sm`;
+      document.getElementById('breathInstruction').innerText = `${current.name} (${stepTimer}초)`;
+      document.getElementById('breathSubInstruction').innerText = current.desc;
+      document.getElementById('breathTimerDisplay').innerText = `${stepTimer}s`;
+      document.getElementById('balloonFace').innerText = current.face;
+
+      // 풍선 스케일
+      const core = document.getElementById('balloonCore');
+      core.className = `w-40 h-40 bg-gradient-to-tr from-pink-400 via-rose-300 to-amber-200 rounded-full shadow-2xl flex flex-col items-center justify-center transition-all duration-1000 transform ${current.scale} border-4 border-white`;
+
+      // 들이마실 때 사운드 살짝
+      if (stepTimer === current.duration) {
+        playTone(breathStep === 0 ? 350 : (breathStep === 1 ? 400 : 300), 'sine', 0.2, 0.08);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 5. 3단계: 나만의 스트레스 관리 자판기 인터랙션
+    // -------------------------------------------------------------
+    const defaultSlots = [
+      { id: 1, name: "신나는 음악 듣기", icon: "🎵", color: "pink", drinkName: "룰루랄라 멜로디 소다", tip: "좋아하는 음악을 들으면 스트레스 호르몬이 줄고 뇌에 즐거운 에너지가 채워져요!" },
+      { id: 2, name: "운동장 달리기 & 줄넘기", icon: "🏃‍♂️", color: "sky", drinkName: "비타민 활력 팡팡 워터", tip: "가볍게 땀을 흘리면 뇌에서 행복 호르몬(엔도르핀)이 퐁퐁 솟아납니다!" },
+      { id: 3, name: "친구/가족과 속마음 털어놓기", icon: "🗣️", color: "amber", drinkName: "달콤 따뜻 온기 코코아", tip: "마음속 응어리를 말로 표현하는 것만으로도 긴장감의 절반이 사라져요." },
+      { id: 4, name: "좋아하는 그림 & 낙서하기", icon: "🎨", color: "purple", drinkName: "무지개빛 상상 스파클링", tip: "좋아하는 취미에 몰입하면 시험이나 숙제 걱정에서 벗어날 수 있어요." }
+    ];
+
+    let currentSlots = JSON.parse(JSON.stringify(defaultSlots));
+
+    function pressVendingButton(slotNum) {
+      playVendingDropSound();
+      const slot = currentSlots.find(s => s.id === slotNum);
+      const dropZone = document.getElementById('vendingDropZone');
+
+      dropZone.innerHTML = `
+        <div class="animate-dropCan bg-white p-4 rounded-2xl border-2 border-pink-400 shadow-xl inline-block max-w-sm w-full text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-3xl shrink-0">
+              ${slot.icon}
+            </div>
+            <div>
+              <span class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${slot.id}번 힐링 처방캔 나옴!</span>
+              <h5 class="font-jua text-lg text-slate-800 leading-tight">${slot.drinkName}</h5>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 bg-pink-50 p-2.5 rounded-xl border border-pink-100 leading-relaxed">
+            🥤 <strong>처방 행동:</strong> "${slot.name}"<br>
+            💡 <strong>비타민 효과:</strong> ${slot.tip}
+          </p>
+          <div class="mt-2 text-right">
+            <span class="text-[11px] font-bold text-pink-600">몸과 마음에 힘이 퐁퐁 충전되었어요! 💖</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function applySlotEdits() {
+      for (let i = 1; i <= 4; i++) {
+        const val = document.getElementById(`editSlot${i}`).value.trim();
+        if (val) {
+          currentSlots[i - 1].name = val;
+          document.getElementById(`slotName${i}`).innerText = val;
+        }
+      }
+      playChime();
+      alertBox("✨ 자판기 슬롯 메뉴가 성공적으로 등록되었습니다!");
+    }
+
+    function loadDefaultSlots() {
+      currentSlots = JSON.parse(JSON.stringify(defaultSlots));
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`editSlot${i}`).value = currentSlots[i - 1].name;
+        document.getElementById(`slotName${i}`).innerText = currentSlots[i - 1].name;
+      }
+      playTone(400, 'sine', 0.1);
+    }
+
+    // 응원 메시지 보관
+    const sampleCheers = [
+      { author: "5학년 1반 친구", text: "가온아 괜찮아! 달리기 조금 못해도 넌 배려심 넘치는 착한 친구잖아!" },
+      { author: "보건지킴이", text: "스트레스 받을 땐 크게 복식 호흡 3번 하고 씩 웃어보자 :)" }
+    ];
+
+    function saveCheerMessage() {
+      const input = document.getElementById('cheerMessageInput');
+      const text = input.value.trim();
+      if (!text) {
+        alertBox("친구에게 보낼 응원 메시지를 한 줄 적어주세요!");
+        return;
+      }
+
+      sampleCheers.unshift({
+        author: "나 (5학년 보건 박사)",
+        text: text
+      });
+      input.value = "";
+      playChime();
+      renderCheers();
+      alertBox("💌 친구에게 따뜻한 응원 카드가 전달되었습니다!");
+    }
+
+    function renderCheers() {
+      const container = document.getElementById('savedCheerList');
+      container.innerHTML = sampleCheers.slice(0, 3).map(c => `
+        <div class="bg-white/90 p-2 rounded-xl border border-amber-200 text-xs shadow-sm">
+          <span class="font-bold text-pink-600">[${c.author}]</span> ${c.text}
+        </div>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------
+    // 6. 모달 및 보조 도구
+    // -------------------------------------------------------------
+    function openHelpModal() {
+      playTone(600, 'triangle', 0.1);
+      document.getElementById('helpModal').classList.remove('hidden');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('helpModal').classList.add('hidden');
+    }
+
+    function alertBox(msg) {
+      const toast = document.createElement('div');
+      toast.className = "fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900/90 text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-jua shadow-2xl z-50 flex items-center gap-2 border border-slate-700";
+      toast.innerHTML = `<span>💬</span> <span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    // 페이지 로드 시 초기화
+    window.onload = function() {
+      selectSituation(0);
+      renderCheers();
+    };
+  </script>
+</body>
+</html>
