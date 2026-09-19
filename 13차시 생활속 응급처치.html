@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>골든타임 히어로: 생활 속 응급처치 탐험대</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .font-kids {
+      font-family: 'Jua', cursive, sans-serif;
+    }
+    .card-bounce {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-bounce:hover {
+      transform: translateY(-4px);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-animation {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-amber-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-rose-200">
+
+  <header class="bg-gradient-to-r from-red-500 via-rose-500 to-amber-500 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+        <div class="w-12 h-12 bg-white text-red-500 rounded-2xl flex items-center justify-center text-2xl shadow-inner font-black">
+          🚑
+        </div>
+        <div>
+          <span class="text-xs font-bold tracking-wider px-2 py-0.5 bg-red-700/60 rounded-full text-amber-200 uppercase">
+            초등 5학년 보건교육
+          </span>
+          <h1 class="text-xl md:text-2xl font-kids tracking-wide drop-shadow-sm flex items-center gap-2">
+            골든타임 히어로 <span class="text-sm font-normal text-amber-100 hidden sm:inline">생활 속 응급처치 탐험대</span>
+          </h1>
+        </div>
+      </div>
+      
+      <!-- Quick Badges & Nav Tabs -->
+      <nav class="flex items-center space-x-1 sm:space-x-2">
+        <button onclick="switchTab('simulation')" id="nav-simulation" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm transition bg-white/10 hover:bg-white/20 flex items-center gap-1.5">
+          <i class="fa-solid fa-gamepad text-emerald-300"></i>
+          <span>상황 롤플레잉</span>
+        </button>
+        <button onclick="switchTab('call119')" id="nav-call119" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm transition bg-white/10 hover:bg-white/20 flex items-center gap-1.5">
+          <i class="fa-solid fa-phone-volume text-yellow-300"></i>
+          <span>119 신고 & 퀴즈</span>
+        </button>
+        <button onclick="switchTab('certificate')" id="nav-certificate" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm transition bg-amber-400 text-slate-900 shadow hover:bg-amber-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-award text-red-600"></i>
+          <span>영웅 임명장</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- TAB 0: HOME DASHBOARD -->
+    <section id="tab-home" class="tab-content block space-y-6">
+      <div class="bg-gradient-to-br from-amber-100 via-rose-50 to-orange-100 border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-rose-600 text-xs font-bold shadow-sm mb-3">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            오산시 마루초등학교 5학년 보건 교실
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-kids text-slate-900 leading-snug">
+            위급할 때 골든타임을 지키는<br>
+            <span class="text-rose-600 underline decoration-amber-400 decoration-wavy">생활 속 응급처치 영웅</span>이 되어보자!
+          </h2>
+          <p class="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
+            운동장, 체육관, 놀이터, 가정에서 일어날 수 있는 응급 상황! 무작위로 뒤섞인 처치 도구 중 올바른 순서를 찾고 119 신고 요령을 배워 마루초등학교 공식 응급처치 히어로 임명장에 도전하세요.
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button onclick="switchTab('simulation')" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-md transition flex items-center gap-2 transform active:scale-95">
+              <i class="fa-solid fa-gamepad"></i> 1단계: 실전 롤플레잉 순서 맞추기
+            </button>
+            <button onclick="switchTab('call119')" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-2xl shadow-md transition flex items-center gap-2 transform active:scale-95">
+              <i class="fa-solid fa-phone-volume"></i> 2단계: 119 신고 & 골든벨
+            </button>
+          </div>
+        </div>
+        <div class="absolute -right-6 -bottom-6 w-48 h-48 sm:w-64 sm:h-64 opacity-20 sm:opacity-90 pointer-events-none select-none text-9xl flex items-center justify-center">
+          🩺
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div onclick="switchTab('simulation')" class="card-bounce cursor-pointer bg-white rounded-3xl p-6 border border-emerald-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-4 font-black">
+              🎮
+            </div>
+            <span class="text-xs font-bold text-emerald-600 uppercase">미션 1</span>
+            <h3 class="text-xl font-kids text-slate-800 mt-1">119 출동! 가상 롤플레잉</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+              놀이터 무릎 출혈, 무더운 날 운동장 실신 등 교과서 123쪽 4대 상황극을 디지털로 시뮬레이션! 무작위로 뒤섞인 처치 도구 중에서 올바른 단계 순서에 맞는 행동을 찾아 환자를 구해보세요.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-emerald-600 text-xs font-bold flex items-center justify-between">
+            <span>4대 실전 순서 맞추기 미션</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <div onclick="switchTab('call119')" class="card-bounce cursor-pointer bg-white rounded-3xl p-6 border border-amber-300 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-3xl mb-4 font-black">
+              📞
+            </div>
+            <span class="text-xs font-bold text-amber-600 uppercase">미션 2</span>
+            <h3 class="text-xl font-kids text-slate-800 mt-1">스마트 119 신고 & 퀴즈왕</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+              오산시 마루초등학교 위치부터 상태까지 119 상황실 요원과 대화하듯 실전 신고 연습! 형성평가를 통과하면 히어로 임명장을 수여합니다.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-amber-600 text-xs font-bold flex items-center justify-between">
+            <span>대화형 신고 & 임명장 수여</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-simulation" class="tab-content hidden space-y-6">
+      <div class="border-b border-emerald-200 pb-4">
+        <div class="flex items-center gap-2">
+          <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">미션 1</span>
+          <h2 class="text-2xl font-kids text-slate-900">119 출동! 가상 시나리오 롤플레잉</h2>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">교과서 123쪽의 상황극을 직접 체험합니다. 무작위로 섞여 있는 도구 중에서 알맞은 처치 순서대로 도구를 골라보세요!</p>
+      </div>
+
+      <!-- Scenario Selection Buttons -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button onclick="startScenario(0)" id="scen-btn-0" class="scen-selector p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-left transition hover:shadow-md">
+          <div class="text-2xl mb-1">🏃‍♂️🩸</div>
+          <div class="text-xs font-bold text-emerald-700">상황 1 (놀이터)</div>
+          <div class="font-bold text-xs sm:text-sm text-slate-800 truncate">무릎 출혈 상처</div>
+        </button>
+        <button onclick="startScenario(1)" id="scen-btn-1" class="scen-selector p-3 rounded-2xl border-2 border-slate-200 bg-white text-left transition hover:shadow-md">
+          <div class="text-2xl mb-1">☀️⚽</div>
+          <div class="text-xs font-bold text-slate-500">상황 2 (운동장)</div>
+          <div class="font-bold text-xs sm:text-sm text-slate-800 truncate">온열질환 의식소실</div>
+        </button>
+        <button onclick="startScenario(2)" id="scen-btn-2" class="scen-selector p-3 rounded-2xl border-2 border-slate-200 bg-white text-left transition hover:shadow-md">
+          <div class="text-2xl mb-1">🏀👃</div>
+          <div class="text-xs font-bold text-slate-500">상황 3 (체육관)</div>
+          <div class="font-bold text-xs sm:text-sm text-slate-800 truncate">공에 맞은 코피</div>
+        </button>
+        <button onclick="startScenario(3)" id="scen-btn-3" class="scen-selector p-3 rounded-2xl border-2 border-slate-200 bg-white text-left transition hover:shadow-md">
+          <div class="text-2xl mb-1">🍜🔥</div>
+          <div class="text-xs font-bold text-slate-500">상황 4 (가정)</div>
+          <div class="font-bold text-xs sm:text-sm text-slate-800 truncate">뜨거운 국물 화상</div>
+        </button>
+      </div>
+
+      <!-- Scenario Game Screen -->
+      <div id="game-stage" class="bg-white rounded-3xl border border-emerald-300 shadow-md p-6 sm:p-8 space-y-6">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+    <section id="tab-call119" class="tab-content hidden space-y-6">
+      <div class="border-b border-amber-300 pb-4">
+        <div class="flex items-center gap-2">
+          <span class="bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full">미션 2</span>
+          <h2 class="text-2xl font-kids text-slate-900">스마트 119 신고 훈련 & 골든벨 퀴즈</h2>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">119에 침착하게 신고하는 요령(위치, 상황, 인원, 상태)을 대화로 연습하고, 스스로 다지기 퀴즈를 풀어보세요.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: 119 Call Simulation (7 cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl border-2 border-red-300 shadow-md p-5 sm:p-6 flex flex-col justify-between min-h-[480px]">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                <span class="font-bold text-slate-800 text-sm">119 긴급 신고 접수대 통화 실습</span>
+              </div>
+              <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                훈련 지역: 오산시 마루초등학교
+              </span>
+            </div>
+
+            <!-- Chat Window -->
+            <div id="call-chat-box" class="space-y-3 my-4 overflow-y-auto max-h-[300px] p-2 bg-slate-50 rounded-2xl border border-slate-100">
+              <!-- Dialog messages injected by JS -->
+            </div>
+          </div>
+
+          <!-- Interaction Area (Options to choose next reply) -->
+          <div id="call-action-box" class="pt-3 border-t border-slate-100">
+            <!-- Buttons injected by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Self Test Quiz (5 cols) -->
+        <div class="lg:col-span-5 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl border border-amber-300 p-5 sm:p-6 flex flex-col justify-between shadow-sm">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-amber-200 mb-4">
+              <h3 class="font-kids text-lg text-slate-800 flex items-center gap-2">
+                <span>✏️</span> 스스로 다지기 골든벨
+              </h3>
+              <span id="quiz-counter" class="text-xs font-bold text-amber-700 bg-amber-200/70 px-2 py-0.5 rounded-lg">1 / 4 문항</span>
+            </div>
+
+            <div id="quiz-box" class="space-y-4">
+              <!-- Quiz Questions injected by JS -->
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-amber-200 flex justify-between items-center text-xs text-slate-500">
+            <span>교과서 123쪽 빈칸 학습 연계</span>
+            <button onclick="resetQuiz()" class="text-rose-600 font-bold hover:underline">
+              <i class="fa-solid fa-rotate-right"></i> 다시 풀기
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-certificate" class="tab-content hidden space-y-6">
+      <div class="text-center max-w-xl mx-auto space-y-2">
+        <span class="px-3 py-1 bg-amber-200 text-amber-900 rounded-full font-bold text-xs uppercase tracking-wider">
+          골든타임 수호자 공식 수료증
+        </span>
+        <h2 class="text-3xl font-kids text-slate-900">응급처치 히어로 임명장</h2>
+        <p class="text-sm text-slate-600">
+          모든 미션과 119 훈련을 성실히 이수한 학생에게 수여하는 공식 임명장입니다. 학생 이름과 교육 날짜를 설정하여 임명장을 출력하거나 저장하세요!
+        </p>
+      </div>
+
+      <!-- Student Name & Training Date Input Control -->
+      <div class="max-w-xl mx-auto bg-white p-4 sm:p-5 rounded-2xl border border-amber-200 shadow-sm space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="student-name-input" class="block text-xs font-bold text-slate-600 mb-1">
+              <i class="fa-solid fa-user-graduate text-rose-500"></i> 학생 성명
+            </label>
+            <input type="text" id="student-name-input" placeholder="학생 성명 입력 (예: 김하늘)" value="김민준" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+          <div>
+            <label for="cert-date-input" class="block text-xs font-bold text-slate-600 mb-1">
+              <i class="fa-regular fa-calendar-check text-amber-600"></i> 교육 실시 일자
+            </label>
+            <input type="date" id="cert-date-input" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+        </div>
+        <button onclick="updateCertInfo()" class="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2">
+          <i class="fa-solid fa-check"></i> 학생 성명 및 교육 일자 임명장 반영
+        </button>
+      </div>
+
+      <!-- Printable Certificate Card -->
+      <div id="certificate-print-area" class="max-w-2xl mx-auto bg-amber-50/70 border-8 border-double border-amber-600 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+        <!-- Decorative Corner Ribbons -->
+        <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-amber-700 rounded-tl-2xl"></div>
+        <div class="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-amber-700 rounded-tr-2xl"></div>
+        <div class="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-amber-700 rounded-bl-2xl"></div>
+        <div class="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-amber-700 rounded-br-2xl"></div>
+
+        <!-- Watermark -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none text-9xl">
+          🏅
+        </div>
+
+        <div class="relative z-10 text-center space-y-6">
+          <div class="inline-block p-2 bg-amber-100 border-2 border-amber-400 rounded-full text-3xl shadow-inner">
+            🎖️
+          </div>
+
+          <div>
+            <span id="cert-doc-no" class="text-xs font-bold tracking-widest text-amber-800">제 2026-0913호</span>
+            <h3 class="text-3xl sm:text-4xl font-kids text-amber-950 mt-1 tracking-wider">
+              응급처치 히어로 임명장
+            </h3>
+          </div>
+
+          <div class="py-2 border-y border-amber-300 text-slate-800 space-y-1">
+            <p class="text-base font-bold text-rose-700">소속: 오산시 마루초등학교 5학년</p>
+            <p class="text-xl sm:text-2xl font-kids text-slate-900">성명: <span id="cert-student-name" class="underline decoration-amber-500 underline-offset-4 decoration-2">김민준</span></p>
+          </div>
+
+          <p class="text-xs sm:text-base leading-relaxed text-slate-700 font-medium px-4 text-justify sm:text-center">
+            위 학생은 5학년 보건교육 <span class="font-bold text-rose-600">『생활 속 응급처치』</span> 교육과정을 우수한 성적으로 이수하였으며, 
+            피부 상처·화상·코피 등 일상 속 응급 상황에 대한 신속하고 바른 처치 역량과 
+            <span class="font-bold text-slate-900">오산소방서 119 신고 요령</span>을 완벽히 습득하였으므로 
+            우리 학교와 이웃의 생명을 지키는 <span class="font-bold text-amber-700">『골든타임 주니어 히어로』</span>로 임명합니다.
+          </p>
+
+          <div class="pt-4 flex flex-col sm:flex-row justify-between items-center text-xs sm:text-sm text-slate-600 px-6 gap-4">
+            <div class="text-left">
+              <p id="cert-date-display" class="font-bold text-slate-800 text-base">2026년 9월 13일</p>
+              <p class="text-xs text-slate-500">오산시 마루초등학교 보건실 & 119 응급센터</p>
+            </div>
+            
+            <!-- School Official Stamp -->
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <span class="font-bold text-slate-800 block text-sm">오산시 마루초등학교장</span>
+                <span class="text-xs text-slate-500 font-normal">보건 교사 일동</span>
+              </div>
+              <div class="w-14 h-14 rounded-full border-2 border-red-600 bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs p-1 text-center shadow-inner transform rotate-6 select-none">
+                마루초<br>직인
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="text-center flex justify-center gap-3">
+        <button onclick="window.print()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> 임명장 인쇄하기
+        </button>
+        <button onclick="celebrateConfetti()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 축하 축포 터뜨리기!
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="app-modal" class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border-2 border-amber-300 transform transition-all text-center space-y-4">
+      <div id="modal-icon" class="text-4xl">💡</div>
+      <h4 id="modal-title" class="text-xl font-kids text-slate-900">알림</h4>
+      <p id="modal-message" class="text-sm text-slate-600 whitespace-pre-line leading-relaxed"></p>
+      <button onclick="closeModal()" class="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-sm shadow transition">
+        확인했습니다
+      </button>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 text-slate-400 text-xs py-4 text-center mt-8 border-t border-slate-800">
+    <p>초등학교 5학년 보건 교과서 연계 교육용 웹 앱 | 관할 교육기관: <strong>오산시 마루초등학교</strong> 보건실</p>
+    <p class="mt-1 text-slate-500">생명을 살리는 4분의 기적, 우리가 바로 골든타임의 주인공입니다.</p>
+  </footer>
+
+  <script>
+    const SCENARIOS = [
+      {
+        title: "놀이터 달리기 도중 넘어져 무릎에서 피가 철철 날 때",
+        location: "마루초 앞 놀이터",
+        patient: "친구 은우가 넘어져 무릎에 흙이 잔뜩 묻고 피가 흐르고 있어요!",
+        patientIcon: "🏃‍♀️😭",
+        correctToolOrder: ["거즈지혈", "수돗물세척", "소독약바깥", "밴드부착"],
+        tools: [
+          { id: "거즈지혈", name: "깨끗한 거즈로 직접 지혈", icon: "🩹", desc: "피 나는 곳을 꾹 누른다" },
+          { id: "수돗물세척", name: "흐르는 깨끗한 물 세척", icon: "🚰", desc: "흙과 오염물질 씻기" },
+          { id: "소독약바깥", name: "소독약 바깥쪽 바르기", icon: "🧪", desc: "중심에서 바깥쪽으로" },
+          { id: "밴드부착", name: "멸균 밴드로 상처 보호", icon: "🩹", desc: "2차 감염 방지" },
+          { id: "더러운휴지", name: "주머니 속 구겨진 휴지", icon: "🧻", desc: "더러운 휴지로 닦기 (오답!)" },
+          { id: "된장바르기", name: "된장 민간요법 바르기", icon: "🥣", desc: "할머니 비법? (오답!)" }
+        ]
+      },
+      {
+        title: "한여름 운동장에서 축구하다 친구가 쓰러졌을 때 (온열질환)",
+        location: "오산시 마루초등학교 운동장",
+        patient: "민호가 땡볕에서 공을 차다 땀도 안 흘리고 뜨거운 몸으로 털썩 쓰러졌어요!",
+        patientIcon: "☀️😵",
+        correctToolOrder: ["그늘이동119", "옷벗기기", "젖은수건", "물먹이지않기"],
+        tools: [
+          { id: "그늘이동119", name: "시원한 그늘로 이동하여 119 신고", icon: "🌳📞", desc: "시원한 장소 이동 및 긴급 신고" },
+          { id: "옷벗기기", name: "옷을 벗기기", icon: "👕", desc: "열 발산을 돕기 위해 옷 벗기기" },
+          { id: "젖은수건", name: "젖은 수건으로 닦아 체온 식히기", icon: "🧊", desc: "물 뿌리기 및 젖은 수건으로 냉각" },
+          { id: "물먹이지않기", name: "의식이 없으므로 시원한 물은 먹이지 않기", icon: "🚫🥤", desc: "기도 막힘 및 질식 예방" },
+          { id: "억지물먹이기", name: "기절한 친구 입에 억지로 물 붓기", icon: "🥤", desc: "폐로 들어가 질식 위험! (오답)" },
+          { id: "패딩덮기", name: "추울까 봐 두꺼운 옷으로 덮기", icon: "🧥", desc: "체온이 더 올라감! (오답)" }
+        ]
+      },
+      {
+        title: "체육관에서 날아오는 농구공에 코를 맞아 코피가 날 때",
+        location: "마루초 체육관",
+        patient: "체육 시간 지안이가 날아온 공에 코를 맞아 쌍코피를 흘리고 있어요!",
+        patientIcon: "🏀🩸",
+        correctToolOrder: ["고개숙이기", "콧망울압박", "입숨쉬기", "목뒤얼음"],
+        tools: [
+          { id: "고개숙이기", name: "고개를 '앞으로' 숙이기", icon: "🙇‍♂️", desc: "피가 기도로 안 넘어가게" },
+          { id: "콧망울압박", name: "콧망울을 10분간 꾹 압박", icon: "🤏", desc: "확실한 지혈 처치" },
+          { id: "입숨쉬기", name: "입으로 숨쉬고 피 뱉기", icon: "😮", desc: "피를 삼키지 않기" },
+          { id: "목뒤얼음", name: "코나 목 뒤에 시원한 냉찜질", icon: "🧊", desc: "혈관 수축 돕기" },
+          { id: "고개젖히기", name: "고개를 뒤로 힘껏 젖히기", icon: "🙆‍♂️", desc: "기도 막힘 위험! (오답!)" },
+          { id: "코파기", name: "손가락 넣어 굳은 피 후비기", icon: "👃", desc: "재출혈 위험! (오답!)" }
+        ]
+      },
+      {
+        title: "집에서 컵라면 먹다가 발등에 뜨거운 국물이 쏟아졌을 때",
+        location: "우리 집 주방",
+        patient: "뜨거운 라면 국물이 발등에 쏟아져 피부가 빨갛게 달아오르고 물집이 잡히려 해요!",
+        patientIcon: "🍜🔥",
+        correctToolOrder: ["흐르는찬물", "물집보호", "거즈덮기", "병원가기"],
+        tools: [
+          { id: "흐르는찬물", name: "흐르는 찬물에 10~15분 식히기", icon: "🚰", desc: "화상 열기 빼내기" },
+          { id: "물집보호", name: "생긴 물집 절대 터뜨리지 않기", icon: "🫧", desc: "2차 세균 감염 차단" },
+          { id: "거즈덮기", name: "깨끗한 멸균 거즈로 덮기", icon: "🩹", desc: "상처 안전 보호" },
+          { id: "병원가기", name: "부모님과 함께 병원 진료", icon: "🏥", desc: "전문 치료 받기" },
+          { id: "얼음대기", name: "냉동실 각얼음 직접 문지르기", icon: "🧊", desc: "동상/조직 손상! (오답!)" },
+          { id: "치약바르기", name: "화끈거리니 치약 듬뿍 바르기", icon: "🪥", desc: "심각한 감염 유발! (오답!)" }
+        ]
+      }
+    ];
+
+    const CALL_SCRIPT_STEPS = [
+      {
+        step: 1,
+        agentText: "119 종합상황실입니다. 응급 상황이 발생한 정확한 위치가 어디인가요?",
+        options: [
+          { text: "우리 학교 운동장 수돗가 근처요!", correct: false, feedback: "전국에 학교가 너무 많아요! 시/군/구와 구체적인 학교 이름을 말해야 해요." },
+          { text: "오산시 마루초등학교 운동장 조회대 옆이에요!", correct: true, feedback: "정확합니다! 소방관들이 빠르게 출동할 위치(시·도 및 학교명, 구체적 장소)를 명확히 알렸습니다." },
+          { text: "잘 모르겠는데 그냥 빨리 와주세요!", correct: false, feedback: "당황스럽겠지만 위치를 말하지 않으면 구급차가 찾아갈 수 없어요!" }
+        ]
+      },
+      {
+        step: 2,
+        agentText: "네, '오산시 마루초등학교'로 구급차 출동 지령 내렸습니다. 어떤 상황인지 설명해 주세요.",
+        options: [
+          { text: "친구가 체육 시간에 축구하다가 쓰러졌는데 불러도 대답이 없어요!", correct: true, feedback: "상황(활동 내용 및 의식 소실 상태)을 매우 침착하고 명확하게 전달했어요!" },
+          { text: "아무튼 엄청 큰일 났어요! 피가 날지도 몰라요!", correct: false, feedback: "무슨 일로 다쳤는지 정확한 원인(축구하다 쓰러짐 등)을 알려주셔야 맞춤 장비를 준비해요." }
+        ]
+      },
+      {
+        step: 3,
+        agentText: "다친 환자는 총 몇 명인가요?",
+        options: [
+          { text: "쓰러진 친구 1명이에요.", correct: true, feedback: "환자 수를 정확히 밝혀 필요한 구급차 대수를 파악할 수 있습니다." },
+          { text: "주변에 구경하는 친구들이 한 10명 모여 있어요.", correct: false, feedback: "구경하는 사람이 아닌 '다친 환자의 수'를 말씀해 주셔야 합니다." }
+        ]
+      },
+      {
+        step: 4,
+        agentText: "마지막으로 환자의 체온이나 숨쉬는 상태는 어떤가요?",
+        options: [
+          { text: "몸이 엄청 뜨겁고 땀이 안 나요. 숨은 쉬는데 깨어나질 않아요.", correct: true, feedback: "완벽합니다! 열사병 의심 증상을 정확히 알려주어 구급대원이 최적의 냉각 응급장비를 준비합니다." },
+          { text: "그냥 누워있는데 무서워서 못 만져보겠어요.", correct: false, feedback: "숨을 쉬는지, 몸이 뜨거운지 조심스럽게 확인해 주시면 환자에게 큰 도움이 됩니다." }
+        ]
+      }
+    ];
+
+    const QUIZ_QUESTIONS = [
+      {
+        q: "1. 코피가 날 때는 고개를 (_____) 숙인 후 엄지와 검지로 콧망울을 꾹 누른다.",
+        options: ["뒤로 힘껏", "앞으로", "오른쪽으로"],
+        answer: 1,
+        desc: "고개를 뒤로 젖히면 피가 기도로 넘어가 질식할 수 있으므로 반드시 '앞으로' 숙여야 합니다."
+      },
+      {
+        q: "2. 화상을 입었을 때 즉시 흐르는 찬물로 (_____) 정도 열기를 식혀준다.",
+        options: ["1초", "10~15분", "3시간"],
+        answer: 1,
+        desc: "충분히 열기를 빼주기 위해 깨끗한 찬물로 10~15분간 식혀주어야 깊은 화상으로 번지지 않습니다."
+      },
+      {
+        q: "3. 빠진 영구치는 흙을 털고 (_____) 또는 생리식염수에 담아 30분 이내에 치과로 간다.",
+        options: ["콜라", "뜨거운 차", "우유"],
+        answer: 2,
+        desc: "치아 뿌리의 인대 세포가 죽지 않도록 삼투압이 맞는 '우유'나 '생리식염수'에 보관해야 합니다."
+      },
+      {
+        q: "4. 벌에 쏘였을 때 독침은 (_____)으로 살살 밀어서 제거한다.",
+        options: ["손톱으로 쥐어짜기", "플라스틱 카드", "핀셋으로 꽉 집기"],
+        answer: 1,
+        desc: "핀셋이나 손으로 집으면 독주머니가 터져 독이 체내로 더 들어가므로 플라스틱 카드로 긁어냅니다."
+      }
+    ];
+
+    let currentSituationIndex = 0;
+    let completedSituations = new Set();
+    let currentScenarioIndex = 0;
+    let scenarioStep = 0; // index into correctToolOrder
+    let selectedScenarioTools = [];
+    let currentShuffledTools = []; // Holds the randomized tool cards
+    let currentCallStep = 0;
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    window.onload = function() {
+      startScenario(0);
+      initCallSim();
+      renderQuiz();
+      initCertDate();
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.remove('hidden');
+
+      // Update Nav active classes (only simulation, call119, certificate)
+      const navIds = ['simulation', 'call119', 'certificate'];
+      navIds.forEach(id => {
+        const btn = document.getElementById('nav-' + id);
+        if (!btn) return;
+        if (id === tabId) {
+          btn.classList.add('bg-white', 'text-slate-900', 'shadow-md');
+          btn.classList.remove('bg-white/10', 'text-white');
+        } else {
+          btn.classList.remove('bg-white', 'text-slate-900', 'shadow-md');
+          btn.classList.add('bg-white/10', 'text-white');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showModal(title, message, icon = '💡') {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-message').innerText = message;
+      document.getElementById('modal-icon').innerText = icon;
+      document.getElementById('app-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('app-modal').classList.add('hidden');
+    }
+
+    function startScenario(scenIdx) {
+      currentScenarioIndex = scenIdx;
+      scenarioStep = 0;
+      selectedScenarioTools = [];
+
+      // Randomly shuffle the tools array so options do not appear in correct sequential order
+      const scen = SCENARIOS[currentScenarioIndex];
+      currentShuffledTools = [...scen.tools].sort(() => Math.random() - 0.5);
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`scen-btn-${i}`);
+        if (!btn) continue;
+        if (i === scenIdx) {
+          btn.className = 'scen-selector p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-left transition shadow-sm';
+        } else {
+          btn.className = 'scen-selector p-3 rounded-2xl border-2 border-slate-200 bg-white text-left transition hover:shadow-md';
+        }
+      }
+
+      renderScenarioStage();
+    }
+
+    function renderScenarioStage() {
+      const scen = SCENARIOS[currentScenarioIndex];
+      const stage = document.getElementById('game-stage');
+
+      const isCompleted = scenarioStep >= scen.correctToolOrder.length;
+
+      let toolButtonsHtml = '';
+      if (!isCompleted) {
+        // Use the shuffled tool order for rendering buttons
+        toolButtonsHtml = currentShuffledTools.map(tool => {
+          const isUsed = selectedScenarioTools.includes(tool.id);
+          return `
+            <button onclick="chooseTool('${tool.id}')" ${isUsed ? 'disabled' : ''} class="p-3 rounded-2xl border-2 ${
+              isUsed ? 'border-slate-200 bg-slate-100 opacity-40 cursor-not-allowed' : 'border-emerald-300 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-500'
+            } text-left transition flex flex-col justify-between">
+              <div>
+                <span class="text-2xl">${tool.icon}</span>
+                <div class="font-bold text-xs sm:text-sm text-slate-900 mt-1">${tool.name}</div>
+              </div>
+              <span class="text-[11px] text-slate-500 mt-1">${tool.desc}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      let stepTrackerHtml = scen.correctToolOrder.map((toolId, i) => {
+        const done = i < scenarioStep;
+        return `
+          <div class="flex items-center gap-1.5 text-xs font-bold ${done ? 'text-emerald-600' : 'text-slate-400'}">
+            <span class="w-5 h-5 rounded-full ${done ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'} flex items-center justify-center text-[10px]">
+              ${done ? '✓' : i + 1}
+            </span>
+            <span>단계 ${i + 1}</span>
+          </div>
+        `;
+      }).join('<span class="text-slate-300 text-xs">➜</span>');
+
+      stage.innerHTML = `
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-200/70 px-2.5 py-0.5 rounded-full mb-1">
+              <i class="fa-solid fa-map-pin"></i> ${scen.location}
+            </div>
+            <h3 class="text-lg sm:text-xl font-kids text-slate-900">${scen.title}</h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-0.5">${scen.patient}</p>
+          </div>
+          <div class="text-5xl">${scen.patientIcon}</div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="flex items-center gap-2 overflow-x-auto py-1">
+          ${stepTrackerHtml}
+        </div>
+
+        ${!isCompleted ? `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-bold text-slate-800">
+                🎒 무작위로 섞인 구급함 도구 중 이번 순서에 알맞은 것을 찾아주세요 (<span class="text-emerald-600">${scenarioStep + 1}단계</span> / 총 ${scen.correctToolOrder.length}단계):
+              </h4>
+              <button onclick="shuffleCurrentTools()" class="text-xs text-slate-500 hover:text-emerald-600 flex items-center gap-1">
+                <i class="fa-solid fa-shuffle"></i> 다시 섞기
+              </button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              ${toolButtonsHtml}
+            </div>
+          </div>
+        ` : `
+          <div class="bg-emerald-100 border-2 border-emerald-500 rounded-2xl p-6 text-center space-y-3">
+            <div class="text-5xl">🎉</div>
+            <h4 class="text-2xl font-kids text-emerald-900">시나리오 미션 완벽 해결!</h4>
+            <p class="text-xs sm:text-sm text-emerald-800 max-w-md mx-auto">
+              정확한 순서로 응급처치를 완료하여 친구가 무사히 회복되었습니다! 오산시 마루초등학교 안전 영웅답습니다.
+            </p>
+            <div class="flex justify-center gap-2 pt-2">
+              <button onclick="startScenario(${currentScenarioIndex})" class="px-4 py-2 bg-white text-emerald-700 text-xs font-bold rounded-xl border border-emerald-300 hover:bg-emerald-50">
+                다시 실습하기
+              </button>
+              <button onclick="startScenario(${(currentScenarioIndex + 1) % 4})" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 shadow">
+                다음 시나리오 도전 <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        `}
+      `;
+    }
+
+    function shuffleCurrentTools() {
+      currentShuffledTools = [...currentShuffledTools].sort(() => Math.random() - 0.5);
+      renderScenarioStage();
+    }
+
+    function chooseTool(toolId) {
+      const scen = SCENARIOS[currentScenarioIndex];
+      const targetTool = scen.correctToolOrder[scenarioStep];
+
+      if (toolId === targetTool) {
+        selectedScenarioTools.push(toolId);
+        scenarioStep++;
+        if (scenarioStep >= scen.correctToolOrder.length) {
+          confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+        }
+        renderScenarioStage();
+      } else {
+        // Find tool details
+        const selectedToolObj = scen.tools.find(t => t.id === toolId);
+        showModal(
+          "잘못된 처치 선택!",
+          `선택하신 [${selectedToolObj ? selectedToolObj.name : toolId}]는 지금 순서에 적절하지 않거나 위험한 행동입니다.\n\n교과서의 올바른 처치 원칙을 다시 생각해보세요!`,
+          "⚠️"
+        );
+      }
+    }
+
+    function initCallSim() {
+      currentCallStep = 0;
+      const chatBox = document.getElementById('call-chat-box');
+      chatBox.innerHTML = '';
+      appendAgentMessage(CALL_SCRIPT_STEPS[0].agentText);
+      renderCallActionButtons();
+    }
+
+    function appendAgentMessage(text) {
+      const chatBox = document.getElementById('call-chat-box');
+      const msg = document.createElement('div');
+      msg.className = 'flex items-start gap-2 max-w-[85%]';
+      msg.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow">
+          119
+        </div>
+        <div class="bg-white border border-red-200 text-slate-800 text-xs sm:text-sm p-3 rounded-2xl rounded-tl-none shadow-sm leading-relaxed">
+          <span class="block font-bold text-red-600 text-[11px] mb-0.5">119 상황실 요원</span>
+          ${text}
+        </div>
+      `;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendStudentMessage(text) {
+      const chatBox = document.getElementById('call-chat-box');
+      const msg = document.createElement('div');
+      msg.className = 'flex items-start gap-2 max-w-[85%] ml-auto flex-row-reverse';
+      msg.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-xs font-black shrink-0 shadow">
+          나
+        </div>
+        <div class="bg-amber-400 text-slate-900 text-xs sm:text-sm p-3 rounded-2xl rounded-tr-none shadow-sm leading-relaxed font-medium">
+          ${text}
+        </div>
+      `;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function renderCallActionButtons() {
+      const actionBox = document.getElementById('call-action-box');
+      if (currentCallStep >= CALL_SCRIPT_STEPS.length) {
+        actionBox.innerHTML = `
+          <div class="p-3 bg-red-50 border border-red-300 rounded-2xl text-center space-y-2">
+            <span class="text-xs font-bold text-red-700">🚒 119 신고 완료! 구급대가 오산시 마루초등학교로 즉시 출발했습니다.</span>
+            <div>
+              <button onclick="initCallSim()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition">
+                119 신고 훈련 처음부터 다시하기
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const stepData = CALL_SCRIPT_STEPS[currentCallStep];
+      let buttonsHtml = stepData.options.map((opt, i) => `
+        <button onclick="handleCallOption(${i})" class="w-full text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-400 text-xs sm:text-sm text-slate-800 transition flex items-center justify-between group">
+          <span>${opt.text}</span>
+          <i class="fa-solid fa-microphone text-slate-400 group-hover:text-rose-500 text-xs"></i>
+        </button>
+      `).join('');
+
+      actionBox.innerHTML = `
+        <div class="space-y-1.5">
+          <span class="text-xs font-bold text-slate-600">내 답변 선택하기 (신고 4요소: 위치, 상황, 인원, 상태):</span>
+          ${buttonsHtml}
+        </div>
+      `;
+    }
+
+    function handleCallOption(optIdx) {
+      const stepData = CALL_SCRIPT_STEPS[currentCallStep];
+      const selected = stepData.options[optIdx];
+
+      appendStudentMessage(selected.text);
+
+      if (selected.correct) {
+        currentCallStep++;
+        setTimeout(() => {
+          if (currentCallStep < CALL_SCRIPT_STEPS.length) {
+            appendAgentMessage(CALL_SCRIPT_STEPS[currentCallStep].agentText);
+          } else {
+            appendAgentMessage("알겠습니다. 오산소방서 구급대가 출동 중이며 4분 내 도착 예정입니다. 소방관이 도착할 때까지 침착하게 환자의 호흡을 확인하고 말을 걸어주세요!");
+            confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+          }
+          renderCallActionButtons();
+        }, 600);
+      } else {
+        showModal("119 상황실 안내", selected.feedback, "🚒");
+      }
+    }
+
+    function renderQuiz() {
+      const quizBox = document.getElementById('quiz-box');
+      const counter = document.getElementById('quiz-counter');
+      counter.innerText = `${currentQuizIndex + 1} / ${QUIZ_QUESTIONS.length} 문항`;
+
+      if (currentQuizIndex >= QUIZ_QUESTIONS.length) {
+        quizBox.innerHTML = `
+          <div class="text-center py-6 space-y-3">
+            <div class="text-4xl">🏆</div>
+            <h4 class="font-kids text-xl text-slate-900">골든벨 퀴즈 완점 통과!</h4>
+            <p class="text-xs sm:text-sm text-slate-600">
+              교과서 123쪽 '스스로 다지기' 핵심 내용을 모두 마스터했습니다. 이제 마루초등학교 영웅 임명장을 발급받으세요!
+            </p>
+            <button onclick="switchTab('certificate')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl text-xs shadow transition">
+              히어로 임명장 확인하러 가기 ➜
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = QUIZ_QUESTIONS[currentQuizIndex];
+      let optionsHtml = q.options.map((opt, i) => `
+        <button onclick="answerQuiz(${i})" class="w-full text-left p-3 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 text-xs sm:text-sm font-semibold text-slate-800 transition flex items-center justify-between">
+          <span>${i + 1}. ${opt}</span>
+          <i class="fa-regular fa-circle-check text-amber-500"></i>
+        </button>
+      `).join('');
+
+      quizBox.innerHTML = `
+        <div>
+          <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug mb-3">
+            ${q.q}
+          </h4>
+          <div class="space-y-2">
+            ${optionsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function answerQuiz(optIdx) {
+      const q = QUIZ_QUESTIONS[currentQuizIndex];
+      if (optIdx === q.answer) {
+        showModal("정답입니다! 👏", q.desc, "⭕");
+        currentQuizIndex++;
+        renderQuiz();
+      } else {
+        showModal("오답입니다! 다시 한 번 생각해보세요.", "힌트: " + q.desc, "❌");
+      }
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      renderQuiz();
+    }
+
+    function initCertDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const yyyyMmDd = `${year}-${month}-${day}`;
+
+      const dateInput = document.getElementById('cert-date-input');
+      if (dateInput) {
+        dateInput.value = yyyyMmDd;
+      }
+      applyDateToCert(today);
+    }
+
+    function applyDateToCert(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = dateObj.getMonth() + 1;
+      const d = dateObj.getDate();
+      const mm = String(m).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+
+      document.getElementById('cert-date-display').innerText = `${y}년 ${m}월 ${d}일`;
+      document.getElementById('cert-doc-no').innerText = `제 ${y}-${mm}${dd}호`;
+    }
+
+    function updateCertInfo() {
+      const nameInput = document.getElementById('student-name-input');
+      const dateInput = document.getElementById('cert-date-input');
+
+      const nameVal = nameInput.value.trim();
+      if (!nameVal) {
+        showModal("입력 오류", "학생 성명을 올바르게 입력해주세요.", "✏️");
+        return;
+      }
+
+      if (!dateInput.value) {
+        showModal("입력 오류", "교육 실시 일자를 선택해주세요.", "📅");
+        return;
+      }
+
+      const [year, month, day] = dateInput.value.split('-').map(Number);
+      const chosenDate = new Date(year, month - 1, day);
+
+      document.getElementById('cert-student-name').innerText = nameVal;
+      applyDateToCert(chosenDate);
+
+      showModal(
+        "임명장 갱신 완료",
+        `[오산시 마루초등학교 5학년 ${nameVal}] 학생의 성명과 교육 일자(${year}년 ${month}월 ${day}일)가 임명장에 정상 반영되었습니다!`,
+        "🏅"
+      );
+      celebrateConfetti();
+    }
+
+    function celebrateConfetti() {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 }
+      });
+    }
+  </script>
+</body>
+</html>
