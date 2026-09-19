@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>디지털 지킴이 e-케어 | 초등 5학년 보건</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Jua & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- Confetti Canvas library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f0fdf4;
+    }
+    .font-jua {
+      font-family: 'Jua', sans-serif;
+    }
+    /* 말풍선 꼬리 */
+    .bubble-left::after {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 14px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 8px solid #ffffff;
+    }
+    .bubble-right::after {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: 14px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 8px solid #fef08a;
+    }
+    /* 부드러운 스크롤 */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start text-slate-800 antialiased p-2 sm:p-4">
+
+  <!-- 전체 컨테이너 (스마트 디바이스 비율) -->
+  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl border-4 border-emerald-300 overflow-hidden flex flex-col min-h-[92vh]">
+    
+    <!-- 상단 헤더 -->
+    <header class="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 p-4 text-white flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner text-2xl font-black">
+          🛡️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-emerald-700/40 text-emerald-100 text-xs px-2 py-0.5 rounded-full font-bold">초등 5학년 보건</span>
+            <span class="bg-amber-400 text-amber-900 text-xs px-2 py-0.5 rounded-full font-bold">3단원</span>
+          </div>
+          <h1 class="font-jua text-xl sm:text-2xl tracking-wide drop-shadow">디지털 지킴이 e-케어</h1>
+        </div>
+      </div>
+      <!-- 배지 / 점수 -->
+      <div class="text-right">
+        <div class="text-xs text-emerald-100">나의 안심 뱃지</div>
+        <div id="badgeCount" class="font-jua text-lg sm:text-xl text-yellow-300 flex items-center justify-end gap-1">
+          <span>🏅</span> <span id="badgeNumber">0</span> / 8개
+        </div>
+      </div>
+    </header>
+
+    <!-- 네비게이션 탭 (3대 핵심 모듈) -->
+    <nav class="grid grid-cols-3 bg-emerald-50 border-b border-emerald-200 p-1.5 gap-1.5 font-jua text-sm sm:text-base">
+      <button onclick="switchTab('sim')" id="tab-btn-sim" class="tab-btn py-2.5 px-1 rounded-2xl flex items-center justify-center gap-1.5 transition bg-white text-emerald-700 shadow-sm border border-emerald-200">
+        <span>💬</span> <span>1. 모의 톡 챌린지</span>
+      </button>
+      <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="tab-btn py-2.5 px-1 rounded-2xl flex items-center justify-center gap-1.5 transition text-slate-600 hover:text-emerald-700">
+        <span>🧩</span> <span>2. 유형 & 퀴즈</span>
+      </button>
+      <button onclick="switchTab('sos')" id="tab-btn-sos" class="tab-btn py-2.5 px-1 rounded-2xl flex items-center justify-center gap-1.5 transition text-slate-600 hover:text-emerald-700">
+        <span>🚨</span> <span>3. 대처 & 약속판</span>
+      </button>
+    </nav>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 p-3 sm:p-5 overflow-y-auto hide-scrollbar bg-slate-50 flex flex-col">
+
+      <!-- ================= 탭 1: 톡톡 모의 챌린지 ================= -->
+      <section id="section-sim" class="space-y-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex items-start gap-3">
+          <div class="text-2xl">📱</div>
+          <div class="text-xs sm:text-sm text-amber-900">
+            <strong>교과서 95·97쪽 연계 체험</strong><br>
+            가상 메신저 속 위험 상황에서 올바른 답변을 골라보세요. 용기 있게 행동하면 안심 뱃지를 얻습니다!
+          </div>
+        </div>
+
+        <!-- 시나리오 선택기 -->
+        <div class="flex gap-2">
+          <button onclick="loadScenario(0)" id="scen-btn-0" class="scen-btn flex-1 py-2 px-2 text-xs sm:text-sm font-jua rounded-xl bg-emerald-600 text-white shadow">
+            상황 1: 단톡방 몰카 사진
+          </button>
+          <button onclick="loadScenario(1)" id="scen-btn-1" class="scen-btn flex-1 py-2 px-2 text-xs sm:text-sm font-jua rounded-xl bg-slate-200 text-slate-700 hover:bg-slate-300">
+            상황 2: 게임 속 친절한 유혹
+          </button>
+          <button onclick="loadScenario(2)" id="scen-btn-2" class="scen-btn flex-1 py-2 px-2 text-xs sm:text-sm font-jua rounded-xl bg-slate-200 text-slate-700 hover:bg-slate-300">
+            상황 3: 친구 얼굴 합성(딥페이크)
+          </button>
+        </div>
+
+        <!-- 스마트폰 메신저 UI 시뮬레이터 -->
+        <div class="bg-sky-100 rounded-3xl p-3.5 sm:p-5 border-4 border-slate-300 shadow-inner flex flex-col min-h-[380px] justify-between">
+          
+          <!-- 상단 대화방 헤더 -->
+          <div class="flex items-center justify-between pb-3 border-b border-sky-200/80 mb-3 text-slate-700 text-xs sm:text-sm font-bold">
+            <span id="chatRoomTitle">👥 5학년 우리 반 단톡방 (4명)</span>
+            <span class="bg-sky-200 text-sky-800 px-2 py-0.5 rounded-full text-xs">보건 모의 체험 중</span>
+          </div>
+
+          <!-- 대화 메시지 영역 -->
+          <div id="chatMessages" class="space-y-3 flex-1 flex flex-col justify-start">
+            <!-- JS 동적 렌더링 -->
+          </div>
+
+          <!-- 피드백 알림 박스 (결과) -->
+          <div id="feedbackBox" class="hidden mt-3 p-3 rounded-2xl border text-xs sm:text-sm"></div>
+
+          <!-- 선택지 버튼 영역 -->
+          <div id="choiceContainer" class="mt-4 pt-3 border-t border-sky-200 space-y-2">
+            <!-- JS 동적 렌더링 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 탭 2: 유형 쏙쏙 카드 & 퀴즈 팡팡 ================= -->
+      <section id="section-quiz" class="space-y-5 hidden">
+        <!-- 6대 유형 도감 카드 -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="font-jua text-lg text-emerald-800 flex items-center gap-1.5">
+              <span>📚</span> 교과서 96쪽: 디지털 성폭력 6가지 유형 알아보기
+            </h2>
+            <span class="text-xs text-slate-500 font-medium">카드를 눌러 설명을 확인하세요</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="typeCardsContainer">
+            <!-- JS 동적 생성 -->
+          </div>
+        </div>
+
+        <!-- 퀴즈 팡팡 (교과서 97~98쪽 연계) -->
+        <div class="bg-white rounded-2xl p-4 border-2 border-emerald-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-2">
+            <h3 class="font-jua text-emerald-700 text-base sm:text-lg flex items-center gap-1">
+              <span>🎯</span> 교과서 빈칸 채우기 & 상황 퀴즈
+            </h3>
+            <span id="quizScoreText" class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full">
+              퀴즈 진행: 1 / 3
+            </span>
+          </div>
+
+          <!-- 문제 카드 -->
+          <div id="quizQuestionBox" class="space-y-3">
+            <p id="quizQuestionPrompt" class="text-sm sm:text-base font-bold text-slate-800"></p>
+            <div id="quizOptionContainer" class="space-y-2"></div>
+          </div>
+
+          <div id="quizResultMsg" class="hidden text-xs sm:text-sm p-3 rounded-xl"></div>
+          
+          <button id="nextQuizBtn" onclick="nextQuizQuestion()" class="hidden w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-jua rounded-xl transition">
+            다음 문제 풀기 ➔
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= 탭 3: SOS 안심 대처 & 우리 반 약속 보드 ================= -->
+      <section id="section-sos" class="space-y-5 hidden">
+        
+        <!-- 1. 가상 캡처 미션 (교과서 98쪽 증거 확보) -->
+        <div class="bg-white rounded-2xl p-4 border-2 border-rose-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-jua text-rose-600 text-base sm:text-lg flex items-center gap-1.5">
+              <span>📸</span> 실전 미션: 당황하지 말고 '화면 캡처'로 증거 남기기!
+            </h3>
+          </div>
+          <p class="text-xs text-slate-600">
+            피해 메시지를 받으면 무작정 방을 나가거나 지우지 마세요! <strong>보낸 사람의 ID와 날짜, 내용</strong>이 보이게 캡처해야 도움을 받을 수 있습니다.
+          </p>
+
+          <!-- 모의 캡처 대상 화면 -->
+          <div id="captureTarget" class="relative bg-slate-100 border-2 border-dashed border-rose-300 rounded-2xl p-3 text-xs">
+            <div class="flex justify-between text-slate-400 text-[11px] mb-2">
+              <span>오후 3:24 | ID: stranger_999</span>
+              <span class="text-rose-500 font-bold">⚠️ 의심되는 대화</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-800">
+              "야 너 예쁜 옷 입은 사진 하나만 보내봐. 아무한테도 안 보여줄 테니까 편하게 보내~"
+            </div>
+            <!-- 워터마크 안내 -->
+            <div id="captureSuccessBadge" class="hidden absolute inset-0 bg-emerald-600/90 rounded-2xl flex flex-col items-center justify-center text-white text-center p-3 animate-fade-in">
+              <span class="text-3xl mb-1">📸 ✔️</span>
+              <span class="font-jua text-base">증거 화면 안전하게 저장 완료!</span>
+              <span class="text-xs text-emerald-100 mt-1">경찰 및 전문 상담 기관에 바로 증거로 제출할 수 있습니다.</span>
+            </div>
+          </div>
+
+          <button id="captureBtn" onclick="triggerCaptureSimulation()" class="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-jua rounded-xl shadow transition flex items-center justify-center gap-2">
+            <span>📷</span> <span>가상 화면 캡처하고 증거 보관하기</span>
+          </button>
+        </div>
+
+        <!-- 2. 한눈에 보는 안심 비상벨 (신고/상담 기관) -->
+        <div class="bg-white rounded-2xl p-4 border-2 border-indigo-200 shadow-sm space-y-3">
+          <h3 class="font-jua text-indigo-700 text-base sm:text-lg flex items-center gap-1.5">
+            <span>📞</span> 교과서 98쪽: 기억해요! 안심 상담·신고 기관
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-indigo-900 block">청소년 상담 전화</span>
+                <span class="text-slate-500 text-[11px]">고민 상담, 24시간 운영</span>
+              </div>
+              <span class="font-jua text-indigo-700 text-base bg-white px-2 py-1 rounded-lg border border-indigo-200">☎️ 1388</span>
+            </div>
+            <div class="p-2.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-indigo-900 block">경찰청 사이버수사</span>
+                <span class="text-slate-500 text-[11px]">긴급 범죄 신고 및 수사 요청</span>
+              </div>
+              <span class="font-jua text-indigo-700 text-base bg-white px-2 py-1 rounded-lg border border-indigo-200">☎️ 112</span>
+            </div>
+            <div class="p-2.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-indigo-900 block">디지털 성폭력 피해자 지원 센터</span>
+                <span class="text-slate-500 text-[11px]">불법 촬영물 삭제 지원 및 상담</span>
+              </div>
+              <span class="font-jua text-indigo-700 text-xs bg-white px-1.5 py-1 rounded-lg border border-indigo-200">02-735-8994</span>
+            </div>
+            <div class="p-2.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-indigo-900 block">방송통신심의위원회</span>
+                <span class="text-slate-500 text-[11px]">불법 정보 심의 및 접속 차단</span>
+              </div>
+              <span class="font-jua text-indigo-700 text-base bg-white px-2 py-1 rounded-lg border border-indigo-200">☎️ 1377</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 실시간 우리 반 약속 보드 -->
+        <div class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-300 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-jua text-amber-800 text-base sm:text-lg flex items-center gap-1.5">
+              <span>📝</span> 내가 실천하고 싶은 '디지털 안심 약속' 보드
+            </h3>
+            <span class="text-xs text-amber-700">등록된 실천 다짐: <strong id="promiseCount">3</strong>개</span>
+          </div>
+          <p class="text-xs text-slate-600">
+            디지털 공간에서 나를 지키고 친구를 존중하기 위한 <strong>나만의 실천 다짐</strong>을 적고 등록해 보세요!
+          </p>
+
+          <!-- 작성 입력 폼 -->
+          <div class="flex gap-2">
+            <input type="text" id="promiseInput" placeholder="예: 친구 사진을 찍거나 올릴 때는 반드시 먼저 물어보고 허락받기!" maxlength="40" class="flex-1 px-3 py-2 text-xs sm:text-sm rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white" />
+            <button id="addPromiseBtn" onclick="addPromise()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-jua rounded-xl text-xs sm:text-sm whitespace-nowrap shadow transition">
+              다짐 등록 📌
+            </button>
+          </div>
+
+          <!-- 약속 등록 완료 후 수업 마무리 안내 카드 -->
+          <div id="promiseDoneNotice" class="hidden p-3 bg-emerald-100 border border-emerald-300 text-emerald-900 rounded-2xl text-xs sm:text-sm text-center font-medium space-y-2">
+            <div>🎉 <strong>나만의 안심 실천 약속이 등록되었습니다!</strong> 모든 보건 교육 활동을 성실하게 마쳤습니다.</div>
+            <button onclick="openFinishModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-jua rounded-xl text-xs sm:text-sm shadow transition">
+              🎓 디지털 안심 지킴이 수료증 확인하고 수업 마무리하기
+            </button>
+          </div>
+
+          <!-- 약속 포스트잇 그리드 -->
+          <div id="promiseBoard" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+            <!-- 개인 실천 예시 (교과서 97~98쪽 연계) -->
+            <div class="p-2.5 bg-yellow-100 rounded-xl border border-yellow-200 shadow-xs text-xs flex items-start gap-2">
+              <span>🌟</span>
+              <div class="flex-1">
+                <span class="font-bold text-amber-900 block">[실천 다짐 1]</span>
+                <span class="text-slate-700">친구의 사진이나 영상을 올릴 때는 꼭 먼저 물어보고 허락(동의)받겠습니다!</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-yellow-100 rounded-xl border border-yellow-200 shadow-xs text-xs flex items-start gap-2">
+              <span>🛡️</span>
+              <div class="flex-1">
+                <span class="font-bold text-amber-900 block">[실천 다짐 2]</span>
+                <span class="text-slate-700">온라인에서 불편하거나 이상한 사진 요구를 받으면 단호하게 거절하고 차단하겠습니다!</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-yellow-100 rounded-xl border border-yellow-200 shadow-xs text-xs flex items-start gap-2">
+              <span>🤝</span>
+              <div class="flex-1">
+                <span class="font-bold text-amber-900 block">[실천 다짐 3]</span>
+                <span class="text-slate-700">모르는 사람이 보낸 링크나 선물은 받지 않고, 의심스러우면 즉시 어른께 알리겠습니다!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 하단 상태 바 -->
+    <footer class="bg-slate-100 border-t border-slate-200 p-2.5 text-center text-xs text-slate-500 flex justify-between items-center px-4">
+      <span>배우고 실천하는 보건 5학년 (디지털 성폭력 예방)</span>
+      <button onclick="resetBadges()" class="text-[11px] text-slate-400 hover:text-slate-600 underline">
+        진행 초기화
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- 최종 수업 완주 및 수료 축하 모달 -->
+  <div id="finishModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-sm w-full shadow-2xl border-4 border-emerald-400 text-center space-y-4">
+      <div class="text-5xl animate-bounce">🎓</div>
+      <div class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">
+        디지털 안심 지킴이 위촉
+      </div>
+      <h3 class="font-jua text-xl sm:text-2xl text-emerald-900">오늘의 보건 수업 완료!</h3>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl py-2 px-3 text-emerald-800 font-jua text-sm">
+        🏅 획득한 안심 뱃지: <span id="modalBadgeScore" class="text-emerald-700 font-bold">8 / 8개</span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <strong>1. 모의톡 거절 실습 (3개)</strong><br>
+        <strong>2. 6대 유형 퀴즈 정복 (3개)</strong><br>
+        <strong>3. 증거 캡처 & 나만의 실천 약속 (2개)</strong><br>
+        모든 미션을 멋지게 완수하였습니다.
+      </p>
+      <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 font-medium">
+        "서로를 존중하고 배려하며 디지털 공간의 경계를 꼭 지키겠습니다!" 🤝
+      </div>
+      <button onclick="closeFinishModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-jua rounded-xl text-sm shadow transition">
+        확인 및 마무리 ✨
+      </button>
+    </div>
+  </div>
+
+  <!-- 오디오 피드백 (Web Audio API) 및 앱 스크립트 -->
+  <script>
+    /* ================= Web Audio 효과음 (자체 생성) ================= */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq, type, duration) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function soundSuccess() {
+      playBeep(523.25, 'triangle', 0.15);
+      setTimeout(() => playBeep(659.25, 'triangle', 0.15), 120);
+      setTimeout(() => playBeep(783.99, 'triangle', 0.25), 240);
+    }
+    function soundFail() {
+      playBeep(300, 'sawtooth', 0.18);
+      setTimeout(() => playBeep(220, 'sawtooth', 0.25), 150);
+    }
+
+    /* ================= 배지 상태 관리 ================= */
+    let earnedBadges = new Set();
+    function earnBadge(name) {
+      if (!earnedBadges.has(name)) {
+        earnedBadges.add(name);
+        document.getElementById('badgeNumber').textContent = earnedBadges.size;
+        soundSuccess();
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.2 }
+        });
+      }
+    }
+    function resetBadges() {
+      earnedBadges.clear();
+      document.getElementById('badgeNumber').textContent = '0';
+      alert('체험 진행 상황과 배지가 초기화되었습니다.');
+      location.reload();
+    }
+
+    /* ================= 탭 전환 ================= */
+    function switchTab(tabKey) {
+      const tabs = ['sim', 'quiz', 'sos'];
+      tabs.forEach(key => {
+        const sec = document.getElementById(`section-${key}`);
+        const btn = document.getElementById(`tab-btn-${key}`);
+        if (key === tabKey) {
+          sec.classList.remove('hidden');
+          btn.className = 'tab-btn py-2.5 px-1 rounded-2xl flex items-center justify-center gap-1.5 transition bg-white text-emerald-700 shadow-sm border border-emerald-200';
+        } else {
+          sec.classList.add('hidden');
+          btn.className = 'tab-btn py-2.5 px-1 rounded-2xl flex items-center justify-center gap-1.5 transition text-slate-600 hover:text-emerald-700';
+        }
+      });
+    }
+
+    /* ================= 1. 모의 톡 시나리오 데이터 ================= */
+    const scenarios = [
+      {
+        title: "👥 5학년 우리 반 단톡방 (4명)",
+        messages: [
+          { sender: "친구 1", text: "이 사진 좀 봐봐 ㅋㅋㅋ 우리 반 누구 화장실 앞 사진인데 대박 웃김", isMe: false, avatar: "👦" },
+          { sender: "친구 2", text: "오~ 웃기네 ㅋㅋㅋ 친구끼리 장난으로 같이 보면 뭐 어때! 캡처해서 올려야지", isMe: false, avatar: "👧" },
+          { sender: "시스템", text: "💡 교과서 95쪽: 친구를 몰래 찍은 사진이 올라왔습니다. 당신은 어떻게 말하겠습니까?", isSystem: true }
+        ],
+        choices: [
+          {
+            text: "“ㅋㅋㅋ 누구야? 더 웃긴 사진 있으면 더 풀어봐!” 같이 구경한다.",
+            correct: false,
+            feedback: "❌ 안 돼요! 불법 촬영물을 함께 보거나 재밌다고 동조하는 것은 상대방에게 큰 상처를 주는 2차 가해이자 법적인 책임을 질 수 있는 행동이에요."
+          },
+          {
+            text: "“친구 동의 없이 몰래 찍은 사진을 올리는 건 명백한 잘못이야. 지금 즉시 지워!”",
+            correct: true,
+            feedback: "⭕ 훌륭해요! 방관하지 않고 단호하게 잘못을 지적하는 용기 있는 방어자의 태도입니다! (배지 획득 🏅)"
+          },
+          {
+            text: "기분 나쁘지만 아무 말도 안 하고 가만히 지켜본다.",
+            correct: false,
+            feedback: "⚠️ 침묵은 피해를 키울 수 있어요. 말리기 어렵다면 즉시 단톡방 내용을 캡처하고 선생님이나 부모님께 도움을 요청해야 합니다."
+          }
+        ]
+      },
+      {
+        title: "🎮 인기 모바일 게임 1:1 귓속말",
+        messages: [
+          { sender: "친절한고수", text: "너 게임 진짜 잘한다! 내가 아끼는 비싼 전설 스킨 아이템 그냥 공짜로 보내줄게 ㅎㅎ", isMe: false, avatar: "👾" },
+          { sender: "친절한고수", text: "대신 나랑 절친 인증하게 너 교복 입은 전신 사진이나 얼굴 사진 한 장만 보내줘~ 비밀로 해줄게!", isMe: false, avatar: "👾" },
+          { sender: "시스템", text: "💡 교과서 96·97쪽: 친절을 베풀며 신뢰를 쌓은 후 사진을 요구하고 있습니다 (온라인 그루밍 위험)", isSystem: true }
+        ],
+        choices: [
+          {
+            text: "“귀한 아이템을 주니까 얼굴 사진 정도는 괜찮겠지?” 사진을 전송한다.",
+            correct: false,
+            feedback: "❌ 매우 위험해요! 온라인에서 친절을 베풀며 개인적인 사진을 요구하는 것은 대표적인 '온라인 그루밍' 수법입니다. 나중에 협박으로 이어질 수 있습니다."
+          },
+          {
+            text: "“낯선 사람에게 제 사진은 절대 보낼 수 없어요. 선물도 사양하겠습니다.” 거절 후 즉시 차단/신고한다.",
+            correct: true,
+            feedback: "⭕ 아주 잘했어요! 온라인에서 신체나 사생활 사진을 요구할 때는 단호하게 거절하고 차단하는 것이 나를 지키는 가장 좋은 방법입니다! (배지 획득 🏅)"
+          }
+        ]
+      },
+      {
+        title: "📸 SNS 그룹 메신저",
+        messages: [
+          { sender: "영호", text: "야 요즘 유행하는 AI 어플 깔았는데, 우리 반 친구 얼굴 다른 야한 사진에 합성해 보니까 똑같음 ㅋㅋㅋ", isMe: false, avatar: "🧒" },
+          { sender: "영호", text: "너도 사진 합성해서 애들한테 장난쳐볼래?", isMe: false, avatar: "🧒" },
+          { sender: "시스템", text: "💡 교과서 96쪽: 타인의 얼굴을 합성하는 행위(딥페이크 허위영상물) 권유", isSystem: true }
+        ],
+        choices: [
+          {
+            text: "“그냥 장난이고 진짜 사진도 아닌데 어때? 나도 한 번 해볼래!”",
+            correct: false,
+            feedback: "❌ 절대 안 돼요! 다른 사람의 얼굴을 성적인 이미지에 합성하는 '딥페이크 성적 영상물' 제작은 단순 장난이 아닌 중대한 디지털 성범죄입니다."
+          },
+          {
+            text: "“다른 사람 얼굴을 함부로 합성하는 건 심각한 범죄야. 당장 지우고 절대 유포하지 마!”",
+            correct: true,
+            feedback: "⭕ 멋져요! 허위 영상물 제작 및 소지도 명백한 성범죄임을 명확하게 인지하고 친구를 올바른 길로 바로잡아 주었습니다. (배지 획득 🏅)"
+          }
+        ]
+      }
+    ];
+
+    let currentScenarioIdx = 0;
+
+    function loadScenario(idx) {
+      currentScenarioIdx = idx;
+      // 버튼 하이라이트
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`scen-btn-${i}`);
+        if (i === idx) {
+          btn.className = "scen-btn flex-1 py-2 px-2 text-xs sm:text-sm font-jua rounded-xl bg-emerald-600 text-white shadow";
+        } else {
+          btn.className = "scen-btn flex-1 py-2 px-2 text-xs sm:text-sm font-jua rounded-xl bg-slate-200 text-slate-700 hover:bg-slate-300";
+        }
+      }
+
+      const data = scenarios[idx];
+      document.getElementById('chatRoomTitle').textContent = data.title;
+      
+      const msgBox = document.getElementById('chatMessages');
+      msgBox.innerHTML = '';
+
+      data.messages.forEach(m => {
+        if (m.isSystem) {
+          const sys = document.createElement('div');
+          sys.className = "text-center my-2 text-xs text-sky-800 bg-sky-200/70 p-2 rounded-xl border border-sky-300";
+          sys.textContent = m.text;
+          msgBox.appendChild(sys);
+        } else {
+          const row = document.createElement('div');
+          row.className = "flex items-start gap-2 max-w-[88%]";
+          row.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-base shadow-xs border border-slate-200">${m.avatar}</div>
+            <div>
+              <div class="text-[11px] text-slate-500 font-bold ml-1">${m.sender}</div>
+              <div class="relative bg-white text-slate-800 p-2.5 rounded-2xl shadow-xs text-xs sm:text-sm bubble-left mt-0.5 border border-slate-200">
+                ${m.text}
+              </div>
+            </div>
+          `;
+          msgBox.appendChild(row);
+        }
+      });
+
+      // 피드백 숨김
+      const fb = document.getElementById('feedbackBox');
+      fb.className = "hidden mt-3 p-3 rounded-2xl border text-xs sm:text-sm";
+      fb.innerHTML = "";
+
+      // 선택지 로드
+      const choiceBox = document.getElementById('choiceContainer');
+      choiceBox.innerHTML = '';
+      data.choices.forEach((c, cIdx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-200 hover:border-emerald-400 text-xs sm:text-sm font-medium transition shadow-xs flex items-center justify-between";
+        btn.innerHTML = `<span>${c.text}</span> <span class="text-slate-400 text-xs font-bold">선택 👉</span>`;
+        btn.onclick = () => selectChoice(idx, cIdx);
+        choiceBox.appendChild(btn);
+      });
+    }
+
+    function selectChoice(scenIdx, choiceIdx) {
+      const choice = scenarios[scenIdx].choices[choiceIdx];
+      const fb = document.getElementById('feedbackBox');
+      fb.classList.remove('hidden');
+
+      if (choice.correct) {
+        soundSuccess();
+        fb.className = "mt-3 p-3.5 rounded-2xl border text-xs sm:text-sm bg-emerald-100 border-emerald-300 text-emerald-900 font-medium";
+        fb.innerHTML = `<div>${choice.feedback}</div>`;
+        earnBadge(`scen_${scenIdx}`);
+      } else {
+        soundFail();
+        fb.className = "mt-3 p-3.5 rounded-2xl border text-xs sm:text-sm bg-rose-100 border-rose-300 text-rose-900 font-medium";
+        fb.innerHTML = `<div>${choice.feedback}</div><div class="mt-2 text-xs font-bold text-rose-700">다시 한 번 올바른 대처를 골라보세요!</div>`;
+      }
+    }
+
+    /* ================= 2. 유형 쏙쏙 카드 & 퀴즈 ================= */
+    const typeCards = [
+      {
+        icon: "📷",
+        title: "불법 촬영",
+        desc: "상대방의 동의 없이 신체나 사생활을 몰래 촬영하는 것",
+        danger: "단 한 번의 촬영도 중대한 성범죄!"
+      },
+      {
+        icon: "💾",
+        title: "소지·저장·시청",
+        desc: "불법 촬영된 사진이나 영상을 보는 것, 다운로드하고 보관하는 것",
+        danger: "보는 것만으로도 처벌 대상!"
+      },
+      {
+        icon: "📤",
+        title: "유포 및 유포 협박",
+        desc: "사진·영상을 인터넷에 올리거나 남에게 전달하기, 퍼뜨리겠다고 협박하기",
+        danger: "한번 유포되면 피해가 걷잡을 수 없이 확산!"
+      },
+      {
+        icon: "🎭",
+        title: "딥페이크 합성물",
+        desc: "다른 사람의 얼굴이나 신체를 성적인 이미지나 영상에 합성하는 행위",
+        danger: "인공지능을 악용한 심각한 인격권 침해 범죄!"
+      },
+      {
+        icon: "🤝",
+        title: "온라인 그루밍",
+        desc: "친절하게 다가와 신뢰를 쌓은 뒤 사생활 사진을 요구하거나 착취하는 행위",
+        danger: "선물이나 칭찬 뒤에 숨은 위험!"
+      },
+      {
+        icon: "💬",
+        title: "온라인 성적 괴롭힘",
+        desc: "채팅이나 SNS에서 외모 평가, 성적인 문자나 불쾌한 사진을 보내는 것",
+        danger: "상대방에게 깊은 수치심과 공포를 줌!"
+      }
+    ];
+
+    function renderTypeCards() {
+      const container = document.getElementById('typeCardsContainer');
+      container.innerHTML = '';
+      typeCards.forEach(c => {
+        const card = document.createElement('div');
+        card.className = "p-3 bg-emerald-50/70 hover:bg-emerald-100 border border-emerald-200 rounded-2xl transition cursor-pointer flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="text-2xl mb-1">${c.icon}</div>
+            <h4 class="font-jua text-sm text-emerald-900 mb-1">${c.title}</h4>
+            <p class="text-[11px] text-slate-600 leading-tight">${c.desc}</p>
+          </div>
+          <div class="mt-2 text-[10px] font-bold text-emerald-700 bg-white/80 p-1 rounded-lg">
+            ⚠️ ${c.danger}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 퀴즈 문제 목록 (교과서 97, 98쪽 연계)
+    const quizList = [
+      {
+        q: "[교과서 98쪽 스스로 다지기]\n디지털 성폭력은 카메라나 스마트폰 같은 디지털 기기로 상대방의 [ 이것 ] 없이 몸이나 성적인 모습을 몰래 찍는 것을 말합니다.",
+        options: ["허락과 동의", "질투", "칭찬", "선물"],
+        ans: 0,
+        hint: "힌트 초성: ㄷㅇ (동의를 구하지 않은 행위는 모두 범죄입니다)"
+      },
+      {
+        q: "친구가 단톡방에서 다른 사람의 신체 사진을 보내며 '너만 봐'라고 했습니다. 올바른 행동은?",
+        options: [
+          "재미있으니 다른 친구들에게도 전송해준다.",
+          "나 혼자만 보는 거니까 휴대전화에 고이 저장해둔다.",
+          "절대 저장하거나 공유하지 않고, 친구에게 즉시 삭제하라고 단호히 말한다.",
+          "단톡방을 바로 탈퇴하고 아무 일도 없던 척한다."
+        ],
+        ans: 2,
+        hint: "교과서 97쪽: '혼자만 봤다고? 그래도 범죄야!'"
+      },
+      {
+        q: "만약 인터넷이나 SNS에서 원치 않는 사진 요구를 받거나 피해를 입었을 때의 올바른 대처는?",
+        options: [
+          "창피하니까 아무에게도 말하지 않고 대화방을 나가버린다.",
+          "화면을 캡처하여 증거를 확보한 후 보호자, 선생님, 전문 상담 기관에 도움을 요청한다.",
+          "상대방이 시키는 대로 더 이상 유포하지 말아 달라고 빌면서 원하는 사진을 더 보낸다.",
+          "비밀번호를 바꾸고 스마트폰을 버린다."
+        ],
+        ans: 1,
+        hint: "교과서 98쪽: 화면 캡처(증거 보존) ➔ 어른 및 전문기관(1388, 112) 도움 요청!"
+      }
+    ];
+
+    let currentQuizIdx = 0;
+    function renderQuiz() {
+      const q = quizList[currentQuizIdx];
+      document.getElementById('quizScoreText').textContent = `퀴즈 진행: ${currentQuizIdx + 1} / ${quizList.length}`;
+      document.getElementById('quizQuestionPrompt').innerText = q.q;
+      
+      const optBox = document.getElementById('quizOptionContainer');
+      optBox.innerHTML = '';
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 rounded-xl border border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 text-xs sm:text-sm font-medium transition flex items-center gap-2";
+        btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">${idx + 1}</span> <span>${opt}</span>`;
+        btn.onclick = () => checkQuizAnswer(idx);
+        optBox.appendChild(btn);
+      });
+
+      document.getElementById('quizResultMsg').classList.add('hidden');
+      document.getElementById('nextQuizBtn').classList.add('hidden');
+    }
+
+    function checkQuizAnswer(selectedIdx) {
+      const q = quizList[currentQuizIdx];
+      const resMsg = document.getElementById('quizResultMsg');
+      resMsg.classList.remove('hidden');
+
+      if (selectedIdx === q.ans) {
+        soundSuccess();
+        earnBadge(`quiz_${currentQuizIdx}`); // 퀴즈 문항별로 개별 뱃지 즉시 지급
+        resMsg.className = "text-xs sm:text-sm p-3 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+        resMsg.innerHTML = `🎉 정답입니다! 아주 정확하게 이해하고 있어요! (안심 뱃지 획득 🏅)`;
+        if (currentQuizIdx === quizList.length - 1) {
+          document.getElementById('nextQuizBtn').innerText = "🏆 모든 퀴즈 완료!";
+          document.getElementById('nextQuizBtn').disabled = true;
+          document.getElementById('nextQuizBtn').classList.remove('hidden');
+        } else {
+          document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+      } else {
+        soundFail();
+        resMsg.className = "text-xs sm:text-sm p-3 rounded-xl bg-rose-100 text-rose-800 font-medium border border-rose-300";
+        resMsg.innerHTML = `❌ 아쉬워요! 다시 생각해볼까요?<br><span class="text-xs text-rose-600 font-normal mt-1 block">${q.hint}</span>`;
+      }
+    }
+
+    function nextQuizQuestion() {
+      if (currentQuizIdx < quizList.length - 1) {
+        currentQuizIdx++;
+        renderQuiz();
+      }
+    }
+
+    /* ================= 3. SOS 가상 캡처 & 약속 보드 ================= */
+    let isCaptured = false;
+    let hasRegisteredPromise = false;
+
+    function triggerCaptureSimulation() {
+      if (isCaptured) return;
+      isCaptured = true;
+      soundSuccess();
+      
+      const badge = document.getElementById('captureSuccessBadge');
+      badge.classList.remove('hidden');
+      
+      const btn = document.getElementById('captureBtn');
+      btn.innerHTML = "<span>✔️</span> <span>증거 수집 완료 (보관함에 저장됨)</span>";
+      btn.className = "w-full py-2.5 bg-emerald-600 text-white font-jua rounded-xl shadow cursor-default flex items-center justify-center gap-2";
+
+      earnBadge("sos_capture");
+    }
+
+    function addPromise() {
+      // 이미 등록한 경우 다시 늘어나지 않도록 모달만 호출
+      if (hasRegisteredPromise) {
+        openFinishModal();
+        return;
+      }
+
+      const input = document.getElementById('promiseInput');
+      const text = input.value.trim();
+      if (!text) {
+        input.focus();
+        return;
+      }
+
+      hasRegisteredPromise = true;
+
+      const board = document.getElementById('promiseBoard');
+      const newCard = document.createElement('div');
+      newCard.className = "p-2.5 bg-emerald-100 rounded-xl border border-emerald-300 shadow-xs text-xs flex items-start gap-2";
+      newCard.innerHTML = `
+        <span>🌟</span>
+        <div class="flex-1">
+          <span class="font-bold text-emerald-900 block">[나의 안심 다짐]</span>
+          <span class="text-slate-800 font-medium">${escapeHtml(text)}</span>
+        </div>
+      `;
+      board.prepend(newCard);
+
+      // 입력창 비활성화 및 마감 처리 (숫자가 계속 늘지 않도록 방지)
+      input.disabled = true;
+      input.placeholder = "약속 등록이 완료되었습니다.";
+      
+      const addBtn = document.getElementById('addPromiseBtn');
+      if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.className = "px-4 py-2 bg-slate-300 text-slate-500 font-jua rounded-xl text-xs sm:text-sm whitespace-nowrap cursor-not-allowed";
+        addBtn.textContent = "등록 완료 ✔️";
+      }
+
+      // 마무리 안내 영역 표시
+      const notice = document.getElementById('promiseDoneNotice');
+      if (notice) {
+        notice.classList.remove('hidden');
+      }
+
+      // 남겨진 약속 개수를 4개로 1회만 반영 후 고정
+      const countElem = document.getElementById('promiseCount');
+      if (countElem) {
+        countElem.textContent = '4';
+      }
+
+      soundSuccess();
+      earnBadge('sos_promise');
+
+      // 마무리 축하 모달 자동 오픈
+      setTimeout(() => {
+        openFinishModal();
+      }, 500);
+    }
+
+    function openFinishModal() {
+      const modal = document.getElementById('finishModal');
+      if (modal) {
+        const scoreElem = document.getElementById('modalBadgeScore');
+        if (scoreElem) {
+          scoreElem.textContent = `${earnedBadges.size} / 8개`;
+        }
+        modal.classList.remove('hidden');
+      }
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.4 }
+      });
+    }
+
+    function closeFinishModal() {
+      const modal = document.getElementById('finishModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // 초기 실행
+    window.addEventListener('DOMContentLoaded', () => {
+      loadScenario(0);
+      renderTypeCards();
+      renderQuiz();
+    });
+  </script>
+</body>
+</html>
