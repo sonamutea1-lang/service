@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>2026 학교 감염병 대응 모의훈련 및 퀴즈</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#16a34a',
+              600: '#15803d'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-100">
+
+  <!-- Main App Header -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-xs">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+          <i class="fa-solid fa-shield-virus"></i>
+        </span>
+        <div>
+          <h1 class="text-sm font-bold text-slate-900 leading-tight">2026 감염병 대응 모의훈련</h1>
+          <p class="text-[11px] text-slate-500 font-medium">인플루엔자(독감) 대응 및 평가</p>
+        </div>
+      </div>
+      
+      <!-- Top Mode Switcher (훈련 / 퀴즈) -->
+      <div class="flex bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-semibold">
+        <button id="view-mode-training" onclick="setMainView('training')" class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 shadow-xs transition">
+          훈련수칙
+        </button>
+        <button id="view-mode-quiz" onclick="setMainView('quiz')" class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition">
+          이해도퀴즈
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== VIEW 1: TRAINING STEP VIEW ==================== -->
+  <div id="training-view" class="flex-grow flex flex-col">
+    <!-- Step Tab Navigation -->
+    <div class="sticky top-[57px] z-20 bg-slate-50/95 backdrop-blur-md pt-3 pb-2 px-4 border-b border-slate-200/60">
+      <div class="max-w-md mx-auto grid grid-cols-3 gap-2">
+        <button onclick="switchStep(1)" id="tab-btn-1" class="py-2.5 px-1 rounded-xl text-xs font-bold transition text-center shadow-xs bg-emerald-600 text-white">
+          <span class="block text-[10px] font-normal opacity-85">10.19(발생)</span>
+          1단계
+        </button>
+        <button onclick="switchStep(2)" id="tab-btn-2" class="py-2.5 px-1 rounded-xl text-xs font-bold transition text-center bg-white text-slate-500 border border-slate-200">
+          <span class="block text-[10px] font-normal text-slate-400">10.20(확진)</span>
+          2단계
+        </button>
+        <button onclick="switchStep(3)" id="tab-btn-3" class="py-2.5 px-1 rounded-xl text-xs font-bold transition text-center bg-white text-slate-500 border border-slate-200">
+          <span class="block text-[10px] font-normal text-slate-400">10.21~(유행)</span>
+          3단계
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-md mx-auto w-full px-4 pt-3 pb-24 space-y-4">
+      <div id="step-container" class="space-y-4"></div>
+    </main>
+
+    <!-- Bottom Action Bar for Training -->
+    <footer class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3">
+      <div class="max-w-md mx-auto flex items-center justify-between space-x-2">
+        <button onclick="prevStep()" id="prev-btn" class="w-1/3 py-3 rounded-xl border border-slate-300 font-semibold text-slate-600 text-xs hover:bg-slate-50 active:scale-95 transition disabled:opacity-30 disabled:pointer-events-none">
+          <i class="fa-solid fa-chevron-left mr-1"></i>이전
+        </button>
+        <button onclick="nextStep()" id="next-btn" class="w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center space-x-1.5">
+          <span>다음 단계 이동</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== VIEW 2: QUIZ VIEW ==================== -->
+  <div id="quiz-view" class="hidden flex-grow flex flex-col">
+    <main class="flex-grow max-w-md mx-auto w-full px-4 pt-4 pb-24 space-y-4">
+      <!-- Quiz Progress Bar -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-bold text-slate-700">
+            <i class="fa-solid fa-circle-question text-emerald-600 mr-1.5"></i>감염병 대응 이해도 평가
+          </span>
+          <span id="quiz-progress-text" class="font-semibold text-emerald-600">문제 1 / 4</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div id="quiz-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all duration-300" style="width: 25%;"></div>
+        </div>
+      </div>
+
+      <!-- Quiz Card Container -->
+      <div id="quiz-card-container"></div>
+    </main>
+  </div>
+
+  <!-- Training Completion Modal -->
+  <div id="cert-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center space-y-4 animate-in fade-in zoom-in duration-200">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">모의훈련 수칙 확인 완료!</h3>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+          1단계 발생부터 3단계 유행 관리까지 수칙을 확인하셨습니다. 이제 <strong>이해도 퀴즈</strong>를 풀어보시겠습니까?
+        </p>
+      </div>
+      <div class="space-y-2 pt-1">
+        <button onclick="goToQuizFromModal()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center space-x-1.5">
+          <span>이해도 퀴즈 시작하기</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button onclick="closeModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium text-xs hover:bg-slate-50 transition">
+          수칙 다시 검토하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Result Modal -->
+  <div id="quiz-result-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center space-y-4 animate-in fade-in zoom-in duration-200">
+      <div id="quiz-result-icon" class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+        <i class="fa-solid fa-award"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">퀴즈 결과 안내</h3>
+        <div class="mt-2 text-2xl font-black text-slate-800" id="quiz-final-score">0 / 4</div>
+        <p class="text-xs text-slate-500 mt-1" id="quiz-result-msg">인플루엔자 대응 수칙을 훌륭히 이수하셨습니다.</p>
+      </div>
+      <div class="space-y-2 pt-2">
+        <button onclick="restartQuiz()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+          퀴즈 다시 풀기
+        </button>
+        <button onclick="setMainView('training'); closeQuizResultModal();" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50 transition">
+          훈련 수칙 화면으로 이동
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global Navigation State
+    let currentMainView = 'training';
+    let currentStep = 1;
+    const checkedMap = JSON.parse(sessionStorage.getItem('flu_check_list') || '{}');
+
+    // -------------------------------------------------------------
+    // Training Content Data
+    // -------------------------------------------------------------
+    const stepData = {
+      1: {
+        title: "1단계 : 유증상자 발견 및 초기 대응",
+        date: "10월 19일 (월)",
+        badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+        scenario: "10월 19일, 1학년 6반 <strong>이마루</strong> 학생이 <strong>고열(38.2℃)과 심한 기침</strong>을 호소함",
+        roles: [
+          {
+            key: "homeroom_1",
+            title: "담임교사",
+            icon: "fa-chalkboard-user",
+            color: "text-blue-600",
+            tasks: [
+              "교실 환기 및 주변 학생 손 씻기·기침예절 지도",
+              "마스크 착용 후 이마루 학생과 동행하여 보건실 인계",
+              "보호자 연락 및 병원 진료 안내"
+            ]
+          },
+          {
+            key: "nurse_1",
+            title: "보건교사",
+            icon: "fa-user-nurse",
+            color: "text-emerald-600",
+            tasks: [
+              "마스크 착용, 발열 확인 및 증상 관찰",
+              "진료 전 상태 확인 및 일시적 관찰실 안내",
+              "보호자 내교 전까지 상태 모니터링"
+            ]
+          }
+        ],
+        qa: [
+          {
+            q: "인플루엔자(독감) 주요 의심 증상 및 발열 기준은 무엇인가요?",
+            a: "37.8℃ 이상의 발열과 함께 두통, 근육통, 피로감 등의 전신 증상과 기침, 인후통 등의 호흡기 증상을 보입니다. (소아·청소년의 경우 복통, 구토 등 소화기 증상이 동반되기도 합니다.)"
+          }
+        ]
+      },
+      2: {
+        title: "2단계 : 확진 및 능동감시",
+        date: "10월 20일 (화)",
+        badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+        scenario: "10월 20일, <strong>이마루</strong> 학생이 <strong>인플루엔자 확진 판정</strong>을 받고 등교중지됨",
+        roles: [
+          {
+            key: "homeroom_2",
+            title: "담임교사",
+            icon: "fa-chalkboard-user",
+            color: "text-blue-600",
+            tasks: [
+              "등교중지 및 출결 관련 안내 (진료확인서 등)",
+              "동일 층 학급 학생 대상 매일 결석·유증상 능동감시",
+              "보건교사가 제공한 인플루엔자 예방 가정통신문 안내"
+            ]
+          },
+          {
+            key: "nurse_2",
+            title: "보건교사",
+            icon: "fa-user-nurse",
+            color: "text-emerald-600",
+            tasks: [
+              "확진 보고 (학교장 보고 및 NEIS 보고)",
+              "교내 고위험군(만성질환, 면역저하 등) 학생 현황 점검",
+              "인플루엔자 예방수칙 가정통신문 배부"
+            ]
+          },
+          {
+            key: "manager_2",
+            title: "관리자 (교장·교감)",
+            icon: "fa-user-tie",
+            color: "text-purple-600",
+            tasks: [
+              "감염병 발생 보고 접수 및 대응조직 가동"
+            ]
+          }
+        ],
+        qa: [
+          {
+            q: "인플루엔자 학생의 등교중지 권장 기간은 어떻게 되나요?",
+            a: "해열제 없이 정상 체온 회복 후 24시간이 경과할 때까지 (단, 해열제를 투약한 경우, 마지막 해열제 투약 시점부터 48시간이 경과해야 함)"
+          }
+        ]
+      },
+      3: {
+        title: "3단계 : 교내 유행 확산",
+        date: "10월 21일 이후",
+        badgeColor: "bg-rose-100 text-rose-800 border-rose-200",
+        scenario: "능동감시 결과, <strong>20여 명의 유증상·확진 학생이 연쇄 발생</strong>함",
+        roles: [
+          {
+            key: "homeroom_3",
+            title: "담임교사",
+            icon: "fa-chalkboard-user",
+            color: "text-blue-600",
+            tasks: [
+              "결석/의심 학생 파악 및 나이스(NEIS) 감염병 환자 등록",
+              "추가 유증상 학생 의료기관 진료 안내"
+            ]
+          },
+          {
+            key: "nurse_3",
+            title: "보건교사",
+            icon: "fa-user-nurse",
+            color: "text-emerald-600",
+            tasks: [
+              "유행의심 상황 학교장 및 교육지원청 보고",
+              "일일 환자 발생 현황 모니터링 및 분석"
+            ]
+          },
+          {
+            key: "admin_office_3",
+            title: "행정실",
+            icon: "fa-spray-can-sparkles",
+            color: "text-amber-600",
+            tasks: [
+              "교내 환경 소독"
+            ]
+          },
+          {
+            key: "manager_3",
+            title: "관리자 (교장·교감)",
+            icon: "fa-user-tie",
+            color: "text-purple-600",
+            tasks: [
+              "학교 감염병 비상대책조직 활성화",
+              "관할 보건소 및 교육지원청과 학사운영 관련 협의"
+            ]
+          }
+        ],
+        qa: [
+          {
+            q: "학생이 20명 발생했을 때 학교 자체적으로 휴업을 결정하나요?",
+            a: "학교 자체적인 판단보다는 관할 보건소의 역학조사 결과 및 교육청 협의를 거쳐 신중하게 결정합니다."
+          }
+        ]
+      }
+    };
+
+    // -------------------------------------------------------------
+    // Quiz Questions Data (Based purely on previous content)
+    // -------------------------------------------------------------
+    const quizQuestions = [
+      {
+        id: 1,
+        stepBadge: "1단계",
+        question: "10월 19일 1학년 6반 이마루 학생이 고열과 기침 증상을 보일 때, 담임교사의 초기 조치로 가장 적절한 것은?",
+        options: [
+          "보건실에 혼자 신속히 이동하여 검사받도록 지도한다.",
+          "마스크 착용 후 이마루 학생과 동행하여 보건실로 인계한다.",
+          "즉시 전교생 대상 원격 수업 전환을 공지한다.",
+          "직접 해열제를 투약한 후 계속 교실에서 수업에 참여하도록 한다."
+        ],
+        correct: 1,
+        explanation: "유증상 학생의 단독 이동은 지양하며, 교실 환기 및 마스크 착용 후 담임교사가 동행하여 안전하게 보건실로 인계해야 합니다."
+      },
+      {
+        id: 2,
+        stepBadge: "1단계",
+        question: "1단계 핵심 수칙에서 제시하는 인플루엔자(독감)의 주요 발열 기준 온도는 몇 ℃ 이상인가요?",
+        options: [
+          "36.8℃",
+          "37.2℃",
+          "37.5℃",
+          "37.8℃"
+        ],
+        correct: 3,
+        explanation: "인플루엔자(독감)의 주요 의심 발열 기준은 37.8℃ 이상이며, 두통, 근육통 및 기침·인후통 등의 호흡기 증상을 동반합니다."
+      },
+      {
+        id: 3,
+        stepBadge: "2단계",
+        question: "인플루엔자 확진 학생이 해열제를 복용한 경우, 권장되는 등교중지 기간 기준은 언제까지인가요?",
+        options: [
+          "해열제 복용 직후 24시간이 경과할 때까지",
+          "체온 측정 없이 확진 판정일로부터 24시간",
+          "마지막 해열제 투약 시점부터 48시간 경과 시까지",
+          "증상 유무와 무관하게 무조건 7일간 등교중지"
+        ],
+        correct: 2,
+        explanation: "해열제 없이 정상 체온 회복 시 24시간 경과 후 등교 가능하나, 해열제를 투약한 경우에는 마지막 해열제 투약 시점부터 48시간이 경과해야 합니다."
+      },
+      {
+        id: 4,
+        stepBadge: "3단계",
+        question: "3단계 상황에서 다수 환자가 발생했을 때, 학교 자체적인 휴업 검토 및 결정 절차로 가장 적절한 것은?",
+        options: [
+          "담임교사의 재량으로 학급별 즉각 자율 휴업 결정",
+          "학교 자체 판단보다는 관할 보건소의 역학조사 결과 및 교육청 협의를 거쳐 신중하게 결정",
+          "학부모 5명 이상의 요청이 있으면 즉시 학교장 단독 휴업 선언",
+          "확진자 10명 이상 발생 시 무조건 전면 휴업 실시"
+        ],
+        correct: 1,
+        explanation: "휴업은 사회적 영향이 크므로 학교의 임의 판단보다는 관할 보건소의 역학조사 결과 및 교육지원청 협의를 거쳐 신중하게 결정합니다."
+      }
+    ];
+
+    // Quiz Execution State
+    let currentQuizIndex = 0;
+    let selectedQuizAnswers = {}; // { questionIndex: chosenOptionIndex }
+    let quizSubmitted = false;
+
+    // -------------------------------------------------------------
+    // Main View Navigation Controller
+    // -------------------------------------------------------------
+    function setMainView(mode) {
+      currentMainView = mode;
+      const tView = document.getElementById('training-view');
+      const qView = document.getElementById('quiz-view');
+      const btnTraining = document.getElementById('view-mode-training');
+      const btnQuiz = document.getElementById('view-mode-quiz');
+
+      if (mode === 'training') {
+        tView.classList.remove('hidden');
+        qView.classList.add('hidden');
+        btnTraining.className = "px-2.5 py-1 rounded-lg bg-white text-emerald-700 shadow-xs transition";
+        btnQuiz.className = "px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition";
+        renderTraining();
+      } else {
+        tView.classList.add('hidden');
+        qView.classList.remove('hidden');
+        btnQuiz.className = "px-2.5 py-1 rounded-lg bg-white text-emerald-700 shadow-xs transition";
+        btnTraining.className = "px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition";
+        renderQuiz();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------------
+    // Training Renderer
+    // -------------------------------------------------------------
+    function renderTraining() {
+      const data = stepData[currentStep];
+
+      // Update Top Step Tabs
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`tab-btn-${i}`);
+        if (i === currentStep) {
+          btn.className = "py-2.5 px-1 rounded-xl text-xs font-bold transition text-center shadow-xs bg-emerald-600 text-white";
+        } else if (i < currentStep) {
+          btn.className = "py-2.5 px-1 rounded-xl text-xs font-bold transition text-center bg-emerald-50 text-emerald-700 border border-emerald-200";
+        } else {
+          btn.className = "py-2.5 px-1 rounded-xl text-xs font-bold transition text-center bg-white text-slate-500 border border-slate-200";
+        }
+      }
+
+      // Build HTML
+      let html = `
+        <!-- Scenario Summary Card -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-slate-900">${data.title}</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border ${data.badgeColor}">${data.date}</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+            ${data.scenario}
+          </p>
+        </div>
+
+        <!-- Role Checklist Section -->
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="text-xs font-bold text-slate-700">
+              <i class="fa-solid fa-clipboard-check text-emerald-600 mr-1"></i>직군별 역할 체크리스트
+            </span>
+            <span class="text-[10px] text-slate-400">터치하여 확인 체크</span>
+          </div>
+          <div class="space-y-2.5">
+      `;
+
+      data.roles.forEach((r) => {
+        html += `
+          <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs">
+            <div class="flex items-center space-x-2 mb-2 font-bold text-xs ${r.color}">
+              <i class="fa-solid ${r.icon}"></i>
+              <span>${r.title}</span>
+            </div>
+            <div class="space-y-2">
+              ${r.tasks.map((task, tIdx) => {
+                const checkId = `${r.key}_${tIdx}`;
+                const isChecked = checkedMap[checkId] ? 'checked' : '';
+                return `
+                  <label class="flex items-start space-x-2 text-xs text-slate-700 cursor-pointer active:opacity-75">
+                    <input type="checkbox" id="${checkId}" onchange="toggleTask('${checkId}')" ${isChecked}
+                           class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 h-4 w-4 border-slate-300">
+                    <span class="leading-relaxed ${isChecked ? 'line-through text-slate-400' : ''}">${task}</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+
+        <!-- Essential Q&A Section -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+          <div class="text-xs font-bold text-slate-800 mb-2 flex items-center space-x-1.5">
+            <i class="fa-regular fa-lightbulb text-amber-500 text-sm"></i>
+            <span>${currentStep}단계 핵심 수칙 Q&A</span>
+          </div>
+          <div class="space-y-2">
+            ${data.qa.map((qaItem) => `
+              <div class="bg-amber-50/60 rounded-xl p-3 border border-amber-100 text-xs space-y-1">
+                <div class="font-bold text-amber-900 flex items-start space-x-1">
+                  <span class="text-amber-600 font-extrabold">Q.</span>
+                  <span>${qaItem.q}</span>
+                </div>
+                <div class="text-slate-600 pl-4 leading-relaxed text-[11.5px]">
+                  ${qaItem.a}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('step-container').innerHTML = html;
+
+      // Bottom Button Control
+      document.getElementById('prev-btn').disabled = (currentStep === 1);
+      const nextBtn = document.getElementById('next-btn');
+      if (currentStep === 3) {
+        nextBtn.innerHTML = `<span>모의훈련 완료 (퀴즈 풀기)</span> <i class="fa-solid fa-check ml-1"></i>`;
+        nextBtn.className = "w-2/3 py-3 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center space-x-1.5";
+      } else {
+        nextBtn.innerHTML = `<span>다음 단계 이동</span> <i class="fa-solid fa-chevron-right ml-1"></i>`;
+        nextBtn.className = "w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center space-x-1.5";
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleTask(checkId) {
+      const checkbox = document.getElementById(checkId);
+      if (checkbox.checked) {
+        checkedMap[checkId] = true;
+      } else {
+        delete checkedMap[checkId];
+      }
+      sessionStorage.setItem('flu_check_list', JSON.stringify(checkedMap));
+      renderTraining();
+    }
+
+    function switchStep(step) {
+      currentStep = step;
+      renderTraining();
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        renderTraining();
+      }
+    }
+
+    function nextStep() {
+      if (currentStep < 3) {
+        currentStep++;
+        renderTraining();
+      } else {
+        document.getElementById('cert-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('cert-modal').classList.add('hidden');
+    }
+
+    function goToQuizFromModal() {
+      closeModal();
+      setMainView('quiz');
+    }
+
+    // -------------------------------------------------------------
+    // Quiz Renderer & Logic
+    // -------------------------------------------------------------
+    function renderQuiz() {
+      const total = quizQuestions.length;
+      const q = quizQuestions[currentQuizIndex];
+      const selected = selectedQuizAnswers[currentQuizIndex];
+      const hasAnswered = selected !== undefined;
+
+      // Update progress
+      document.getElementById('quiz-progress-text').textContent = `문제 ${currentQuizIndex + 1} / ${total}`;
+      const pct = ((currentQuizIndex + 1) / total) * 100;
+      document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+
+      let html = `
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <!-- Question Header -->
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              ${q.stepBadge} 연계
+            </span>
+            <span class="text-xs font-semibold text-slate-400">문항 ${q.id}</span>
+          </div>
+
+          <!-- Question Text -->
+          <h3 class="text-sm font-bold text-slate-900 leading-snug">
+            ${q.question}
+          </h3>
+
+          <!-- Options List -->
+          <div class="space-y-2 pt-1">
+      `;
+
+      q.options.forEach((opt, idx) => {
+        let btnStyle = "w-full text-left p-3.5 rounded-2xl border text-xs font-medium transition flex items-start space-x-2.5 ";
+        let badgeStyle = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ";
+
+        if (!hasAnswered) {
+          btnStyle += "bg-white border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30 text-slate-700 active:scale-[0.99]";
+          badgeStyle += "bg-slate-100 text-slate-500 border border-slate-200";
+        } else {
+          // If answered, reveal immediate feedback
+          if (idx === q.correct) {
+            btnStyle += "bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold ring-1 ring-emerald-500";
+            badgeStyle += "bg-emerald-600 text-white";
+          } else if (idx === selected) {
+            btnStyle += "bg-rose-50 border-rose-300 text-rose-900 font-medium";
+            badgeStyle += "bg-rose-500 text-white";
+          } else {
+            btnStyle += "bg-white border-slate-200 opacity-45 text-slate-500";
+            badgeStyle += "bg-slate-100 text-slate-400";
+          }
+        }
+
+        html += `
+          <button onclick="handleOptionSelect(${idx})" ${hasAnswered ? 'disabled' : ''} class="${btnStyle}">
+            <span class="${badgeStyle}">${idx + 1}</span>
+            <span class="leading-relaxed flex-grow">${opt}</span>
+            ${hasAnswered && idx === q.correct ? '<i class="fa-solid fa-circle-check text-emerald-600 ml-1 mt-0.5 text-sm"></i>' : ''}
+            ${hasAnswered && idx === selected && idx !== q.correct ? '<i class="fa-solid fa-circle-xmark text-rose-500 ml-1 mt-0.5 text-sm"></i>' : ''}
+          </button>
+        `;
+      });
+
+      html += `</div>`;
+
+      // Feedback & Explanation Box
+      if (hasAnswered) {
+        const isRight = selected === q.correct;
+        html += `
+          <div class="mt-4 p-3.5 rounded-2xl text-xs space-y-1.5 ${isRight ? 'bg-emerald-50/80 border border-emerald-200' : 'bg-rose-50/80 border border-rose-200'}">
+            <div class="font-bold flex items-center space-x-1.5 ${isRight ? 'text-emerald-800' : 'text-rose-800'}">
+              <i class="fa-solid ${isRight ? 'fa-check-circle' : 'fa-triangle-exclamation'}"></i>
+              <span>${isRight ? '정답입니다!' : '오답입니다. 해설을 확인해 보세요.'}</span>
+            </div>
+            <p class="text-slate-600 pl-4 leading-relaxed text-[11.5px]">
+              ${q.explanation}
+            </p>
+          </div>
+        `;
+      }
+
+      // Quiz Navigation Buttons
+      html += `
+        <div class="flex items-center justify-between pt-2 space-x-2">
+          <button onclick="prevQuiz()" ${currentQuizIndex === 0 ? 'disabled' : ''} class="w-1/3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition">
+            <i class="fa-solid fa-chevron-left mr-1"></i>이전 문항
+          </button>
+      `;
+
+      if (currentQuizIndex === total - 1) {
+        html += `
+          <button onclick="finishQuiz()" ${!hasAnswered ? 'disabled' : ''} class="w-2/3 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-md disabled:opacity-40 disabled:pointer-events-none transition flex items-center justify-center space-x-1.5">
+            <span>최종 결과 확인하기</span>
+            <i class="fa-solid fa-flag-checkered"></i>
+          </button>
+        `;
+      } else {
+        html += `
+          <button onclick="nextQuiz()" ${!hasAnswered ? 'disabled' : ''} class="w-2/3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md disabled:opacity-40 disabled:pointer-events-none transition flex items-center justify-center space-x-1.5">
+            <span>다음 문항</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        `;
+      }
+
+      html += `</div></div>`;
+
+      document.getElementById('quiz-card-container').innerHTML = html;
+    }
+
+    function handleOptionSelect(optionIndex) {
+      if (selectedQuizAnswers[currentQuizIndex] !== undefined) return;
+      selectedQuizAnswers[currentQuizIndex] = optionIndex;
+      renderQuiz();
+    }
+
+    function prevQuiz() {
+      if (currentQuizIndex > 0) {
+        currentQuizIndex--;
+        renderQuiz();
+      }
+    }
+
+    function nextQuiz() {
+      if (currentQuizIndex < quizQuestions.length - 1) {
+        currentQuizIndex++;
+        renderQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      let score = 0;
+      quizQuestions.forEach((q, idx) => {
+        if (selectedQuizAnswers[idx] === q.correct) {
+          score++;
+        }
+      });
+
+      document.getElementById('quiz-final-score').textContent = `${score} / ${quizQuestions.length}`;
+      const msg = document.getElementById('quiz-result-msg');
+      const icon = document.getElementById('quiz-result-icon');
+
+      if (score === quizQuestions.length) {
+        msg.textContent = "완벽합니다! 2026 인플루엔자 대응 수칙을 완벽히 마스터하셨습니다.";
+        icon.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner";
+        icon.innerHTML = `<i class="fa-solid fa-crown text-amber-500"></i>`;
+      } else if (score >= 3) {
+        msg.textContent = "우수한 성적입니다! 학교 현장에서 침착하게 대응하실 수 있습니다.";
+        icon.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner";
+        icon.innerHTML = `<i class="fa-solid fa-award"></i>`;
+      } else {
+        msg.textContent = "수칙을 다시 한번 확인하고 재도전해 보세요!";
+        icon.className = "w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner";
+        icon.innerHTML = `<i class="fa-solid fa-rotate-right"></i>`;
+      }
+
+      document.getElementById('quiz-result-modal').classList.remove('hidden');
+    }
+
+    function closeQuizResultModal() {
+      document.getElementById('quiz-result-modal').classList.add('hidden');
+    }
+
+    function restartQuiz() {
+      selectedQuizAnswers = {};
+      currentQuizIndex = 0;
+      closeQuizResultModal();
+      renderQuiz();
+    }
+
+    // App Initialization
+    window.onload = function() {
+      renderTraining();
+    };
+  </script>
+</body>
+</html>
